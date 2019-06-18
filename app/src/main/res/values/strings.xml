@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">TDM-Client</string>
+    <string name="mapbox_access_token">
+        pk.eyJ1IjoiZnJhbmNlc2NvenoiLCJhIjoiY2pzYndrOTg5MGVrdzN5cGR2ZjdkY3ZnMiJ9.MCiDPh-MIjlWxN1IdzrYSg
+    </string>
+</resources>
