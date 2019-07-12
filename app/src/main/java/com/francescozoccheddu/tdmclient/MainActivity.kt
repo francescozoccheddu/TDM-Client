@@ -2,108 +2,156 @@ package com.francescozoccheddu.tdmclient
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
-import com.francescozoccheddu.tdmclient.data.HttpClient
+import com.francescozoccheddu.tdmclient.data.client.Interpreter
+import com.francescozoccheddu.tdmclient.data.client.Server
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity
+import com.mapbox.mapboxsdk.style.expressions.Expression.interpolate
+import com.mapbox.mapboxsdk.style.expressions.Expression.linear
+import com.mapbox.mapboxsdk.style.expressions.Expression.literal
+import com.mapbox.mapboxsdk.style.expressions.Expression.rgba
+import com.mapbox.mapboxsdk.style.expressions.Expression.stop
+import com.mapbox.mapboxsdk.style.expressions.Expression.zoom
+import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius
 import org.json.JSONObject
 
 
-class MainActivity : AppCompatActivity()
-{
+class MainActivity : AppCompatActivity() {
 
-    companion object
-    {
+    companion object {
 
-        val cagliariBounds = LatLngBounds.Builder()
+        val MAP_BOUNDS = LatLngBounds.Builder()
             .include(LatLng(39.267498, 9.181226))
             .include(LatLng(39.176358, 9.054797))
             .build()
 
-        const val mapStyleUrl = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
+        const val MAP_STYLE_URL = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
+        const val COVERAGE_SOURCE_ID = "coverage"
+        const val COVERAGE_LAYER_ID = "coverage"
     }
 
     private lateinit var mapView: MapView
+    private lateinit var map: MapboxMap
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    private lateinit var server: Server
+    private lateinit var coverageService: Server.Service<JSONObject?, JSONObject>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync { mapboxMap ->
-            mapboxMap.setStyle(Style.Builder().fromUrl(mapStyleUrl))
-            {
-                mapboxMap.setLatLngBoundsForCameraTarget(cagliariBounds)
-                mapboxMap.setMinZoomPreference(10.0)
-                mapboxMap.setMaxZoomPreference(18.0)
-                val uiSettings = mapboxMap.uiSettings
+        mapView.getMapAsync { map ->
+            this.map = map
+            map.setStyle(Style.Builder().fromUrl(MAP_STYLE_URL)) { style ->
+                map.setLatLngBoundsForCameraTarget(MAP_BOUNDS)
+                map.setMinZoomPreference(10.0)
+                map.setMaxZoomPreference(18.0)
+                val uiSettings = map.uiSettings
                 uiSettings.isLogoEnabled = false
                 uiSettings.isAttributionEnabled = false
                 uiSettings.isCompassEnabled = false
                 uiSettings.isRotateGesturesEnabled = false
+                addHeatmap(style)
             }
         }
 
-        val client = HttpClient(this)
-        val json = """{"id":0}"""
-        client.request("getcoverage", JSONObject(json), object : HttpClient.Callback
-        {
-
-            override fun onException(exception: Exception)
-            {
-                Toast.makeText(this@MainActivity, exception.toString(), Toast.LENGTH_LONG).show()
-            }
-
-            override fun onResponse(response: JSONObject)
-            {
-                Toast.makeText(this@MainActivity, response.toString(), Toast.LENGTH_LONG).show()
-            }
-
-        })
+        server = Server(this, "http://localhost:8080")
+        coverageService = server.Service("getcoverage", Interpreter.IDENTITY)
+        coverageService.onRequestStatusChanged += {
+            val message = if (it.status.succeeded) it.response.toString() else it.status.toString()
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+        }
 
     }
 
-    public override fun onStart()
-    {
+    fun testButtonClicked(view: View) {
+        Toast.makeText(this@MainActivity, "Request started", Toast.LENGTH_SHORT).show()
+        coverageService.Request(JSONObject("{'mode':'raw'}")).start()
+    }
+
+    fun addHeatmap(style: Style) {
+        val layer = HeatmapLayer(COVERAGE_LAYER_ID, COVERAGE_SOURCE_ID)
+        layer.maxZoom = 15f
+        layer.setProperties(
+            heatmapColor(
+                interpolate(
+                    linear(), heatmapDensity(),
+                    literal(0.0), rgba(6, 50, 255, 0),
+                    literal(0.2), rgba(12, 105, 255, 0.5),
+                    literal(1.0), rgba(48, 210, 255, 1.0)
+                )
+            ),
+            heatmapIntensity(
+                interpolate(
+                    linear(), zoom(),
+                    stop(11, 1),
+                    stop(15, 3)
+                )
+            ),
+            heatmapRadius(
+                interpolate(
+                    linear(), zoom(),
+                    stop(11, 30),
+                    stop(15, 100)
+                )
+            ),
+            heatmapOpacity(
+                interpolate(
+                    linear(), zoom(),
+                    stop(12, 0.5),
+                    stop(15, 0)
+                )
+            )
+/*            heatmapWeight(
+                get("coverage")
+            )*/
+        )
+        style.addLayerBelow(layer, "aerialway")
+    }
+
+    public override fun onStart() {
         super.onStart()
         mapView.onStart()
     }
 
-    public override fun onResume()
-    {
+    public override fun onResume() {
         super.onResume()
         mapView.onResume()
     }
 
-    public override fun onPause()
-    {
+    public override fun onPause() {
         super.onPause()
         mapView.onPause()
     }
 
-    public override fun onStop()
-    {
+    public override fun onStop() {
         super.onStop()
         mapView.onStop()
     }
 
-    override fun onLowMemory()
-    {
+    override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
     }
 
-    override fun onDestroy()
-    {
+    override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
     }
 
-    override fun onSaveInstanceState(outState: Bundle)
-    {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView.onSaveInstanceState(outState)
     }
