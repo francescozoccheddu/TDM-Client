@@ -389,11 +389,17 @@ interface Interpreter<RequestType, ResponseType> {
 interface PollInterpreter<RequestType, ResponseType, DataType> : Interpreter<RequestType, ResponseType> {
 
     companion object {
-        val IDENTITY = object : PollInterpreter<JSONObject?, JSONObject, JSONObject> {
-            override fun interpretRequest(request: JSONObject?) = request
-            override fun interpretResponse(request: JSONObject?, response: JSONObject) = response
-            override fun interpretData(response: JSONObject) = response
-        }
+
+        fun <RequestType, ResponseType> from(interpreter: Interpreter<RequestType, ResponseType>)
+                : PollInterpreter<RequestType, ResponseType, ResponseType> =
+            object : PollInterpreter<RequestType, ResponseType, ResponseType>,
+                Interpreter<RequestType, ResponseType> by interpreter {
+
+                override fun interpretData(response: ResponseType) = response
+
+            }
+
+        val IDENTITY = from(Interpreter.IDENTITY)
     }
 
     fun interpretTime(request: Server.Service<RequestType, ResponseType>.Request) = request.startTime
