@@ -278,14 +278,14 @@ class Server(context: Context, val address: ServerAddress) {
         address: ServiceAddress,
         pollRequest: RequestType,
         interpreter: PollInterpreter<RequestType, ResponseType, DataType>,
-        looper: Looper = Looper.myLooper()
+        looper: Looper = Looper.myLooper() as Looper
     ) : PollService<RequestType, ResponseType, DataType>(address, pollRequest, interpreter) {
 
         constructor(
             address: String,
             pollRequest: RequestType,
             interpreter: PollInterpreter<RequestType, ResponseType, DataType>,
-            looper: Looper = Looper.myLooper()
+            looper: Looper = Looper.myLooper() as Looper
         ) : this(
             ServiceAddress(address), pollRequest, interpreter, looper
         )
