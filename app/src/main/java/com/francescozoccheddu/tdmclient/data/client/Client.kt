@@ -67,7 +67,7 @@ class Server(context: Context, val address: ServerAddress) {
 
     inner open class Service<RequestType, ResponseType>(
         val address: ServiceAddress,
-        val interpreter: Interpreter<RequestType, ResponseType>
+        open val interpreter: Interpreter<RequestType, ResponseType>
     ) {
 
         constructor(
@@ -124,7 +124,7 @@ class Server(context: Context, val address: ServerAddress) {
             var status = Status.PLANNED
                 private set(value) {
                     field = value
-                    this@Service.onRequestStatusChanged(this)
+                    this@Service.requestStatusChanged(this)
                     onStatusChange(this)
                 }
 
@@ -138,7 +138,7 @@ class Server(context: Context, val address: ServerAddress) {
 
             private fun trySetResponse(body: JSONObject) {
                 try {
-                    _response = Nullable(interpreter.interpretResponse(body))
+                    _response = Nullable(interpreter.interpretResponse(request, body))
                 } catch (_: Interpreter.UninterpretableResponseException) {
                 }
             }
@@ -217,11 +217,17 @@ class Server(context: Context, val address: ServerAddress) {
         }
     }
 
-    open inner class PollService<RequestType, ResponseType>(
+    open inner class PollService<RequestType, ResponseType, DataType>(
         address: ServiceAddress,
-        interpreter: Interpreter<RequestType, ResponseType>,
-        var pollRequest: RequestType
+        var pollRequest: RequestType,
+        override val interpreter: PollInterpreter<RequestType, ResponseType, DataType>
     ) : Service<RequestType, ResponseType>(address, interpreter) {
+
+        constructor(
+            address: String,
+            pollRequest: RequestType,
+            interpreter: PollInterpreter<RequestType, ResponseType, DataType>
+        ) : this(ServiceAddress(address), pollRequest, interpreter)
 
 
         var time = Date()
@@ -234,11 +240,11 @@ class Server(context: Context, val address: ServerAddress) {
         val hasData
             get() = _data != null
 
-        private var _data: Nullable<ResponseType>? = null
+        private var _data: Nullable<DataType>? = null
 
-        val onData = FuncEvent<ResponseType>()
+        val onData = FuncEvent<DataType>()
 
-        protected open fun pollSucceeded() {}
+        protected open fun dataSubmitted() {}
 
         protected open fun polled() {}
 
@@ -251,11 +257,11 @@ class Server(context: Context, val address: ServerAddress) {
 
         var cancelPendingRequestsOnPoll = false
 
-        fun submit(time: Date, data: ResponseType) {
-            if (time > this.time) {
+        fun submit(time: Date, data: DataType) {
+            if (!hasData || time > this.time) {
                 this.time = time
                 this._data = Nullable(data)
-                pollSucceeded()
+                dataSubmitted()
                 onData(data)
             }
         }
@@ -263,17 +269,26 @@ class Server(context: Context, val address: ServerAddress) {
         override fun requestStatusChanged(request: Request) {
             super.requestStatusChanged(request)
             if (request.status.succeeded)
-                submit(request.startTime, request.response)
+                submit(interpreter.interpretTime(request), interpreter.interpretData(request.response))
         }
 
     }
 
-    open inner class AutoPollService<RequestType, ResponseType>(
+    open inner class AutoPollService<RequestType, ResponseType, DataType>(
         address: ServiceAddress,
-        interpreter: Interpreter<RequestType, ResponseType>,
         pollRequest: RequestType,
+        interpreter: PollInterpreter<RequestType, ResponseType, DataType>,
         looper: Looper = Looper.myLooper()
-    ) : PollService<RequestType, ResponseType>(address, interpreter, pollRequest) {
+    ) : PollService<RequestType, ResponseType, DataType>(address, pollRequest, interpreter) {
+
+        constructor(
+            address: String,
+            pollRequest: RequestType,
+            interpreter: PollInterpreter<RequestType, ResponseType, DataType>,
+            looper: Looper = Looper.myLooper()
+        ) : this(
+            ServiceAddress(address), pollRequest, interpreter, looper
+        )
 
         private val handler = Handler(looper)
 
@@ -334,8 +349,8 @@ class Server(context: Context, val address: ServerAddress) {
 
         val onExpire = ProcEvent()
 
-        override fun pollSucceeded() {
-            super.pollSucceeded()
+        override fun dataSubmitted() {
+            super.dataSubmitted()
             updateExpiration()
         }
 
@@ -359,7 +374,7 @@ interface Interpreter<RequestType, ResponseType> {
     companion object {
         val IDENTITY = object : Interpreter<JSONObject?, JSONObject> {
             override fun interpretRequest(request: JSONObject?) = request
-            override fun interpretResponse(response: JSONObject) = response
+            override fun interpretResponse(request: JSONObject?, response: JSONObject) = response
         }
     }
 
@@ -367,7 +382,23 @@ interface Interpreter<RequestType, ResponseType> {
 
     fun interpretRequest(request: RequestType): JSONObject?
 
-    fun interpretResponse(response: JSONObject): ResponseType
+    fun interpretResponse(request: RequestType, response: JSONObject): ResponseType
+
+}
+
+interface PollInterpreter<RequestType, ResponseType, DataType> : Interpreter<RequestType, ResponseType> {
+
+    companion object {
+        val IDENTITY = object : PollInterpreter<JSONObject?, JSONObject, JSONObject> {
+            override fun interpretRequest(request: JSONObject?) = request
+            override fun interpretResponse(request: JSONObject?, response: JSONObject) = response
+            override fun interpretData(response: JSONObject) = response
+        }
+    }
+
+    fun interpretTime(request: Server.Service<RequestType, ResponseType>.Request) = request.startTime
+
+    fun interpretData(response: ResponseType): DataType
 
 }
 
