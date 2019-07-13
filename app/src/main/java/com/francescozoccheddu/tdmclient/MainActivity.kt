@@ -4,8 +4,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
-import com.francescozoccheddu.tdmclient.data.client.PollInterpreter
 import com.francescozoccheddu.tdmclient.data.client.Server
+import com.francescozoccheddu.tdmclient.data.retrieve.CoverageRetriever
+import com.francescozoccheddu.tdmclient.data.retrieve.makeCoverageRetriever
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
@@ -23,9 +24,6 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius
-import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -46,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map: MapboxMap
 
     private lateinit var server: Server
-    private lateinit var coverageService: Server.PollService<String, JSONObject, JSONObject>
+    private lateinit var coverageService: CoverageRetriever
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,26 +68,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         server = Server(this, "http://localhost:8080")
-        coverageService = server.PollService("getcoverage", "points", object :
-            PollInterpreter<String, JSONObject, JSONObject> {
-
-            private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-
-            override fun interpretResponse(request: String, response: JSONObject) = response
-
-            override fun interpretData(response: JSONObject) = response["data"] as JSONObject
-
-            override fun interpretRequest(request: String) = JSONObject("{'mode':'$request'}")
-
-            override fun interpretTime(request: Server.Service<String, JSONObject>.Request) = Date()
-        })
+        coverageService = makeCoverageRetriever(server)
         coverageService.onRequestStatusChanged += {
             if (!it.status.pending) {
                 Toast.makeText(this@MainActivity, it.status.toString(), Toast.LENGTH_SHORT).show()
             }
         }
         coverageService.onData += {
-            Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_LONG).show()
+            val message = "${coverageService.time}\n${it.toString().substring(0, 20)}..."
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
         }
 
     }
