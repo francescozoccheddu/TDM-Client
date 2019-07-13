@@ -1,12 +1,15 @@
 package com.francescozoccheddu.tdmclient
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.francescozoccheddu.tdmclient.data.client.Server
 import com.francescozoccheddu.tdmclient.data.retrieve.CoverageRetriever
 import com.francescozoccheddu.tdmclient.data.retrieve.makeCoverageRetriever
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
@@ -46,11 +49,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var server: Server
     private lateinit var coverageService: CoverageRetriever
 
+    private lateinit var sheet: BottomSheetBehavior<LinearLayout>
+    private lateinit var fab: ExtendedFloatingActionButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity)
 
-        mapView = findViewById(R.id.mapView)
+        mapView = findViewById(R.id.map)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { map ->
             this.map = map
@@ -79,12 +85,36 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
         }
 
+        sheet = BottomSheetBehavior.from(findViewById(R.id.sheet))
+        fab = findViewById(R.id.fab)
+
+
+        val shrinkCallback = Runnable { fab.shrink() }
+        fab.setOnClickListener {
+            fab.shrink()
+            fab.removeCallbacks(shrinkCallback)
+            fab.hide()
+            sheet.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+
+        sheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(sheet: View, state: Int) {
+                if (state == BottomSheetBehavior.STATE_HIDDEN) {
+                    fab.extend(false)
+                    fab.show()
+                    fab.postDelayed(shrinkCallback, 2000)
+                }
+            }
+
+            override fun onSlide(sheet: View, offset: Float) {}
+
+        })
+
+        sheet.state = BottomSheetBehavior.STATE_HIDDEN
+        fab.postDelayed(shrinkCallback, 2000)
     }
 
-    fun testButtonClicked(view: View) {
-        Toast.makeText(this@MainActivity, "Request started", Toast.LENGTH_SHORT).show()
-        coverageService.poll()
-    }
 
     fun addHeatmap(style: Style) {
         val layer = HeatmapLayer(COVERAGE_LAYER_ID, COVERAGE_SOURCE_ID)
