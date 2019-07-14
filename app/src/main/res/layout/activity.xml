@@ -43,18 +43,21 @@
             app:layout_anchorGravity="bottom|end"
     />
 
-    <LinearLayout
+    <FrameLayout
             android:id="@+id/sheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:behavior_hideable="true"
             app:behavior_peekHeight="80dp"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+            android:background="@drawable/sheet_background"
+            android:elevation="16dp"
+            android:clickable="true"
     >
 
         <include layout="@layout/sheet"/>
 
-    </LinearLayout>
+    </FrameLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

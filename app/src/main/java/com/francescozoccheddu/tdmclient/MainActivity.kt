@@ -1,5 +1,6 @@
 package com.francescozoccheddu.tdmclient
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
@@ -40,9 +41,12 @@ class MainActivity : AppCompatActivity() {
             .include(LatLng(39.176358, 9.054797))
             .build()
 
-        const val MAP_STYLE_URL = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
+        const val MAP_STYLE_URI = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
         const val COVERAGE_SOURCE_ID = "coverage"
         const val COVERAGE_LAYER_ID = "coverage"
+
+        const val RESIZE_MAP_WITH_SHEET = true
+
     }
 
     private lateinit var mapView: MapView
@@ -63,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { map ->
             this.map = map
-            map.setStyle(Style.Builder().fromUrl(MAP_STYLE_URL)) { style ->
+            map.setStyle(Style.Builder().fromUri(MAP_STYLE_URI)) { style ->
                 map.setLatLngBoundsForCameraTarget(MAP_BOUNDS)
                 addHeatmap(style)
             }
@@ -86,7 +90,6 @@ class MainActivity : AppCompatActivity() {
         sheet = BottomSheetBehavior.from(findViewById(R.id.sheet))
         fab = findViewById(R.id.fab)
 
-
         val shrinkCallback = Runnable { fab.shrink() }
         fab.setOnClickListener {
             fab.shrink()
@@ -97,6 +100,8 @@ class MainActivity : AppCompatActivity() {
 
         sheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
 
+            private val corners = FloatArray(8)
+
             override fun onStateChanged(sheetView: View, state: Int) {
                 if (state == BottomSheetBehavior.STATE_HIDDEN) {
                     fab.extend(false)
@@ -106,12 +111,24 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSlide(sheetView: View, offset: Float) {
-                if (sheet.state == BottomSheetBehavior.STATE_DRAGGING || sheet.state == BottomSheetBehavior.STATE_SETTLING) {
+                var cornerRadius: Float
+                run {
+                    val background = (sheetView.background as GradientDrawable)
+                    val expansion = Math.max(offset, 0.0f)
+                    cornerRadius = expansion * resources.getDimension(R.dimen.sheet_corner_radius)
+                    corners.fill(cornerRadius, 0, 4)
+                    background.cornerRadii = corners
+                    val padding = expansion * resources.getDimension(R.dimen.sheet_top_padding)
+                    sheetView.setPadding(0, padding.roundToInt(), 0, 0)
+                }
+                if (RESIZE_MAP_WITH_SHEET) {
+                    val peekHeight = sheet.peekHeight - cornerRadius
                     val padding = if (offset >= 0) {
-                        offset * (sheetView.height - sheet.peekHeight) + sheet.peekHeight
+                        val sheetHeight = sheetView.height - cornerRadius
+                        offset * (sheetHeight - peekHeight) + peekHeight
                     }
                     else {
-                        (offset + 1.0f) * sheet.peekHeight
+                        (offset + 1.0f) * peekHeight
                     }
                     mapContainer.setPadding(0, 0, 0, padding.roundToInt())
                 }
