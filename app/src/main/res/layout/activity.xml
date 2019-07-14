@@ -10,12 +10,26 @@
         tools:context=".MainActivity">
 
 
-    <com.mapbox.mapboxsdk.maps.MapView
-            android:id="@+id/map"
+    <FrameLayout
+            android:id="@+id/map_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-    />
-
+    >
+        <com.mapbox.mapboxsdk.maps.MapView
+                xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                mapbox:mapbox_uiCompass="false"
+                mapbox:mapbox_cameraZoomMin="10"
+                mapbox:mapbox_cameraZoomMax="18"
+                mapbox:mapbox_uiRotateGestures="false"
+                mapbox:mapbox_uiTiltGestures="false"
+                mapbox:mapbox_uiLogo="false"
+                mapbox:mapbox_uiAttribution="false"
+                mapbox:mapbox_renderTextureMode="true"
+        />
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fab"
