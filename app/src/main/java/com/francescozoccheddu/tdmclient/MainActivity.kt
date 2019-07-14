@@ -2,6 +2,7 @@ package com.francescozoccheddu.tdmclient
 
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius
+import kotlin.math.roundToInt
 
 
 class MainActivity : AppCompatActivity() {
@@ -51,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var sheet: BottomSheetBehavior<LinearLayout>
     private lateinit var fab: ExtendedFloatingActionButton
+    private lateinit var mapContainer: FrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,16 +65,11 @@ class MainActivity : AppCompatActivity() {
             this.map = map
             map.setStyle(Style.Builder().fromUrl(MAP_STYLE_URL)) { style ->
                 map.setLatLngBoundsForCameraTarget(MAP_BOUNDS)
-                map.setMinZoomPreference(10.0)
-                map.setMaxZoomPreference(18.0)
-                val uiSettings = map.uiSettings
-                uiSettings.isLogoEnabled = false
-                uiSettings.isAttributionEnabled = false
-                uiSettings.isCompassEnabled = false
-                uiSettings.isRotateGesturesEnabled = false
                 addHeatmap(style)
             }
         }
+
+        mapContainer = findViewById(R.id.map_container)
 
         server = Server(this, "http://localhost:8080")
         coverageService = makeCoverageRetriever(server)
@@ -99,7 +97,7 @@ class MainActivity : AppCompatActivity() {
 
         sheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
 
-            override fun onStateChanged(sheet: View, state: Int) {
+            override fun onStateChanged(sheetView: View, state: Int) {
                 if (state == BottomSheetBehavior.STATE_HIDDEN) {
                     fab.extend(false)
                     fab.show()
@@ -107,7 +105,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onSlide(sheet: View, offset: Float) {}
+            override fun onSlide(sheetView: View, offset: Float) {
+                if (sheet.state == BottomSheetBehavior.STATE_DRAGGING || sheet.state == BottomSheetBehavior.STATE_SETTLING) {
+                    val padding = if (offset >= 0) {
+                        offset * (sheetView.height - sheet.peekHeight) + sheet.peekHeight
+                    }
+                    else {
+                        (offset + 1.0f) * sheet.peekHeight
+                    }
+                    mapContainer.setPadding(0, 0, 0, padding.roundToInt())
+                }
+            }
 
         })
 
