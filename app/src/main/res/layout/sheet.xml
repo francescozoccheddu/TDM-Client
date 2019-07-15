@@ -3,19 +3,24 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/sheet_content"
         android:layout_width="match_parent"
-        android:layout_height="340dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+>
 
     <TextView
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:gravity="center"
-            android:text="Peek"/>
+            android:text="Peek"
+            android:background="@android:color/transparent"
+    />
 
-    <TextView
+
+    <androidx.viewpager.widget.ViewPager
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/sheet_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Content"/>
+            android:layout_height="200dp"
+    />
 
 </LinearLayout>

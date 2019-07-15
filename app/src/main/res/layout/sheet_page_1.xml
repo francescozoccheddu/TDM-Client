@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+>
+
+    <TextView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            style="?android:textAppearanceMedium"
+            android:padding="16dp"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Step 1"
+            android:textSize="32dp"
+            android:layout_margin="20dp"
+    />
+
+</LinearLayout>
