@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:clipToPadding="false"
-        tools:context=".MainActivity">
+        tools:context=".ui.MainActivity">
 
 
     <FrameLayout
@@ -35,7 +35,6 @@
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="Esteso"
             android:text="Esteso"
             app:icon="@android:drawable/ic_secure"
             android:layout_margin="16dp"
