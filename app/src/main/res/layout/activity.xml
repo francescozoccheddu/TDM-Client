@@ -31,32 +31,50 @@
         />
     </FrameLayout>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Esteso"
-            app:icon="@android:drawable/ic_secure"
+            android:layout_gravity="bottom|right"
             android:layout_margin="16dp"
-            android:layout_gravity="bottom|end"
-            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@android:drawable/ic_dialog_map"
     />
 
-    <FrameLayout
-            android:id="@+id/sheet"
-            android:layout_width="match_parent"
+    <LinearLayout
+            android:id="@+id/dial"
+            android:layout_gravity="top|center_horizontal"
+            android:visibility="invisible"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:behavior_hideable="true"
-            app:behavior_peekHeight="80dp"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-            android:background="@drawable/sheet_background"
-            android:elevation="16dp"
-            android:clickable="true"
+            app:layout_anchor="@id/fab"
+            app:layout_anchorGravity="top|center_horizontal"
+            app:layout_behavior=".ui.FabTransformationEmitBehavior"
     >
 
-        <include layout="@layout/sheet"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                style="@style/Widget.MaterialComponents.FloatingActionButton"
+                android:id="@+id/dial_wo_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@android:drawable/ic_dialog_map"
+                android:layout_marginBottom="10dp"
+                app:fabSize="mini"
+        />
 
-    </FrameLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                style="@style/Widget.MaterialComponents.FloatingActionButton"
+                android:id="@+id/dial_w_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@android:drawable/ic_dialog_map"
+                android:layout_marginBottom="10dp"
+                app:fabSize="mini"
+        />
+
+    </LinearLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
