@@ -54,5 +54,5 @@ fun dateParseISO(date: String): Date {
         }
         else -> throw ParseException("Unexpected length", 0)
     }
-    return format.parse(builder.toString())
+    return format.parse(builder.toString())!!
 }

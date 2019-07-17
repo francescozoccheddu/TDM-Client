@@ -3,6 +3,7 @@ package com.francescozoccheddu.tdmclient.ui
 import android.os.Bundle
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.motion.widget.MotionLayout
 import com.francescozoccheddu.tdmclient.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var fab: FloatingActionButton
 
+    private var set = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity)
@@ -48,10 +51,27 @@ class MainActivity : AppCompatActivity() {
 
         // Fab
         fab = findViewById(R.id.fab)
+
+
+        val transientsTop = findViewById<MotionLayout>(R.id.ml_transients_top)
+        //val transientsBottom = findViewById<MotionLayout>(R.id.ml_transients_bottom)
+
+
         fab.setOnClickListener {
             fab.isExpanded = !fab.isExpanded
+            if (set) {
+                transientsTop.transitionToState(R.id.cs_score)
+                //      transientsBottom.transitionToState(R.id.cs_expanded)
 
+            }
+            else {
+                transientsTop.transitionToState(R.id.cs_search)
+                //    transientsBottom.transitionToState(R.id.cs_hidden)
+
+            }
+            set = !set
         }
+
 
     }
 

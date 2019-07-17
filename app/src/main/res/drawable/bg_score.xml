@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:shape="rectangle"
+>
+    <padding android:bottom="@dimen/score_padding"
+             android:left="@dimen/score_padding"
+             android:right="@dimen/score_padding"
+             android:top="@dimen/score_padding"
+    />
+    <corners
+            android:bottomLeftRadius="@dimen/score_corner_radius"
+            android:topLeftRadius="@dimen/score_corner_radius"
+    />
+    <solid
+            android:color="@color/design_default_color_surface"
+    />
+</shape>

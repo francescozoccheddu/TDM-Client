@@ -7,9 +7,9 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:clickable="false"
         tools:context=".ui.MainActivity">
-
-
+    
     <FrameLayout
             android:id="@+id/map_container"
             android:layout_width="match_parent"
@@ -30,7 +30,9 @@
                 mapbox:mapbox_renderTextureMode="true"
         />
     </FrameLayout>
-
+    
+    <include layout="@layout/transients_top"/>
+    
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
             style="@style/Widget.MaterialComponents.FloatingActionButton"
@@ -40,7 +42,7 @@
             android:layout_margin="16dp"
             app:srcCompat="@android:drawable/ic_dialog_map"
     />
-
+    
     <LinearLayout
             android:id="@+id/dial"
             android:layout_gravity="top|center_horizontal"
@@ -53,7 +55,7 @@
             app:layout_anchorGravity="top|center_horizontal"
             app:layout_behavior=".ui.FabTransformationEmitBehavior"
     >
-
+        
         <com.google.android.material.floatingactionbutton.FloatingActionButton
                 style="@style/Widget.MaterialComponents.FloatingActionButton"
                 android:id="@+id/dial_wo_end"
@@ -63,7 +65,7 @@
                 android:layout_marginBottom="10dp"
                 app:fabSize="mini"
         />
-
+        
         <com.google.android.material.floatingactionbutton.FloatingActionButton
                 style="@style/Widget.MaterialComponents.FloatingActionButton"
                 android:id="@+id/dial_w_end"
@@ -73,8 +75,7 @@
                 android:layout_marginBottom="10dp"
                 app:fabSize="mini"
         />
-
+    
     </LinearLayout>
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
