@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="sheet_corner_radius">16dp</dimen>
-    <dimen name="sheet_top_padding">8dp</dimen>
+    <dimen name="score_corner_radius">8dp</dimen>
+    <dimen name="score_padding">8dp</dimen>
+    <dimen name="score_elevation">8dp</dimen>
+    <dimen name="score_margin_top">20dp</dimen>
 </resources>
