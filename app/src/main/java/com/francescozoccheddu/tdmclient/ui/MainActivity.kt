@@ -4,12 +4,18 @@ import android.app.SearchManager
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.mapbox.geojson.BoundingBox
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
@@ -33,6 +39,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mapView: MapView
     private lateinit var map: MapboxMap
 
+    private lateinit var searchListView: RecyclerView
+    private lateinit var searchProvider: LocationSearchProvider
+
+
     private fun FloatingActionButton.setIcon(icon: Int) {
         setImageDrawable(ContextCompat.getDrawable(this@MainActivity, icon))
     }
@@ -42,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var fab: FloatingActionButton
+
+    private lateinit var etSearch: EditText
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,16 +94,33 @@ class MainActivity : AppCompatActivity() {
             durationSheet.visibility = View.VISIBLE
         }
 
-        /*
-
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        findViewById<SearchView>(R.id.sv_search).apply {
-            setSearchableInfo(searchManager.getSearchableInfo(componentName))
-            setIconifiedByDefault(false)
+        // Search view
+        searchListView = findViewById(R.id.rv_search)
+        searchProvider = LocationSearchProvider(
+            BoundingBox.fromLngLats(
+                MAP_BOUNDS.lonWest,
+                MAP_BOUNDS.latSouth,
+                MAP_BOUNDS.lonEast,
+                MAP_BOUNDS.latNorth
+            )
+        )
+        searchListView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
+            adapter = searchProvider.adapter
         }
-        handleSearchIntent(intent)
 
-        */
+        etSearch = findViewById(R.id.et_search)
+        etSearch.addTextChangedListener(object : TextWatcher {
+
+            override fun afterTextChanged(s: Editable) {
+                searchProvider.query(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
+        })
 
     }
 
