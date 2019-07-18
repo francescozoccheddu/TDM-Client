@@ -10,12 +10,34 @@
         tools:showPaths="true">
     
     <TextView
+            android:id="@+id/tv_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_score"
             android:text="5870"
             android:background="@drawable/bg_score"
             android:elevation="@dimen/score_elevation"
     />
+    
+    <com.mypopsy.widget.FloatingSearchView
+            android:id="@+id/sv_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:background="#90000000"
+            app:fsv_contentBackgroundColor="@color/design_default_color_surface"
+            android:hint="@string/search_hint"
+    />
+    
+    <!--
+    <androidx.appcompat.widget.SearchView
+            android:id="@+id/sv_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_score"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="10dp"
+    />
+    -->
 
 </androidx.constraintlayout.motion.widget.MotionLayout>
