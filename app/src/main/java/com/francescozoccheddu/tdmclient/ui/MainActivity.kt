@@ -1,9 +1,11 @@
 package com.francescozoccheddu.tdmclient.ui
 
+import android.app.SearchManager
+import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
-import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -26,20 +28,25 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private lateinit var mapContainer: FrameLayout
     private lateinit var mapView: MapView
     private lateinit var map: MapboxMap
 
+    private fun FloatingActionButton.setIcon(icon: Int) {
+        setImageDrawable(ContextCompat.getDrawable(this@MainActivity, icon))
+    }
+
+    private fun FloatingActionButton.setColor(color: Int) {
+        backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, color))
+    }
+
     private lateinit var fab: FloatingActionButton
 
-    private var set = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity)
 
         // Map
-        mapContainer = findViewById(R.id.map_container)
         mapView = findViewById(R.id.map)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { map ->
@@ -51,28 +58,43 @@ class MainActivity : AppCompatActivity() {
 
         // Fab
         fab = findViewById(R.id.fab)
-
-
-        val transientsTop = findViewById<MotionLayout>(R.id.ml_transients_top)
-        //val transientsBottom = findViewById<MotionLayout>(R.id.ml_transients_bottom)
-
-
         fab.setOnClickListener {
-            fab.isExpanded = !fab.isExpanded
-            if (set) {
-                transientsTop.transitionToState(R.id.cs_score)
-                //      transientsBottom.transitionToState(R.id.cs_expanded)
-
-            }
-            else {
-                transientsTop.transitionToState(R.id.cs_search)
-                //    transientsBottom.transitionToState(R.id.cs_hidden)
-
-            }
-            set = !set
+            fab.isExpanded = true
         }
 
+        /*
 
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        findViewById<SearchView>(R.id.sv_search).apply {
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            setIconifiedByDefault(false)
+        }
+        handleSearchIntent(intent)
+
+        */
+
+    }
+
+    override fun onBackPressed() {
+        if (fab.isExpanded)
+            fab.isExpanded = false
+        else
+            super.onBackPressed()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent != null)
+            handleSearchIntent(intent)
+    }
+
+    private fun handleSearchIntent(intent: Intent) {
+        if (intent.action == Intent.ACTION_SEARCH) {
+            intent.getStringExtra(SearchManager.QUERY)?.also {
+                //doMySearch(query)
+            }
+        }
     }
 
     public override fun onStart() {

@@ -5,7 +5,8 @@
     <Transition
             motion:constraintSetStart="@id/cs_score"
             motion:constraintSetEnd="@id/cs_search"
-            motion:duration="100"
+            motion:duration="300"
+            motion:motionInterpolator="easeInOut"
     />
     
     <ConstraintSet android:id="@+id/cs_score">
@@ -15,7 +16,14 @@
                 android:layout_width="wrap_content"
                 android:layout_marginTop="@dimen/score_margin_top"
                 motion:layout_constraintTop_toTopOf="parent"
-                motion:layout_constraintRight_toRightOf="parent"
+                motion:layout_constraintEnd_toEndOf="parent"
+        />
+        <Constraint
+                android:id="@+id/sv_search"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                motion:layout_constraintBottom_toTopOf="parent"
+                motion:layout_constraintLeft_toLeftOf="parent"
         />
     </ConstraintSet>
     
@@ -26,7 +34,14 @@
                 android:layout_width="wrap_content"
                 android:layout_marginTop="@dimen/score_margin_top"
                 motion:layout_constraintTop_toTopOf="parent"
-                motion:layout_constraintLeft_toRightOf="parent"
+                motion:layout_constraintStart_toEndOf="parent"
+        />
+        <Constraint
+                android:id="@+id/sv_search"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                motion:layout_constraintTop_toTopOf="parent"
+                motion:layout_constraintLeft_toLeftOf="parent"
         />
     </ConstraintSet>
 

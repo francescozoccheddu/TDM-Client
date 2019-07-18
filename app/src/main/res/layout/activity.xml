@@ -10,72 +10,55 @@
         android:clickable="false"
         tools:context=".ui.MainActivity">
     
-    <FrameLayout
-            android:id="@+id/map_container"
+    <com.mapbox.mapboxsdk.maps.MapView
+            xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-    >
-        <com.mapbox.mapboxsdk.maps.MapView
-                xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/map"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                mapbox:mapbox_uiCompass="false"
-                mapbox:mapbox_cameraZoomMin="10"
-                mapbox:mapbox_cameraZoomMax="18"
-                mapbox:mapbox_uiRotateGestures="false"
-                mapbox:mapbox_uiTiltGestures="false"
-                mapbox:mapbox_uiLogo="false"
-                mapbox:mapbox_uiAttribution="false"
-                mapbox:mapbox_renderTextureMode="true"
-        />
-    </FrameLayout>
+            mapbox:mapbox_uiCompass="false"
+            mapbox:mapbox_cameraZoomMin="10"
+            mapbox:mapbox_cameraZoomMax="18"
+            mapbox:mapbox_uiRotateGestures="false"
+            mapbox:mapbox_uiTiltGestures="false"
+            mapbox:mapbox_uiLogo="false"
+            mapbox:mapbox_uiAttribution="false"
+    />
     
     <include layout="@layout/transients_top"/>
     
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
-            style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/ic_walk"
             android:layout_margin="16dp"
-            app:srcCompat="@android:drawable/ic_dialog_map"
+            app:backgroundTint="@color/colorPrimary"
     />
     
-    <LinearLayout
-            android:id="@+id/dial"
-            android:layout_gravity="top|center_horizontal"
-            android:visibility="invisible"
-            android:layout_marginBottom="16dp"
-            android:orientation="vertical"
+    <com.google.android.material.circularreveal.cardview.CircularRevealCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_anchor="@id/fab"
-            app:layout_anchorGravity="top|center_horizontal"
-            app:layout_behavior=".ui.FabTransformationEmitBehavior"
+            android:visibility="invisible"
+            app:layout_behavior="com.google.android.material.transformation.FabTransformationSheetBehavior"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:id="@+id/sheet"
+            android:clickable="true"
+            android:checkable="false"
+            app:cardBackgroundColor="@color/colorPrimary"
     >
         
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
-                android:id="@+id/dial_wo_end"
+        <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/ic_dialog_map"
-                android:layout_marginBottom="10dp"
-                app:fabSize="mini"
-        />
+                android:animateLayoutChanges="true"
+        >
+            
+            <include layout="@layout/sheet_walktype"/>
         
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                style="@style/Widget.MaterialComponents.FloatingActionButton"
-                android:id="@+id/dial_w_end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/ic_dialog_map"
-                android:layout_marginBottom="10dp"
-                app:fabSize="mini"
-        />
+        </FrameLayout>
     
-    </LinearLayout>
+    </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
