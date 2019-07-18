@@ -34,7 +34,7 @@
             android:fitsSystemWindows="true"
             tools:context=".ui.MainActivity">
         
-        <include layout="@layout/transients_top"/>
+        <include layout="@layout/bar"/>
         
         <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab"

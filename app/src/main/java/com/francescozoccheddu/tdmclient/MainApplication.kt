@@ -1,7 +1,7 @@
 package com.francescozoccheddu.tdmclient
 
 import android.app.Application
-import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.Mapbox
 
 class MainApplication : Application() {
 
