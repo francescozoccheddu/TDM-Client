@@ -4,9 +4,11 @@ import android.app.SearchManager
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
@@ -57,9 +59,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Fab
+        val walktypeSheet = findViewById<View>(R.id.l_walktype)
+        val durationSheet = findViewById<View>(R.id.l_duration)
+
         fab = findViewById(R.id.fab)
         fab.setOnClickListener {
+            walktypeSheet.visibility = View.VISIBLE
+            durationSheet.visibility = View.GONE
             fab.isExpanded = true
+        }
+
+        findViewById<MaterialButton>(R.id.bt_duration_ok).setOnClickListener {
+            fab.isExpanded = false
+        }
+
+        findViewById<View>(R.id.li_walktype_destination).setOnClickListener {
+            fab.isExpanded = false
+        }
+
+        findViewById<View>(R.id.li_walktype_nearby).setOnClickListener {
+            walktypeSheet.visibility = View.GONE
+            durationSheet.visibility = View.VISIBLE
         }
 
         /*

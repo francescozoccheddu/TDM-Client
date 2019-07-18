@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:clickable="false"
+        android:background="@color/colorAccent"
         tools:context=".ui.MainActivity">
     
     <com.mapbox.mapboxsdk.maps.MapView
@@ -24,41 +22,59 @@
             mapbox:mapbox_uiAttribution="false"
     />
     
-    <include layout="@layout/transients_top"/>
-    
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:src="@drawable/ic_walk"
-            android:layout_margin="16dp"
-            app:backgroundTint="@color/colorPrimary"
-    />
-    
-    <com.google.android.material.circularreveal.cardview.CircularRevealCardView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            app:layout_behavior="com.google.android.material.transformation.FabTransformationSheetBehavior"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:id="@+id/sheet"
-            android:clickable="true"
-            android:checkable="false"
-            app:cardBackgroundColor="@color/colorPrimary"
-    >
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:clickable="false"
+            android:fitsSystemWindows="true"
+            tools:context=".ui.MainActivity">
         
-        <FrameLayout
+        <include layout="@layout/transients_top"/>
+        
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/ic_walk"
+                android:layout_margin="16dp"
+                app:backgroundTint="@color/colorPrimary"
+        />
+        
+        <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                app:layout_behavior="com.google.android.material.transformation.FabTransformationSheetBehavior"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:id="@+id/sheet"
+                android:checkable="false"
+                app:cardBackgroundColor="@color/colorPrimary"
         >
             
-            <include layout="@layout/sheet_walktype"/>
+            <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+            >
+                
+                <include layout="@layout/sheet_walktype"
+                         android:id="@+id/l_walktype"/>
+                <include layout="@layout/sheet_duration"
+                         android:id="@+id/l_duration"
+                         android:visibility="gone"
+                />
+            
+            </FrameLayout>
         
-        </FrameLayout>
+        </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
     
-    </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

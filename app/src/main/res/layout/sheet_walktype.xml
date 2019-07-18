@@ -12,6 +12,7 @@
             android:clickable="true"
             android:background="?android:selectableItemBackground"
             android:padding="15dp"
+            android:id="@+id/li_walktype_nearby"
     >
         
         <ImageView
@@ -36,6 +37,7 @@
             android:clickable="true"
             android:background="?android:selectableItemBackground"
             android:padding="15dp"
+            android:id="@+id/li_walktype_destination"
     >
         
         <ImageView

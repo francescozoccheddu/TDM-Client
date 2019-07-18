@@ -36,5 +36,4 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:+'
     implementation 'com.google.android.material:material:+'
     implementation 'com.github.jkwiecien:FloatingSearchView:1.1.2'
-    implementation 'com.ramotion.fluidslider:fluid-slider:0.3.1'
 }
