@@ -1,7 +1,5 @@
 package com.francescozoccheddu.tdmclient.ui
 
-import android.app.SearchManager
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
@@ -13,9 +11,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.utils.boundingBox
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.mapbox.geojson.BoundingBox
+import com.mapbox.mapboxsdk.annotations.Marker
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
@@ -43,12 +43,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchProvider: LocationSearchProvider
 
 
-    private fun FloatingActionButton.setIcon(icon: Int) {
-        setImageDrawable(ContextCompat.getDrawable(this@MainActivity, icon))
+    private fun setFabIcon(icon: Int) {
+        fab.setImageDrawable(ContextCompat.getDrawable(this@MainActivity, icon))
     }
 
-    private fun FloatingActionButton.setColor(color: Int) {
-        backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, color))
+    private fun setFabColor(color: Int) {
+        fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, color))
     }
 
     private lateinit var fab: FloatingActionButton
@@ -67,6 +67,11 @@ class MainActivity : AppCompatActivity() {
             this.map = map
             map.setStyle(Style.Builder().fromUri(MAP_STYLE_URI)) { style ->
                 map.setLatLngBoundsForCameraTarget(MAP_BOUNDS)
+            }
+            map.addOnMapClickListener {
+                if (locationChooseMode)
+                    setChoosenLocation(it, null)
+                locationChooseMode
             }
         }
 
@@ -95,15 +100,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Search view
+        searchProvider = LocationSearchProvider(MAP_BOUNDS.boundingBox)
+        searchProvider.onLocationClick += {
+            if (locationChooseMode)
+                setChoosenLocation(it.point, it.name)
+        }
+
         searchListView = findViewById(R.id.rv_search)
-        searchProvider = LocationSearchProvider(
-            BoundingBox.fromLngLats(
-                MAP_BOUNDS.lonWest,
-                MAP_BOUNDS.latSouth,
-                MAP_BOUNDS.lonEast,
-                MAP_BOUNDS.latNorth
-            )
-        )
         searchListView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
             adapter = searchProvider.adapter
@@ -124,26 +127,34 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun setChoosenLocation(point: LatLng, name: String?) {
+        marker?.remove()
+        marker = map.addMarker(MarkerOptions().setPosition(point))
+        // TODO Open bottom sheet
+        if (name != null) {
+            // TODO Set name in bottom sheet
+        }
+        else {
+            // TODO Set loading in bottom sheet
+            // TODO Start name query
+            // TODO [When query returns] Set name in bottom sheet
+        }
+    }
+
+    private fun removeChoosenLocation() {
+        marker?.remove()
+        // TODO Close bottom sheet
+    }
+
+    private var marker: Marker? = null
+
+    private var locationChooseMode = true
+
     override fun onBackPressed() {
         if (fab.isExpanded)
             fab.isExpanded = false
         else
             super.onBackPressed()
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        if (intent != null)
-            handleSearchIntent(intent)
-    }
-
-    private fun handleSearchIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_SEARCH) {
-            intent.getStringExtra(SearchManager.QUERY)?.also {
-                //doMySearch(query)
-            }
-        }
     }
 
     public override fun onStart() {
