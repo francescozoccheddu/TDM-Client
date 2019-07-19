@@ -5,17 +5,21 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.francescozoccheddu.tdmclient.utils.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.latlng
+import com.francescozoccheddu.tdmclient.utils.mapboxAccessToken
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
 import com.mapbox.geojson.BoundingBox
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 import java.util.stream.Collectors
 
 
 class LocationSearchProvider(boundingBox: BoundingBox) {
+
 
     private companion object {
         const val CACHE_SIZE = 100
@@ -24,8 +28,23 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
         val LANGUAGE = Locale.ITALIAN
     }
 
-    private class SearchListAdapter :
-        RecyclerView.Adapter<SearchListAdapter.ViewHolder>() {
+    private inner class SearchListAdapter : RecyclerView.Adapter<SearchListAdapter.ViewHolder>() {
+
+        private inner class ViewHolder(viewGroup: ViewGroup) : RecyclerView.ViewHolder(viewGroup) {
+
+            init {
+                viewGroup.setOnClickListener {
+                    onLocationClick(list[adapterPosition])
+                }
+            }
+
+            private val tvText = viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.tv_text)
+            private val ivIcon = viewGroup.findViewById<ImageView>(com.francescozoccheddu.tdmclient.R.id.iv_icon)
+
+            fun bind(location: Location) {
+                tvText.text = location.name
+            }
+        }
 
         private val list = mutableListOf<Location>()
 
@@ -35,20 +54,11 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
             notifyDataSetChanged()
         }
 
-        private class ViewHolder(viewGroup: ViewGroup) : RecyclerView.ViewHolder(viewGroup) {
-            private val tvText = viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.tv_text)
-            private val ivIcon = viewGroup.findViewById<ImageView>(com.francescozoccheddu.tdmclient.R.id.iv_icon)
-
-            fun bind(location: Location) {
-                tvText.text = location.name
-            }
-        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(
                 com.francescozoccheddu.tdmclient.R.layout.search_item,
-                parent,
-                false
+                parent, false
             ) as ViewGroup
             return ViewHolder(view)
         }
@@ -61,7 +71,7 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
 
     }
 
-    private data class Location(val name: String, val point: Point)
+    data class Location(val name: String, val point: LatLng)
 
     private val cache = object : LinkedHashMap<String, Collection<Location>>() {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Collection<Location>>?): Boolean {
@@ -70,7 +80,7 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
     }
 
     private val geocodingBuilder = MapboxGeocoding.builder()
-        .accessToken(Mapbox.getAccessToken() ?: throw IllegalStateException("No access token registered"))
+        .accessToken(mapboxAccessToken)
         .autocomplete(true)
         .country(COUNTRY)
         .limit(MAX_RESULTS)
@@ -82,7 +92,7 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
     private fun onResponse(query: String, results: List<CarmenFeature>) {
         val list = results.stream()
             .sorted(compareBy { c -> -c.relevance()!! })
-            .map { Location(it.matchingText() ?: it.text()!!, it.center()!!) }
+            .map { Location(it.matchingText() ?: it.text()!!, it.center()!!.latlng) }
             .collect(Collectors.toList())
         cache[query] = list
         if (query == lastQuery) {
@@ -126,5 +136,7 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
 
     private val _adapter = SearchListAdapter()
     val adapter: RecyclerView.Adapter<*> = _adapter
+
+    val onLocationClick = FuncEvent<Location>()
 
 }
