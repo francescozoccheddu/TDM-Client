@@ -1,11 +1,14 @@
 package com.francescozoccheddu.tdmclient.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.utils.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.latlng
 import com.francescozoccheddu.tdmclient.utils.mapboxAccessToken
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
@@ -16,19 +19,46 @@ import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.math.roundToInt
 
 
 class LocationSearchProvider(boundingBox: BoundingBox) {
 
-
     private companion object {
-        const val CACHE_SIZE = 100
-        const val MAX_RESULTS = 4
-        val COUNTRY = Locale.ITALY
-        val LANGUAGE = Locale.ITALIAN
+        private const val CACHE_SIZE = 100
+        private const val MAX_RESULTS = 4
+        private val COUNTRY = Locale.ITALY
+        private val LANGUAGE = Locale.ITALIAN
+        private const val SECONDS_PER_METER = 0.8
+
+        private fun makeLocation(name: String, point: LatLng, typeDescs: Iterable<String>): Location {
+            var type = Location.Type.UNKNOWN
+            for (typeDesc in typeDescs) {
+                type = when (typeDesc.trim().toLowerCase()) {
+                    "poi" -> Location.Type.POI
+                    "address" -> Location.Type.ADDRESS
+                    "place" -> Location.Type.PLACE
+                    else -> type
+                }
+            }
+            return Location(name, point, type)
+        }
+
     }
 
     private inner class SearchListAdapter : RecyclerView.Adapter<SearchListAdapter.ViewHolder>() {
+
+        private val recyclerViews = mutableSetOf<RecyclerView>()
+
+        override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+            super.onAttachedToRecyclerView(recyclerView)
+            recyclerViews += recyclerView
+        }
+
+        override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+            super.onDetachedFromRecyclerView(recyclerView)
+            recyclerViews -= recyclerView
+        }
 
         private inner class ViewHolder(viewGroup: ViewGroup) : RecyclerView.ViewHolder(viewGroup) {
 
@@ -38,11 +68,33 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
                 }
             }
 
-            private val tvText = viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.tv_text)
-            private val ivIcon = viewGroup.findViewById<ImageView>(com.francescozoccheddu.tdmclient.R.id.iv_icon)
+            private val tvName = viewGroup.findViewById<TextView>(R.id.tv_name)
+            private val ivIcon = viewGroup.findViewById<ImageView>(R.id.iv_icon)
+            private val tvDistance = viewGroup.findViewById<TextView>(R.id.tv_distance)
 
             fun bind(location: Location) {
-                tvText.text = location.name
+                tvName.text = location.name
+                ivIcon.setImageResource(
+                    when (location.type) {
+                        Location.Type.ADDRESS -> R.drawable.ic_map
+                        Location.Type.PLACE -> R.drawable.ic_terrain
+                        Location.Type.POI -> R.drawable.ic_place
+                        Location.Type.UNKNOWN -> R.drawable.ic_place
+                    }
+                )
+                updateDistance()
+            }
+
+            fun updateDistance() {
+                val a = list[adapterPosition].point
+                val b = userLocation
+                if (b != null) {
+                    val minutes = ((a.distanceTo(b) * SECONDS_PER_METER) / 60f).roundToInt()
+                    tvDistance.text = if (minutes < 1) "<1m" else "${minutes}m"
+                    tvDistance.visibility = View.VISIBLE
+                }
+                else
+                    tvDistance.visibility = View.GONE
             }
         }
 
@@ -54,10 +106,9 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
             notifyDataSetChanged()
         }
 
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(
-                com.francescozoccheddu.tdmclient.R.layout.search_item,
+                R.layout.search_item,
                 parent, false
             ) as ViewGroup
             return ViewHolder(view)
@@ -69,9 +120,24 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
 
         override fun getItemCount() = list.size
 
+        fun updateDistances() {
+            for (recyclerView in recyclerViews) {
+                for (i in 0 until _adapter.itemCount) {
+                    val viewHolder = recyclerView.findViewHolderForAdapterPosition(i)
+                    if (viewHolder is ViewHolder)
+                        viewHolder.updateDistance()
+                }
+            }
+        }
+
     }
 
-    data class Location(val name: String, val point: LatLng)
+    data class Location(val name: String, val point: LatLng, val type: Type) {
+
+        enum class Type {
+            PLACE, ADDRESS, POI, UNKNOWN
+        }
+    }
 
     private val cache = object : LinkedHashMap<String, Collection<Location>>() {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Collection<Location>>?): Boolean {
@@ -92,13 +158,22 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
     private fun onResponse(query: String, results: List<CarmenFeature>) {
         val list = results.stream()
             .sorted(compareBy { c -> -c.relevance()!! })
-            .map { Location(it.matchingText() ?: it.text()!!, it.center()!!.latlng) }
+            .map { makeLocation(it.matchingText() ?: it.text()!!, it.center()!!.latlng, it.placeType()!!) }
             .collect(Collectors.toList())
         cache[query] = list
         if (query == lastQuery) {
             _adapter.setList(list)
+            onQueryCompleted()
         }
     }
+
+    var userLocation: LatLng? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                _adapter.updateDistances()
+            }
+        }
 
     private lateinit var lastQuery: String
 
@@ -107,11 +182,13 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
         lastQuery = query
         if (query == "") {
             _adapter.setList(emptyList())
+            onQueryCompleted()
         }
         else {
             cache[query].let {
                 if (it != null) {
                     _adapter.setList(it)
+                    onQueryCompleted()
                 }
                 else {
                     if (proximity != null) {
@@ -126,7 +203,8 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
                         }
 
                         override fun onFailure(call: retrofit2.Call<GeocodingResponse>, throwable: Throwable) {
-                            print("LOC_SEARCH_PROV: Error=$throwable")
+                            if (query == lastQuery)
+                                onQueryFailed()
                         }
                     })
                 }
@@ -138,5 +216,9 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
     val adapter: RecyclerView.Adapter<*> = _adapter
 
     val onLocationClick = FuncEvent<Location>()
+
+    val onQueryCompleted = ProcEvent()
+
+    val onQueryFailed = ProcEvent()
 
 }

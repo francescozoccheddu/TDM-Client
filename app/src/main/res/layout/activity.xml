@@ -10,7 +10,7 @@
     
     <com.mapbox.mapboxsdk.maps.MapView
             xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/map"
+            android:id="@+id/mv_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             mapbox:mapbox_uiCompass="false"
@@ -65,9 +65,9 @@
             >
                 
                 <include layout="@layout/sheet_walktype"
-                         android:id="@+id/l_walktype"/>
+                         android:id="@+id/v_fabSheetWalkMode"/>
                 <include layout="@layout/sheet_duration"
-                         android:id="@+id/l_duration"
+                         android:id="@+id/v_fabSheetDuration"
                          android:visibility="gone"
                 />
             

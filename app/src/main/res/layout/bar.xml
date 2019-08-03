@@ -13,6 +13,8 @@
                  app:layout_constraintStart_toStartOf="parent"
                  app:layout_constraintTop_toTopOf="parent"
                  android:background="@drawable/bg_bar"
+                 android:id="@+id/l_search_bar"
+                 android:visibility="gone"
                  android:elevation="@dimen/bar_elevation"
                  android:layout_margin="@dimen/bar_margin"
     >
@@ -21,11 +23,62 @@
                       android:orientation="vertical"
         >
             
-            <EditText
-                    android:id="@+id/et_search"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-            />
+            <RelativeLayout android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:animateLayoutChanges="true"
+                            android:padding="6dp"
+            >
+                
+                <ImageButton
+                        android:id="@+id/ib_search_close"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_back"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="gone"
+                        android:layout_margin="2dp"
+                />
+                
+                <EditText
+                        android:id="@+id/et_search"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/ib_search_close"
+                        android:layout_toStartOf="@id/ib_search_clear"
+                        android:layout_alignWithParentIfMissing="true"
+                        android:layout_centerVertical="true"
+                        android:hint="@string/search_hint"
+                        android:background="@null"
+                        android:layout_margin="2dp"
+                />
+                
+                <ImageButton
+                        android:id="@+id/ib_search_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_cancel"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:layout_toStartOf="@id/pb_search"
+                        android:layout_alignWithParentIfMissing="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="gone"
+                        android:layout_margin="2dp"
+                />
+                
+                <ProgressBar
+                        android:layout_alignParentEnd="true"
+                        android:id="@+id/pb_search"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:indeterminateOnly="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="gone"
+                        android:layout_margin="2dp"
+                />
+            
+            </RelativeLayout>
             
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_search"
