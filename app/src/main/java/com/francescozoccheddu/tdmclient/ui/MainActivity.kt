@@ -228,6 +228,7 @@ class MainActivity : AppCompatActivity() {
         searchProvider.onLocationClick += {
             if (destinationPickEnabled)
                 destination = it.point
+            etSearch.clearFocus()
         }
 
         rvSearchList = findViewById(R.id.rv_search)
