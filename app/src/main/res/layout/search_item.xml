@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:background="?android:selectableItemBackground"
         android:padding="10dp"
-        android:gravity="center_vertical|start"
         android:clickable="true"
+        android:animateLayoutChanges="true"
 >
     
     <ImageView android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:src="@drawable/ic_somewhere"
                android:id="@+id/iv_icon"
-               android:layout_marginRight="10dp"
+               android:layout_marginEnd="16dp"
+               android:layout_centerVertical="true"
+               android:layout_alignParentStart="true"
     />
     
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:id="@+id/tv_text"
+              android:id="@+id/tv_name"
+              android:layout_centerVertical="true"
+              android:layout_toEndOf="@id/iv_icon"
+              android:layout_toStartOf="@id/tv_distance"
+              android:layout_alignWithParentIfMissing="true"
+    />
+    
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/tv_distance"
+              android:visibility="gone"
+              android:layout_centerVertical="true"
+              android:layout_alignParentEnd="true"
     />
 
-</LinearLayout>
+</RelativeLayout>
