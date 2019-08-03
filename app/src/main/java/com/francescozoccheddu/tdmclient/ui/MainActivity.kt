@@ -1,5 +1,6 @@
 package com.francescozoccheddu.tdmclient.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,9 +26,19 @@ import com.francescozoccheddu.tdmclient.utils.boundingBox
 import com.francescozoccheddu.tdmclient.utils.point
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineCallback
+import com.mapbox.android.core.location.LocationEngineProvider
+import com.mapbox.android.core.location.LocationEngineRequest
+import com.mapbox.android.core.location.LocationEngineResult
+import com.mapbox.android.core.permissions.PermissionsListener
+import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
@@ -52,9 +64,10 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import kotlin.math.roundToLong
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PermissionsListener {
 
     private companion object {
 
@@ -70,6 +83,9 @@ class MainActivity : AppCompatActivity() {
         private const val MB_SOURCE_COVERAGE = "source_coverage"
         private const val MB_LAYER_COVERAGE = "layer_coverage"
 
+        private const val LOCATION_UPDATE_INTERVAL = 1f
+        private const val LOCATION_MAX_WAIT_TIME = LOCATION_UPDATE_INTERVAL * 5f
+
     }
 
     private lateinit var mvMap: MapView
@@ -84,6 +100,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fab: FloatingActionButton
     private lateinit var etSearch: EditText
     private lateinit var vgSearchBar: ViewGroup
+
+    private val callback = object : LocationEngineCallback<LocationEngineResult> {
+
+        override fun onSuccess(result: LocationEngineResult?) {
+            val location = result?.lastLocation
+            if (location != null) {
+                map.locationComponent.forceLocationUpdate(location)
+                userLocation = LatLng(location)
+            }
+        }
+
+        override fun onFailure(exception: Exception) {
+        }
+
+    }
+
+    private lateinit var permissionManager: PermissionsManager
+
+    private lateinit var locationEngine: LocationEngine
 
     private fun setFabIcon(icon: Int) {
         fab.setImageDrawable(ContextCompat.getDrawable(this@MainActivity, icon))
@@ -170,6 +205,7 @@ class MainActivity : AppCompatActivity() {
                                 )
                         )
                 ) { style ->
+                    enableLocationComponent(style)
                     setLatLngBoundsForCameraTarget(MAP_BOUNDS)
                     service.periodicPoll = 2f
                 }
@@ -281,6 +317,7 @@ class MainActivity : AppCompatActivity() {
             pbSearch.visibility = View.GONE
         }
 
+
     }
 
     private var route: Any? = null
@@ -377,6 +414,70 @@ class MainActivity : AppCompatActivity() {
             updateFab()
         }
 
+    private var userLocation: LatLng? = null
+        set(value) {
+            if (field != value) {
+                if (value != null && MAP_BOUNDS.contains(value))
+                    field = value
+                else
+                    field = null
+                searchProvider.userLocation = field
+            }
+        }
+
+    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
+        Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onPermissionResult(granted: Boolean) {
+        if (granted) {
+            map.getStyle { enableLocationComponent(it) }
+        }
+        else {
+            // TODO Handler permission not granted
+        }
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private fun enableLocationComponent(style: Style) {
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+            val locationComponent = map.locationComponent
+
+            val locationComponentActivationOptions =
+                LocationComponentActivationOptions.builder(this, style)
+                    .useDefaultLocationEngine(false)
+                    .build()
+
+            locationComponent.activateLocationComponent(locationComponentActivationOptions)
+            locationComponent.setLocationComponentEnabled(true)
+            locationComponent.setCameraMode(CameraMode.NONE)
+            locationComponent.setRenderMode(RenderMode.COMPASS)
+
+            initLocationEngine()
+        }
+        else {
+            permissionManager = PermissionsManager(this)
+            permissionManager.requestLocationPermissions(this)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initLocationEngine() {
+        locationEngine = LocationEngineProvider.getBestLocationEngine(this)
+
+        val request = LocationEngineRequest.Builder((LOCATION_UPDATE_INTERVAL * 1000f).roundToLong())
+            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+            .setMaxWaitTime((LOCATION_MAX_WAIT_TIME * 1000f).roundToLong())
+            .build()
+
+        locationEngine.requestLocationUpdates(request, callback, getMainLooper())
+        locationEngine.getLastLocation(callback)
+    }
+
     override fun onBackPressed() {
         if (fab.isExpanded)
             fab.isExpanded = false
@@ -419,6 +520,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (this::locationEngine.isInitialized)
+            locationEngine.removeLocationUpdates(callback)
         mvMap.onDestroy()
     }
 
