@@ -11,6 +11,7 @@ import com.francescozoccheddu.tdmclient.utils.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.latlng
 import com.francescozoccheddu.tdmclient.utils.mapboxAccessToken
+import com.francescozoccheddu.tdmclient.utils.travelDuration
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.CarmenFeature
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
@@ -29,7 +30,6 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
         private const val MAX_RESULTS = 4
         private val COUNTRY = Locale.ITALY
         private val LANGUAGE = Locale.ITALIAN
-        private const val SECONDS_PER_METER = 0.8
 
         private fun makeLocation(name: String, point: LatLng, typeDescs: Iterable<String>): Location {
             var type = Location.Type.UNKNOWN
@@ -89,7 +89,7 @@ class LocationSearchProvider(boundingBox: BoundingBox) {
                 val a = list[adapterPosition].point
                 val b = userLocation
                 if (b != null) {
-                    val minutes = ((a.distanceTo(b) * SECONDS_PER_METER) / 60f).roundToInt()
+                    val minutes = (travelDuration(a.distanceTo(b).toFloat()) / 60f).roundToInt()
                     tvDistance.text = if (minutes < 1) "<1m" else "${minutes}m"
                     tvDistance.visibility = View.VISIBLE
                 }
