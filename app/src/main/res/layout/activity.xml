@@ -20,6 +20,8 @@
             mapbox:mapbox_uiTiltGestures="false"
             mapbox:mapbox_uiLogo="false"
             mapbox:mapbox_uiAttribution="false"
+            mapbox:mapbox_compassAnimationEnabled="true"
+            mapbox:mapbox_accuracyAnimationEnabled="true"
     />
     
     <androidx.coordinatorlayout.widget.CoordinatorLayout
