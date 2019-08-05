@@ -2,8 +2,11 @@ package com.francescozoccheddu.tdmclient.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -24,8 +27,8 @@ import com.francescozoccheddu.tdmclient.data.retrieve.CoverageRetrieveMode
 import com.francescozoccheddu.tdmclient.data.retrieve.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.utils.boundingBox
 import com.francescozoccheddu.tdmclient.utils.point
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -39,9 +42,10 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.net.ConnectivityListener
+import com.mapbox.mapboxsdk.net.ConnectivityReceiver
 import com.mapbox.mapboxsdk.style.expressions.Expression.get
 import com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity
 import com.mapbox.mapboxsdk.style.expressions.Expression.interpolate
@@ -64,10 +68,14 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import kotlinx.android.synthetic.main.activity.cl_root
+import kotlinx.android.synthetic.main.activity.mv_map
+import kotlinx.android.synthetic.main.sheet_duration.bt_duration_ok
+import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_destination
+import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_nearby
 import kotlin.math.roundToLong
 
-
-class MainActivity : AppCompatActivity(), PermissionsListener {
+class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListener {
 
     private companion object {
 
@@ -88,7 +96,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
 
     }
 
-    private lateinit var mvMap: MapView
     private lateinit var map: MapboxMap
 
     private lateinit var rvSearchList: RecyclerView
@@ -100,8 +107,13 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     private lateinit var fab: FloatingActionButton
     private lateinit var etSearch: EditText
     private lateinit var vgSearchBar: ViewGroup
+    private lateinit var connectivityReceiver: ConnectivityReceiver
 
     private val callback = object : LocationEngineCallback<LocationEngineResult> {
+
+        override fun onFailure(exception: Exception) {
+
+        }
 
         override fun onSuccess(result: LocationEngineResult?) {
             val location = result?.lastLocation
@@ -111,14 +123,9 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             }
         }
 
-        override fun onFailure(exception: Exception) {
-        }
-
     }
 
     private lateinit var permissionManager: PermissionsManager
-
-    private lateinit var locationEngine: LocationEngine
 
     private fun setFabIcon(icon: Int) {
         fab.setImageDrawable(ContextCompat.getDrawable(this@MainActivity, icon))
@@ -148,71 +155,72 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         }
 
         // Map
-        mvMap = findViewById(R.id.mv_map)
-        mvMap.onCreate(savedInstanceState)
-        mvMap.getMapAsync { map ->
-            this.map = map.apply {
-                setStyle(
-                    Style.Builder()
-                        .fromUri(MAP_STYLE_URI)
-                        .withImage(MB_IMAGE_DESTINATION, resources.getDrawable(R.drawable.ic_somewhere, null))
-                        .withSource(GeoJsonSource(MB_SOURCE_DESTINATION))
-                        .withLayer(
-                            SymbolLayer(MB_LAYER_DESTINATION, MB_SOURCE_DESTINATION)
-                                .withProperties(
-                                    iconAllowOverlap(true),
-                                    textAllowOverlap(true),
-                                    iconImage(MB_IMAGE_DESTINATION),
-                                    iconIgnorePlacement(true),
-                                    iconOptional(false)
-                                )
-                        ).withSource(GeoJsonSource(MB_SOURCE_COVERAGE))
-                        .withLayer(
-                            HeatmapLayer(MB_LAYER_COVERAGE, MB_SOURCE_COVERAGE)
-                                .withProperties(
-                                    heatmapColor(
-                                        interpolate(
-                                            linear(), heatmapDensity(),
-                                            literal(0.0), rgba(6, 50, 255, 0),
-                                            literal(0.2), rgba(12, 105, 255, 0.5),
-                                            literal(1.0), rgba(48, 210, 255, 1.0)
-                                        )
-                                    ),
-                                    heatmapIntensity(
-                                        interpolate(
-                                            linear(), zoom(),
-                                            stop(11, 1),
-                                            stop(15, 3)
-                                        )
-                                    ),
-                                    heatmapRadius(
-                                        interpolate(
-                                            linear(), zoom(),
-                                            stop(11, 30),
-                                            stop(15, 100)
-                                        )
-                                    ),
-                                    heatmapOpacity(
-                                        interpolate(
-                                            linear(), zoom(),
-                                            stop(12, 0.5),
-                                            stop(15, 0)
-                                        )
-                                    ),
-                                    heatmapWeight(
-                                        subtract(literal(1f), get("coverage"))
+        mv_map.apply {
+            onCreate(savedInstanceState)
+            getMapAsync { map ->
+                this@MainActivity.map = map.apply {
+                    setStyle(
+                        Style.Builder()
+                            .fromUri(MAP_STYLE_URI)
+                            .withImage(MB_IMAGE_DESTINATION, resources.getDrawable(R.drawable.ic_somewhere, null))
+                            .withSource(GeoJsonSource(MB_SOURCE_DESTINATION))
+                            .withLayer(
+                                SymbolLayer(MB_LAYER_DESTINATION, MB_SOURCE_DESTINATION)
+                                    .withProperties(
+                                        iconAllowOverlap(true),
+                                        textAllowOverlap(true),
+                                        iconImage(MB_IMAGE_DESTINATION),
+                                        iconIgnorePlacement(true),
+                                        iconOptional(false)
                                     )
-                                )
-                        )
-                ) { style ->
-                    enableLocationComponent(style)
-                    setLatLngBoundsForCameraTarget(MAP_BOUNDS)
-                    service.periodicPoll = 2f
-                }
-                addOnMapClickListener {
-                    if (destinationPickEnabled)
-                        destination = it
-                    destinationPickEnabled
+                            ).withSource(GeoJsonSource(MB_SOURCE_COVERAGE))
+                            .withLayer(
+                                HeatmapLayer(MB_LAYER_COVERAGE, MB_SOURCE_COVERAGE)
+                                    .withProperties(
+                                        heatmapColor(
+                                            interpolate(
+                                                linear(), heatmapDensity(),
+                                                literal(0.0), rgba(6, 50, 255, 0),
+                                                literal(0.2), rgba(12, 105, 255, 0.5),
+                                                literal(1.0), rgba(48, 210, 255, 1.0)
+                                            )
+                                        ),
+                                        heatmapIntensity(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(11, 1),
+                                                stop(15, 3)
+                                            )
+                                        ),
+                                        heatmapRadius(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(11, 30),
+                                                stop(15, 100)
+                                            )
+                                        ),
+                                        heatmapOpacity(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(12, 0.5),
+                                                stop(15, 0)
+                                            )
+                                        ),
+                                        heatmapWeight(
+                                            subtract(literal(1f), get("coverage"))
+                                        )
+                                    )
+                            )
+                    ) { style ->
+                        enableLocationComponent(style)
+                        setLatLngBoundsForCameraTarget(MAP_BOUNDS)
+                        service.periodicPoll = 2f
+                    }
+                    addOnMapClickListener {
+                        if (destinationPickEnabled)
+                            destination = it
+                        destinationPickEnabled
+                    }
                 }
             }
         }
@@ -245,17 +253,17 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             }
         }
 
-        findViewById<MaterialButton>(R.id.bt_duration_ok).setOnClickListener {
+        bt_duration_ok.setOnClickListener {
             fab.isExpanded = false
         }
 
-        findViewById<View>(R.id.li_walktype_destination).setOnClickListener {
+        li_walktype_destination.setOnClickListener {
             destination = null
             fab.isExpanded = false
             destinationPickEnabled = true
         }
 
-        findViewById<View>(R.id.li_walktype_nearby).setOnClickListener {
+        li_walktype_nearby.setOnClickListener {
             fabSheetMode = FabSheetMode.WALK_DURATION
         }
 
@@ -317,16 +325,14 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             pbSearch.visibility = View.GONE
         }
 
-
+        connectivityReceiver = ConnectivityReceiver.instance(applicationContext)
+        connectivityReceiver.addListener(this)
+        connectivityReceiver.activate()
+        online = connectivityReceiver.isConnected
+        updateProblems()
     }
 
     private var route: Any? = null
-        set(value) {
-            field = value
-            updateFab()
-        }
-
-    private var walkable = true
         set(value) {
             field = value
             updateFab()
@@ -368,7 +374,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             }
         }
         else {
-            if (walkable) {
+            if (online && PermissionsManager.areLocationPermissionsGranted(this)) {
                 setFabIcon(R.drawable.ic_walk)
                 setFabColor(R.color.colorPrimary)
             }
@@ -425,6 +431,94 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             }
         }
 
+    private var online = false
+        set(value) {
+            if (value != field) {
+                field = value
+                updateProblems()
+            }
+        }
+
+
+    private enum class Problem {
+        OFFLINE, PERMISSION_REQUIRED, BOTH
+    }
+
+    private var sbProblem: Snackbar? = null
+        set(value) {
+            if (field != value) {
+                field?.dismiss()
+                field = value
+            }
+        }
+
+    private var problem: Problem? = null
+        set(value) {
+            if (field != value) {
+                field = value
+                fun addAction(snackbar: Snackbar) {
+                    snackbar.setAction(R.string.problem_location_permission_action) {
+                        val intent = Intent()
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        intent.setData(Uri.fromParts("package", getPackageName(), null))
+                        startActivity(intent)
+                        problem = null
+                        updateProblems()
+                    }
+                }
+                sbProblem = when (value) {
+                    Problem.OFFLINE -> Snackbar
+                        .make(cl_root, R.string.problem_offline, Snackbar.LENGTH_INDEFINITE)
+                        .apply { show() }
+                    Problem.PERMISSION_REQUIRED -> Snackbar
+                        .make(cl_root, R.string.problem_location_permission, Snackbar.LENGTH_INDEFINITE)
+                        .apply {
+                            addAction(this)
+                            show()
+                        }
+                    Problem.BOTH -> run {
+                        val a = resources.getString(R.string.problem_offline)
+                        val b = resources.getString(R.string.problem_location_permission)
+                        Snackbar
+                            .make(cl_root, "$a\n$b", Snackbar.LENGTH_INDEFINITE)
+                            .apply {
+                                addAction(this)
+                                show()
+                            }
+                    }
+                    null -> null
+                }
+            }
+        }
+
+    private fun updateProblems() {
+        val locationPermission = PermissionsManager.areLocationPermissionsGranted(this)
+
+        if (!locationPermission || !online) {
+            fab.isExpanded = false
+            bt_duration_ok.isEnabled = false
+            if (destinationPickEnabled) {
+                destinationPickEnabled = false
+                destination = null
+            }
+        }
+        else {
+            bt_duration_ok.isEnabled = true
+        }
+        updateFab()
+
+        problem =
+            if (locationPermission) {
+                if (online) null
+                else Problem.OFFLINE
+            }
+            else {
+                if (online) Problem.PERMISSION_REQUIRED
+                else Problem.BOTH
+            }
+    }
+
+
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_LONG).show()
     }
@@ -434,12 +528,13 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     }
 
     override fun onPermissionResult(granted: Boolean) {
-        if (granted) {
+        if (granted)
             map.getStyle { enableLocationComponent(it) }
-        }
-        else {
-            // TODO Handler permission not granted
-        }
+        updateProblems()
+    }
+
+    override fun onNetworkStateChanged(connected: Boolean) {
+        online = connected
     }
 
     @SuppressWarnings("MissingPermission")
@@ -464,6 +559,8 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             permissionManager.requestLocationPermissions(this)
         }
     }
+
+    private lateinit var locationEngine: LocationEngine
 
     @SuppressLint("MissingPermission")
     private fun initLocationEngine() {
@@ -495,39 +592,45 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
 
     public override fun onStart() {
         super.onStart()
-        mvMap.onStart()
+        updateProblems()
+        mv_map.onStart()
     }
 
     public override fun onResume() {
         super.onResume()
-        mvMap.onResume()
+        if (!this::locationEngine.isInitialized && this::map.isInitialized)
+            map.getStyle { enableLocationComponent(it) }
+        updateProblems()
+        mv_map.onResume()
     }
 
     public override fun onPause() {
         super.onPause()
-        mvMap.onPause()
+        mv_map.onPause()
     }
 
     public override fun onStop() {
         super.onStop()
-        mvMap.onStop()
+        if (this::locationEngine.isInitialized)
+            locationEngine.removeLocationUpdates(callback)
+        mv_map.onStop()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mvMap.onLowMemory()
+        mv_map.onLowMemory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (this::locationEngine.isInitialized)
-            locationEngine.removeLocationUpdates(callback)
-        mvMap.onDestroy()
+        connectivityReceiver.removeListener(this)
+        connectivityReceiver.deactivate()
+        mv_map.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mvMap.onSaveInstanceState(outState)
+        mv_map.onSaveInstanceState(outState)
     }
 
 }
