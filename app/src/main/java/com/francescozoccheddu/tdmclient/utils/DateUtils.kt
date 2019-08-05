@@ -3,20 +3,20 @@ package com.francescozoccheddu.tdmclient.utils
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
+import kotlin.math.roundToLong
 
 
-fun dateDiff(date1: Date, date2: Date, timeUnit: TimeUnit = TimeUnit.SECONDS): Long {
+fun dateDiff(date1: Date, date2: Date): Float {
     val diffMs = date2.getTime() - date1.getTime()
-    return timeUnit.convert(diffMs, TimeUnit.MILLISECONDS)
+    return diffMs / 1000f
 }
 
-fun dateElapsed(date: Date, timeUnit: TimeUnit = TimeUnit.SECONDS): Long {
-    return dateDiff(date, Date(), timeUnit)
+fun dateElapsed(date: Date): Float {
+    return dateDiff(date, Date())
 }
 
-fun dateAdd(date: Date, time: Long, timeUnit: TimeUnit = TimeUnit.SECONDS): Date {
-    return Date(date.time + timeUnit.toMillis(time))
+fun dateAdd(date: Date, time: Float): Date {
+    return Date(date.time + (time * 1000).roundToLong())
 }
 
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
@@ -56,3 +56,5 @@ fun dateParseISO(date: String): Date {
     }
     return format.parse(builder.toString())!!
 }
+
+fun toMillis(seconds: Float) = (seconds * 1000).roundToLong()

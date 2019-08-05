@@ -1,8 +1,6 @@
 package com.francescozoccheddu.tdmclient.data.client
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import com.android.volley.AuthFailureError
 import com.android.volley.ClientError
 import com.android.volley.DefaultRetryPolicy
@@ -18,6 +16,7 @@ import com.android.volley.toolbox.Volley
 import com.francescozoccheddu.tdmclient.utils.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.dateElapsed
+import com.francescozoccheddu.tdmclientservice.Timer
 import org.json.JSONException
 import org.json.JSONObject
 import java.nio.charset.Charset
@@ -25,7 +24,6 @@ import java.nio.charset.IllegalCharsetNameException
 import java.nio.charset.UnsupportedCharsetException
 import java.util.*
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 import com.android.volley.Request as VolleyRequest
 import com.android.volley.Response as VolleyResponse
 
@@ -163,7 +161,7 @@ class Server(context: Context, val address: ServerAddress) {
                     {
                         endTime = Date()
                         val networkResponse = it.networkResponse
-                        if (networkResponse != null && networkResponse.data != null) {
+                        if (networkResponse?.data != null) {
                             var body: JSONObject? = null
                             try {
                                 val charsetName = HttpHeaderParser.parseCharset(networkResponse.headers, "utf-8")
@@ -278,32 +276,35 @@ class Server(context: Context, val address: ServerAddress) {
         address: ServiceAddress,
         pollRequest: RequestType,
         interpreter: PollInterpreter<RequestType, ResponseType, DataType>,
-        looper: Looper = Looper.myLooper() as Looper
+        timer: Timer = Timer()
     ) : PollService<RequestType, ResponseType, DataType>(address, pollRequest, interpreter) {
 
         constructor(
             address: String,
             pollRequest: RequestType,
             interpreter: PollInterpreter<RequestType, ResponseType, DataType>,
-            looper: Looper = Looper.myLooper() as Looper
+            timer: Timer = Timer()
         ) : this(
-            ServiceAddress(address), pollRequest, interpreter, looper
+            ServiceAddress(address), pollRequest, interpreter, timer
         )
 
-        private val handler = Handler(looper)
+        private val pollTicker = timer.Ticker().apply {
+            runnable = Runnable { poll() }
+        }
 
-        private val expirationRunnable = Runnable(this::updateExpiration)
-
-        private val pollRunnable = Runnable(this::poll)
+        private val expirationCountdown = timer.Countdown().apply {
+            runnable = Runnable { updateExpiration() }
+        }
 
         private fun updateExpiration() {
-            handler.removeCallbacks(expirationRunnable)
+            expirationCountdown.cancel()
             val expiration = this.expiration
             if (hasData && expiration != null) {
                 val wait = expiration - dateElapsed(time)
                 if (wait > 0) {
                     expired = false
-                    handler.postDelayed(expirationRunnable, (wait * 1000).roundToLong())
+                    expirationCountdown.time = wait
+                    expirationCountdown.pull()
                 }
                 else if (!expired) {
                     expired = true
@@ -326,26 +327,19 @@ class Server(context: Context, val address: ServerAddress) {
 
         var periodicPoll: Float? = null
             set(value) {
-                if (value != null && value < 1.0f) {
-                    throw IllegalArgumentException("Value must be at least 1 second")
-                }
-                field = value
-                handler.removeCallbacks(pollRunnable)
-                if (value != null) {
-                    val wait = if (this::lastPoll.isInitialized) value - dateElapsed(lastPoll) else 0.0f
-                    if (wait > 0) {
-                        handler.postDelayed(pollRunnable, (wait * 1000).roundToLong())
+                if (value != field) {
+                    field = value
+                    if (value != null) {
+                        pollTicker.tickInterval = value
+                        pollTicker.running = true
                     }
-                    else {
-                        poll()
-                    }
+                    else
+                        pollTicker.running = false
                 }
             }
 
         var expired = false
             private set
-
-        private lateinit var lastPoll: Date
 
         val onExpire = ProcEvent()
 
@@ -356,12 +350,7 @@ class Server(context: Context, val address: ServerAddress) {
 
         override fun polled() {
             super.polled()
-            lastPoll = Date()
-            handler.removeCallbacks(pollRunnable)
-            val periodicPoll = this.periodicPoll
-            if (periodicPoll != null) {
-                handler.postDelayed(pollRunnable, (periodicPoll * 1000).roundToLong())
-            }
+            pollTicker.notifyTick()
         }
 
     }

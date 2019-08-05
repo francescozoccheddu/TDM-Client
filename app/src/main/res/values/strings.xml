@@ -6,4 +6,7 @@
         pk.eyJ1IjoiZnJhbmNlc2NvenoiLCJhIjoiY2pzYndrOTg5MGVrdzN5cGR2ZjdkY3ZnMiJ9.MCiDPh-MIjlWxN1IdzrYSg
     </string>
     <string name="user_location_permission_explanation">TDM-Client ha bisogno di conoscere la tua posizione per poter ottimizzare il tuo percorso</string>
+    <string name="problem_offline">Nessuna connessione ad Internet</string>
+    <string name="problem_location_permission">Permesso di accededere alla posizione negato</string>
+    <string name="problem_location_permission_action">Concedi</string>
 </resources>
