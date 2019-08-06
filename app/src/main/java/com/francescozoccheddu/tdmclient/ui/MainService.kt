@@ -16,8 +16,10 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.data.operation.FakeSensor
 import com.francescozoccheddu.tdmclient.data.operation.SensorDriver
 import com.francescozoccheddu.tdmclient.ui.MainActivity
+import com.francescozoccheddu.tdmclient.utils.FuncEvent
 import com.francescozoccheddu.tdmclientservice.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclientservice.LocationStatusReceiver
 import com.francescozoccheddu.tdmclientservice.Timer
@@ -70,45 +72,40 @@ class MainService : Service() {
     }
 
 
-    interface Callbacks {
-
-        fun onScoreChange(service: MainService)
-
-        fun onLocationChange(service: MainService)
-
-        fun onConnectivityChange(service: MainService)
-
-        fun onLocationProviderChange(service: MainService)
-
-    }
-
     inner class Binding : Binder() {
         val service get() = this@MainService
     }
 
-    var callbacks: Callbacks? = null
+    val onLocationChange = FuncEvent<MainService>()
+    val onLocatableChange = FuncEvent<MainService>()
+    val onOnlineChange = FuncEvent<MainService>()
+    val onScoreChange = FuncEvent<MainService>()
 
     var location: Location? = null
         private set(value) {
             if (value != field) {
                 field = value
-                callbacks?.onLocationChange(this)
+                if (value != null)
+                    sensorDriver.location = value
+                sensorDriver.measuring = value != null
+                onLocationChange(this)
             }
         }
 
-    var locatable = true
+    var locatable = false
         private set(value) {
             if (value != field) {
                 field = value
-                callbacks?.onLocationProviderChange(this)
+                onLocatableChange(this)
             }
         }
 
-    var online = true
+    var online = false
         private set(value) {
             if (value != field) {
                 field = value
-                callbacks?.onConnectivityChange(this)
+                sensorDriver.pushing = value
+                onOnlineChange(this)
             }
         }
 
@@ -116,11 +113,12 @@ class MainService : Service() {
         private set(value) {
             if (value != field) {
                 field = value
-                callbacks?.onScoreChange(this)
+                onScoreChange(this)
             }
         }
 
     fun requestScoreUpdate() {
+        sensorDriver.requestScoreUpdate()
     }
 
     private val locationCallback = object : LocationEngineCallback<LocationEngineResult> {
@@ -140,6 +138,7 @@ class MainService : Service() {
     private val connectivityStatusReceiver = ConnectivityStatusReceiver()
     private val locationStatusReceiver = LocationStatusReceiver()
     private lateinit var locationEngine: LocationEngine
+    private lateinit var sensorDriver: SensorDriver
 
     private fun setForeground(enabled: Boolean) {
         if (enabled)
@@ -177,25 +176,6 @@ class MainService : Service() {
             setForeground(true)
         }
 
-        // Prepare callbacks
-        run {
-            connectivityStatusReceiver.register(this) { online = it }
-            locationStatusReceiver.register(this) { locatable = it }
-
-            locationEngine = LocationEngineProvider.getBestLocationEngine(this)
-            val request = LocationEngineRequest
-                .Builder((LOCATION_POLL_INTERVAL * 1000).roundToLong())
-                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime((LOCATION_POLL_MAX_WAIT * 1000).roundToLong())
-                .build()
-            locationEngine.requestLocationUpdates(request, locationCallback, mainLooper)
-        }
-
-        // Prepare client
-        run {
-
-        }
-
         // Prepare timer
         run {
             val timer = Timer()
@@ -207,13 +187,35 @@ class MainService : Service() {
             }
         }
 
+        // Prepare sensor
+        run {
+            val fakeMeasurement = SensorDriver.Measurement(100f, 50f, 50f, 20f, 50f, 50f)
+            sensorDriver = SensorDriver(this, USER, FakeSensor(fakeMeasurement))
+            sensorDriver.onScoreChange += { score = it.score }
+            sensorDriver.onConnectionChange += { online = it.reachable && ConnectivityStatusReceiver.isOnline(this) }
+            sensorDriver.measureInterval = MEASURE_INTERVAL_TIME
+            sensorDriver.loadScore(this)
+        }
+
+        // Prepare callbacks
+        run {
+            connectivityStatusReceiver.register(this) { online = it && sensorDriver.reachable }
+            locationStatusReceiver.register(this) { locatable = it }
+
+            locationEngine = LocationEngineProvider.getBestLocationEngine(this)
+            val request = LocationEngineRequest
+                .Builder((LOCATION_POLL_INTERVAL * 1000).roundToLong())
+                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                .setMaxWaitTime((LOCATION_POLL_MAX_WAIT * 1000).roundToLong())
+                .build()
+            locationEngine.requestLocationUpdates(request, locationCallback, mainLooper)
+        }
+
         // Update results
         run {
             online = ConnectivityStatusReceiver.isOnline(this)
             locatable = LocationStatusReceiver.isEnabled(this)
-
             locationEngine.getLastLocation(locationCallback)
-
             requestScoreUpdate()
         }
 
@@ -229,7 +231,6 @@ class MainService : Service() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        callbacks = null
         setForeground(true)
         return true
     }
@@ -251,6 +252,10 @@ class MainService : Service() {
         locationEngine.removeLocationUpdates(locationCallback)
         connectivityStatusReceiver.unregister(this)
         locationStatusReceiver.unregister(this)
+        sensorDriver.measuring = false
+        sensorDriver.pushing = false
+        sensorDriver.cancelAll()
+        sensorDriver.saveScore(this)
     }
 
 }
