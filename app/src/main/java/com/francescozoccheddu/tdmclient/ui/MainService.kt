@@ -16,9 +16,12 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.data.client.Server
+import com.francescozoccheddu.tdmclient.data.operation.CoverageRetrieveMode
+import com.francescozoccheddu.tdmclient.data.operation.CoverageRetriever
 import com.francescozoccheddu.tdmclient.data.operation.FakeSensor
 import com.francescozoccheddu.tdmclient.data.operation.SensorDriver
-import com.francescozoccheddu.tdmclient.ui.MainActivity
+import com.francescozoccheddu.tdmclient.data.operation.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.utils.FuncEvent
 import com.francescozoccheddu.tdmclientservice.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclientservice.LocationStatusReceiver
@@ -28,6 +31,7 @@ import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
+import org.json.JSONObject
 import kotlin.math.roundToLong
 
 
@@ -35,8 +39,8 @@ class MainService : Service() {
 
     companion object {
 
-        private const val NOTIFICATION_CHANNEL = "ForegroundServiceChannel"
-        private const val KILL_WITH_APP = false
+        private const val NOTIFICATION_CHANNEL = "ServiceNotificationChannel"
+        private const val KILL_WITH_TASK = false
         private const val ENABLE_KILL_BUTTON = false
         private const val FOREGROUND_NOTIFICATION_ID = 1
         private const val DEVICE_LOST_NOTIFICATION_ID = 2
@@ -44,6 +48,10 @@ class MainService : Service() {
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
         private const val LOCATION_EXPIRATION_TIME = 15f
         private const val MEASURE_INTERVAL_TIME = 3f
+        private const val COVERAGE_INTERVAL_TIME = 10f
+        private const val COVERAGE_EXPIRATION_TIME = 60f
+        private val COVERAGE_RETRIEVE_MODE = CoverageRetrieveMode.POINTS
+        private const val SERVER_ADDRESS = "http://localhost:8080/"
         private val USER = SensorDriver.User(0, "0")
 
         fun bind(context: Context, connection: ServiceConnection) {
@@ -80,6 +88,10 @@ class MainService : Service() {
     val onLocatableChange = FuncEvent<MainService>()
     val onOnlineChange = FuncEvent<MainService>()
     val onScoreChange = FuncEvent<MainService>()
+    val onCoverageDataChange = FuncEvent<MainService>()
+
+    val coverageData: JSONObject?
+        get() = if (coverageRetriever.hasData && !coverageRetriever.expired) coverageRetriever.data else null
 
     var location: Location? = null
         private set(value) {
@@ -105,6 +117,7 @@ class MainService : Service() {
             if (value != field) {
                 field = value
                 sensorDriver.pushing = value
+                coverageRetriever.periodicPoll = if (value && bound) COVERAGE_INTERVAL_TIME else null
                 onOnlineChange(this)
             }
         }
@@ -138,7 +151,17 @@ class MainService : Service() {
     private val connectivityStatusReceiver = ConnectivityStatusReceiver()
     private val locationStatusReceiver = LocationStatusReceiver()
     private lateinit var locationEngine: LocationEngine
+    private lateinit var server: Server
     private lateinit var sensorDriver: SensorDriver
+    private lateinit var coverageRetriever: CoverageRetriever
+    private var bound = false
+        set(value) {
+            if (value != field) {
+                field = value
+                setForeground(value)
+                coverageRetriever.periodicPoll = if (value && online) COVERAGE_INTERVAL_TIME else null
+            }
+        }
 
     private fun setForeground(enabled: Boolean) {
         if (enabled)
@@ -158,7 +181,7 @@ class MainService : Service() {
                     .createNotificationChannel(
                         NotificationChannel(
                             NOTIFICATION_CHANNEL,
-                            "Foreground Service Channel",
+                            resources.getString(R.string.service_notification_channel),
                             NotificationManager.IMPORTANCE_DEFAULT
                         )
                     )
@@ -187,14 +210,27 @@ class MainService : Service() {
             }
         }
 
+        server = Server(this, SERVER_ADDRESS)
+
+        // Prepare retriever
+        coverageRetriever = makeCoverageRetriever(server).apply {
+            pollRequest = COVERAGE_RETRIEVE_MODE
+            expiration = COVERAGE_EXPIRATION_TIME
+            onData += { onCoverageDataChange(this@MainService) }
+            onExpire += { onCoverageDataChange(this@MainService) }
+        }
+
         // Prepare sensor
         run {
             val fakeMeasurement = SensorDriver.Measurement(100f, 50f, 50f, 20f, 50f, 50f)
-            sensorDriver = SensorDriver(this, USER, FakeSensor(fakeMeasurement))
-            sensorDriver.onScoreChange += { score = it.score }
-            sensorDriver.onConnectionChange += { online = it.reachable && ConnectivityStatusReceiver.isOnline(this) }
-            sensorDriver.measureInterval = MEASURE_INTERVAL_TIME
-            sensorDriver.loadScore(this)
+            sensorDriver = SensorDriver(server, USER, FakeSensor(fakeMeasurement)).apply {
+                onScoreChange += { this@MainService.score = it.score }
+                onConnectionChange += {
+                    online = it.reachable && ConnectivityStatusReceiver.isOnline(this@MainService)
+                }
+                measureInterval = MEASURE_INTERVAL_TIME
+                loadScore(this@MainService)
+            }
         }
 
         // Prepare callbacks
@@ -225,24 +261,20 @@ class MainService : Service() {
         return START_STICKY
     }
 
-    override fun onRebind(intent: Intent?) {
-        super.onRebind(intent)
-        setForeground(false)
-    }
-
     override fun onUnbind(intent: Intent?): Boolean {
-        setForeground(true)
-        return true
+        bound = false
+        sensorDriver.saveScore(this)
+        return false
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (KILL_WITH_APP)
+        if (KILL_WITH_TASK)
             stopSelf()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        setForeground(false)
+        bound = true
         return Binding()
     }
 
@@ -252,9 +284,10 @@ class MainService : Service() {
         locationEngine.removeLocationUpdates(locationCallback)
         connectivityStatusReceiver.unregister(this)
         locationStatusReceiver.unregister(this)
+        coverageRetriever.periodicPoll = null
         sensorDriver.measuring = false
         sensorDriver.pushing = false
-        sensorDriver.cancelAll()
+        server.cancelAll()
         sensorDriver.saveScore(this)
     }
 
