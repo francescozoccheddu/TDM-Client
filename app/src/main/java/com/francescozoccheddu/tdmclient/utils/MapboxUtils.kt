@@ -1,6 +1,7 @@
 package com.francescozoccheddu.tdmclient.utils
 
 import android.content.Context
+import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
@@ -19,9 +20,11 @@ val LatLngBounds.boundingBox get() = BoundingBox.fromLngLats(lonWest, latSouth, 
 
 val LatLng.point get() = Point.fromLngLat(longitude, latitude)
 
+val Location.latLng get() = LatLng(this)
+
 val mapboxAccessToken get() = Mapbox.getAccessToken() ?: throw IllegalStateException("No access token registered")
 
-fun isLocationEnabled(context: Context) : Boolean {
+fun isLocationEnabled(context: Context): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         val lm = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         lm.isLocationEnabled

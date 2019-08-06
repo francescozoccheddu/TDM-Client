@@ -1,12 +1,8 @@
 package com.francescozoccheddu.tdmclient.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -28,12 +24,6 @@ import com.francescozoccheddu.tdmclient.data.operation.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.utils.boundingBox
 import com.francescozoccheddu.tdmclient.utils.point
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.android.core.location.LocationEngineCallback
-import com.mapbox.android.core.location.LocationEngineProvider
-import com.mapbox.android.core.location.LocationEngineRequest
-import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.geojson.FeatureCollection
@@ -44,8 +34,6 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.net.ConnectivityListener
-import com.mapbox.mapboxsdk.net.ConnectivityReceiver
 import com.mapbox.mapboxsdk.style.expressions.Expression.get
 import com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity
 import com.mapbox.mapboxsdk.style.expressions.Expression.interpolate
@@ -68,14 +56,12 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import kotlinx.android.synthetic.main.activity.cl_root
 import kotlinx.android.synthetic.main.activity.mv_map
 import kotlinx.android.synthetic.main.sheet_duration.bt_duration_ok
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_destination
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_nearby
-import kotlin.math.roundToLong
 
-class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListener {
+class MainActivity : AppCompatActivity(), PermissionsListener {
 
     private companion object {
 
@@ -91,9 +77,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
         private const val MB_SOURCE_COVERAGE = "source_coverage"
         private const val MB_LAYER_COVERAGE = "layer_coverage"
 
-        private const val LOCATION_UPDATE_INTERVAL = 1f
-        private const val LOCATION_MAX_WAIT_TIME = LOCATION_UPDATE_INTERVAL * 5f
-
     }
 
     private lateinit var map: MapboxMap
@@ -107,23 +90,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
     private lateinit var fab: FloatingActionButton
     private lateinit var etSearch: EditText
     private lateinit var vgSearchBar: ViewGroup
-    private lateinit var connectivityReceiver: ConnectivityReceiver
-
-    private val callback = object : LocationEngineCallback<LocationEngineResult> {
-
-        override fun onFailure(exception: Exception) {
-
-        }
-
-        override fun onSuccess(result: LocationEngineResult?) {
-            val location = result?.lastLocation
-            if (location != null) {
-                map.locationComponent.forceLocationUpdate(location)
-                userLocation = LatLng(location)
-            }
-        }
-
-    }
 
     private lateinit var permissionManager: PermissionsManager
 
@@ -325,11 +291,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
             pbSearch.visibility = View.GONE
         }
 
-        connectivityReceiver = ConnectivityReceiver.instance(applicationContext)
-        connectivityReceiver.addListener(this)
-        connectivityReceiver.activate()
-        online = connectivityReceiver.isConnected
-        updateProblems()
     }
 
     private var route: Any? = null
@@ -374,7 +335,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
             }
         }
         else {
-            if (online && PermissionsManager.areLocationPermissionsGranted(this)) {
+            if (PermissionsManager.areLocationPermissionsGranted(this)) {
                 setFabIcon(R.drawable.ic_walk)
                 setFabColor(R.color.colorPrimary)
             }
@@ -431,94 +392,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
             }
         }
 
-    private var online = false
-        set(value) {
-            if (value != field) {
-                field = value
-                updateProblems()
-            }
-        }
-
-
-    private enum class Problem {
-        OFFLINE, PERMISSION_REQUIRED, BOTH
-    }
-
-    private var sbProblem: Snackbar? = null
-        set(value) {
-            if (field != value) {
-                field?.dismiss()
-                field = value
-            }
-        }
-
-    private var problem: Problem? = null
-        set(value) {
-            if (field != value) {
-                field = value
-                fun addAction(snackbar: Snackbar) {
-                    snackbar.setAction(R.string.problem_location_permission_action) {
-                        val intent = Intent()
-                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        intent.setData(Uri.fromParts("package", getPackageName(), null))
-                        startActivity(intent)
-                        problem = null
-                        updateProblems()
-                    }
-                }
-                sbProblem = when (value) {
-                    Problem.OFFLINE -> Snackbar
-                        .make(cl_root, R.string.problem_offline, Snackbar.LENGTH_INDEFINITE)
-                        .apply { show() }
-                    Problem.PERMISSION_REQUIRED -> Snackbar
-                        .make(cl_root, R.string.problem_location_permission, Snackbar.LENGTH_INDEFINITE)
-                        .apply {
-                            addAction(this)
-                            show()
-                        }
-                    Problem.BOTH -> run {
-                        val a = resources.getString(R.string.problem_offline)
-                        val b = resources.getString(R.string.problem_location_permission)
-                        Snackbar
-                            .make(cl_root, "$a\n$b", Snackbar.LENGTH_INDEFINITE)
-                            .apply {
-                                addAction(this)
-                                show()
-                            }
-                    }
-                    null -> null
-                }
-            }
-        }
-
-    private fun updateProblems() {
-        val locationPermission = PermissionsManager.areLocationPermissionsGranted(this)
-
-        if (!locationPermission || !online) {
-            fab.isExpanded = false
-            bt_duration_ok.isEnabled = false
-            if (destinationPickEnabled) {
-                destinationPickEnabled = false
-                destination = null
-            }
-        }
-        else {
-            bt_duration_ok.isEnabled = true
-        }
-        updateFab()
-
-        problem =
-            if (locationPermission) {
-                if (online) null
-                else Problem.OFFLINE
-            }
-            else {
-                if (online) Problem.PERMISSION_REQUIRED
-                else Problem.BOTH
-            }
-    }
-
-
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_LONG).show()
     }
@@ -530,11 +403,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
     override fun onPermissionResult(granted: Boolean) {
         if (granted)
             map.getStyle { enableLocationComponent(it) }
-        updateProblems()
-    }
-
-    override fun onNetworkStateChanged(connected: Boolean) {
-        online = connected
     }
 
     @SuppressWarnings("MissingPermission")
@@ -551,28 +419,11 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
             locationComponent.setLocationComponentEnabled(true)
             locationComponent.setCameraMode(CameraMode.NONE)
             locationComponent.setRenderMode(RenderMode.COMPASS)
-
-            initLocationEngine()
         }
         else {
             permissionManager = PermissionsManager(this)
             permissionManager.requestLocationPermissions(this)
         }
-    }
-
-    private lateinit var locationEngine: LocationEngine
-
-    @SuppressLint("MissingPermission")
-    private fun initLocationEngine() {
-        locationEngine = LocationEngineProvider.getBestLocationEngine(this)
-
-        val request = LocationEngineRequest.Builder((LOCATION_UPDATE_INTERVAL * 1000f).roundToLong())
-            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-            .setMaxWaitTime((LOCATION_MAX_WAIT_TIME * 1000f).roundToLong())
-            .build()
-
-        locationEngine.requestLocationUpdates(request, callback, getMainLooper())
-        locationEngine.getLastLocation(callback)
     }
 
     override fun onBackPressed() {
@@ -592,15 +443,11 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
 
     public override fun onStart() {
         super.onStart()
-        updateProblems()
         mv_map.onStart()
     }
 
     public override fun onResume() {
         super.onResume()
-        if (!this::locationEngine.isInitialized && this::map.isInitialized)
-            map.getStyle { enableLocationComponent(it) }
-        updateProblems()
         mv_map.onResume()
     }
 
@@ -611,8 +458,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
 
     public override fun onStop() {
         super.onStop()
-        if (this::locationEngine.isInitialized)
-            locationEngine.removeLocationUpdates(callback)
         mv_map.onStop()
     }
 
@@ -623,8 +468,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener, ConnectivityListe
 
     override fun onDestroy() {
         super.onDestroy()
-        connectivityReceiver.removeListener(this)
-        connectivityReceiver.deactivate()
         mv_map.onDestroy()
     }
 

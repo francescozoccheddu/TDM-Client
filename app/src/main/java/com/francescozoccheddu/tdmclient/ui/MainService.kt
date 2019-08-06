@@ -15,6 +15,7 @@ import com.francescozoccheddu.tdmclient.data.operation.FakeSensor
 import com.francescozoccheddu.tdmclient.data.operation.SensorDriver
 import com.francescozoccheddu.tdmclient.data.operation.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.utils.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.latLng
 import com.francescozoccheddu.tdmclientservice.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclientservice.LocationStatusReceiver
 import com.francescozoccheddu.tdmclientservice.Timer
@@ -23,6 +24,8 @@ import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import org.json.JSONObject
 import kotlin.math.roundToLong
 
@@ -32,7 +35,6 @@ class MainService : Service() {
     companion object {
 
         private const val KILL_WITH_TASK = false
-        private const val ENABLE_KILL_BUTTON = false
         private const val LOCATION_POLL_INTERVAL = 1f
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
         private const val LOCATION_EXPIRATION_TIME = 15f
@@ -42,6 +44,11 @@ class MainService : Service() {
         private val COVERAGE_RETRIEVE_MODE = CoverageRetrieveMode.POINTS
         private const val SERVER_ADDRESS = "http://localhost:8080/"
         private val USER = SensorDriver.User(0, "0")
+
+        val MAP_BOUNDS = LatLngBounds.Builder()
+            .include(LatLng(39.267498, 9.181226))
+            .include(LatLng(39.176358, 9.054797))
+            .build()
 
         fun bind(context: Context, connection: ServiceConnection) {
             val intent = Intent(context, MainService::class.java)
@@ -72,13 +79,19 @@ class MainService : Service() {
     val coverageData: JSONObject?
         get() = if (coverageRetriever.hasData && !coverageRetriever.expired) coverageRetriever.data else null
 
+    val insideMeasurementArea
+        get() = run {
+            val loc = location
+            loc != null && MAP_BOUNDS.contains(loc.latLng)
+        }
+
     var location: Location? = null
         private set(value) {
             if (value != field) {
                 field = value
                 if (value != null)
                     sensorDriver.location = value
-                sensorDriver.measuring = value != null
+                sensorDriver.measuring = insideMeasurementArea
                 onLocationChange(this)
             }
         }
