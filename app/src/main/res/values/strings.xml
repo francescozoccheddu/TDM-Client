@@ -9,4 +9,5 @@
     <string name="problem_offline">Nessuna connessione ad Internet</string>
     <string name="problem_location_permission">Permesso di accededere alla posizione negato</string>
     <string name="problem_location_permission_action">Concedi</string>
+    <string name="service_notification_channel">Notifiche</string>
 </resources>

@@ -18,7 +18,7 @@ import org.json.JSONObject
 import java.util.*
 import kotlin.math.max
 
-class SensorDriver(context: Context, val user: User, val sensor: Sensor, looper: Looper = Looper.myLooper()!!) {
+class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: Looper = Looper.myLooper()!!) {
 
     companion object {
         const val DEFAULT_PREFS_NAME = "tdmclient:SensorDriver:SharedPreferences"
@@ -32,7 +32,6 @@ class SensorDriver(context: Context, val user: User, val sensor: Sensor, looper:
         private const val MAX_QUEUE_HOLD_TIME = 30f
         private const val MAX_QUEUE_SIZE = 100
         private const val PRIORITIZE_OLDEST = true
-        private const val SERVER_ADDRESS = "http://localhost:8080/"
     }
 
     interface Sensor {
@@ -52,7 +51,6 @@ class SensorDriver(context: Context, val user: User, val sensor: Sensor, looper:
 
     private val queue = FixedSizeSortedQueue.by(MAX_QUEUE_SIZE, false) { value: LocalizedMeasurement -> value.time }
 
-    private val server = Server(context, SERVER_ADDRESS)
     private val scoreService =
         server.PollService("getuser", user, PollInterpreter.from(object : Interpreter<User, Int> {
             override fun interpretRequest(request: User): JSONObject? =
@@ -263,7 +261,8 @@ class SensorDriver(context: Context, val user: User, val sensor: Sensor, looper:
     }
 
     fun cancelAll() {
-        server.cancelAll()
+        scoreService.cancelAll()
+        measurementService.cancelAll()
     }
 
 }
