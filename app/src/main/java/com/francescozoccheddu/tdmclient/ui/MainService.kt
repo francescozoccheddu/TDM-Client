@@ -1,21 +1,13 @@
 package com.francescozoccheddu.tdmclient.ui
 
 import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.location.Location
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.client.Server
 import com.francescozoccheddu.tdmclient.data.operation.CoverageRetrieveMode
 import com.francescozoccheddu.tdmclient.data.operation.CoverageRetriever
@@ -39,11 +31,8 @@ class MainService : Service() {
 
     companion object {
 
-        private const val NOTIFICATION_CHANNEL = "ServiceNotificationChannel"
         private const val KILL_WITH_TASK = false
         private const val ENABLE_KILL_BUTTON = false
-        private const val FOREGROUND_NOTIFICATION_ID = 1
-        private const val DEVICE_LOST_NOTIFICATION_ID = 2
         private const val LOCATION_POLL_INTERVAL = 1f
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
         private const val LOCATION_EXPIRATION_TIME = 15f
@@ -62,19 +51,8 @@ class MainService : Service() {
         }
 
         fun sensorLostConnection(context: Context) {
-            if (context.stopService(Intent(context, MainService::class.java))) {
-                with(NotificationManagerCompat.from(context)) {
-                    notify(
-                        DEVICE_LOST_NOTIFICATION_ID,
-                        NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
-                            .setContentTitle("TDM Client")
-                            .setContentText("Connessione col dispositivo persa. Premi per riprovare.")
-                            .setSmallIcon(R.drawable.ic_launcher_foreground)
-                            .setAutoCancel(true)
-                            .build()
-                    )
-                }
-            }
+            if (context.stopService(Intent(context, MainService::class.java)))
+                ServiceNotification.notifySensorConnectionLost(context)
         }
 
     }
@@ -86,6 +64,7 @@ class MainService : Service() {
 
     val onLocationChange = FuncEvent<MainService>()
     val onLocatableChange = FuncEvent<MainService>()
+    val onConnectedChange = FuncEvent<MainService>()
     val onOnlineChange = FuncEvent<MainService>()
     val onScoreChange = FuncEvent<MainService>()
     val onCoverageDataChange = FuncEvent<MainService>()
@@ -112,12 +91,19 @@ class MainService : Service() {
             }
         }
 
+    var connected = false
+        private set(value) {
+            if (value != field) {
+                field = value
+                onConnectedChange(this)
+            }
+        }
+
     var online = false
         private set(value) {
             if (value != field) {
                 field = value
-                sensorDriver.pushing = value
-                coverageRetriever.periodicPoll = if (value && bound) COVERAGE_INTERVAL_TIME else null
+                connected = sensorDriver.reachable && value
                 onOnlineChange(this)
             }
         }
@@ -146,7 +132,6 @@ class MainService : Service() {
         override fun onFailure(exception: Exception) {}
     }
 
-    private lateinit var notification: Notification
     private lateinit var locationExpirationCountdown: Timer.Countdown
     private val connectivityStatusReceiver = ConnectivityStatusReceiver()
     private val locationStatusReceiver = LocationStatusReceiver()
@@ -154,21 +139,15 @@ class MainService : Service() {
     private lateinit var server: Server
     private lateinit var sensorDriver: SensorDriver
     private lateinit var coverageRetriever: CoverageRetriever
+    private lateinit var notification: ServiceNotification
     private var bound = false
         set(value) {
             if (value != field) {
                 field = value
-                setForeground(value)
-                coverageRetriever.periodicPoll = if (value && online) COVERAGE_INTERVAL_TIME else null
+                notification.foreground = value
+                coverageRetriever.periodicPoll = if (value && connected) COVERAGE_INTERVAL_TIME else null
             }
         }
-
-    private fun setForeground(enabled: Boolean) {
-        if (enabled)
-            startForeground(FOREGROUND_NOTIFICATION_ID, notification)
-        else
-            stopForeground(true)
-    }
 
     @SuppressLint("MissingPermission")
     override fun onCreate() {
@@ -176,27 +155,9 @@ class MainService : Service() {
 
         // Prepare notification
         run {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                    .createNotificationChannel(
-                        NotificationChannel(
-                            NOTIFICATION_CHANNEL,
-                            resources.getString(R.string.service_notification_channel),
-                            NotificationManager.IMPORTANCE_DEFAULT
-                        )
-                    )
-            }
-
-            val notificationIntent = Intent(this, MainActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
-
-            notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
-                .setContentTitle("Title")
-                .setContentText("Content")
-                .setContentIntent(pendingIntent)
-                .build()
-
-            setForeground(true)
+            notification = ServiceNotification(this)
+            notification.registerChannel()
+            notification.foreground = true
         }
 
         // Prepare timer
@@ -225,9 +186,7 @@ class MainService : Service() {
             val fakeMeasurement = SensorDriver.Measurement(100f, 50f, 50f, 20f, 50f, 50f)
             sensorDriver = SensorDriver(server, USER, FakeSensor(fakeMeasurement)).apply {
                 onScoreChange += { this@MainService.score = it.score }
-                onConnectionChange += {
-                    online = it.reachable && ConnectivityStatusReceiver.isOnline(this@MainService)
-                }
+                onReachableChange += { connected = it.reachable && online }
                 measureInterval = MEASURE_INTERVAL_TIME
                 loadScore(this@MainService)
             }
@@ -235,7 +194,7 @@ class MainService : Service() {
 
         // Prepare callbacks
         run {
-            connectivityStatusReceiver.register(this) { online = it && sensorDriver.reachable }
+            connectivityStatusReceiver.register(this) { connected = it && sensorDriver.reachable }
             locationStatusReceiver.register(this) { locatable = it }
 
             locationEngine = LocationEngineProvider.getBestLocationEngine(this)
@@ -249,7 +208,7 @@ class MainService : Service() {
 
         // Update results
         run {
-            online = ConnectivityStatusReceiver.isOnline(this)
+            connected = ConnectivityStatusReceiver.isOnline(this)
             locatable = LocationStatusReceiver.isEnabled(this)
             locationEngine.getLastLocation(locationCallback)
             requestScoreUpdate()
