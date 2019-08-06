@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Looper
 import com.francescozoccheddu.tdmclient.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.data.client.PollInterpreter
+import com.francescozoccheddu.tdmclient.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.data.client.Server
 import com.francescozoccheddu.tdmclient.data.client.error
 import com.francescozoccheddu.tdmclient.utils.FixedSizeSortedQueue
@@ -31,6 +32,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
         private const val MAX_PUT_REQUEST_SIZE = 50
         private const val MAX_QUEUE_HOLD_TIME = 30f
         private const val MAX_QUEUE_SIZE = 100
+        private const val MIN_REQUEST_DELAY = 1f
         private const val PRIORITIZE_OLDEST = true
     }
 
@@ -68,6 +70,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             }
         })).apply {
             onData += { score = it }
+            customRetryPolicy = RetryPolicy(2f)
         }
     private val measurementService =
         server.Service("putmeasurements", object : Interpreter<MeasurementPutRequest, MeasurementPutResult> {
@@ -111,13 +114,13 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
                     if (failureCount > MAX_UNREACHABLE_ATTEMPTS)
                         reachable = false
                 }
-
                 if (!it.status.pending) {
                     if (!it.status.succeeded)
                         queue.addLocalized(it.request.measurements.filter { dateElapsed(it.time) < MAX_QUEUE_HOLD_TIME })
                     updateBatch()
                 }
             }
+            customRetryPolicy = RetryPolicy(6f)
         }
 
     private var failureCount = 0
@@ -138,6 +141,8 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             }
 
             fun canPush() = measurementService.pendingRequests.size < MAX_MEASUREMENTS_REQUESTS
+                    && !requestCountdown.running
+
             fun shouldPush() = queue.length >= MAX_BATCH_SIZE || batchWaitTime() == 0f
             while (canPush() && shouldPush()) {
                 val measurements = mutableListOf<LocalizedMeasurement>()
@@ -149,6 +154,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
                         break
                 }
                 measurementService.Request(MeasurementPutRequest(user, measurements)).start()
+                requestCountdown.pull()
             }
             run {
                 val wait = batchWaitTime()
@@ -161,11 +167,18 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
         }
     }
 
+    private val requestCountdown: Timer.Countdown
     private val countdown: Timer.Countdown
     private val ticker: Timer.Ticker
 
     init {
         val timer = Timer()
+        requestCountdown = timer.Countdown().apply {
+            time = MIN_REQUEST_DELAY
+            runnable = Runnable {
+                updateBatch()
+            }
+        }
         countdown = timer.Countdown().apply {
             runnable = Runnable {
                 updateBatch()
@@ -202,7 +215,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
     var measureInterval
         get() = ticker.tickInterval
         set(value) {
-            ticker.tickInterval = measureInterval
+            ticker.tickInterval = value
         }
 
     var score = 0

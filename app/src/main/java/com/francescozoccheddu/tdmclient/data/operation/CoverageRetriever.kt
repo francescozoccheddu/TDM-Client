@@ -2,12 +2,14 @@ package com.francescozoccheddu.tdmclient.data.operation
 
 import com.francescozoccheddu.tdmclient.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.data.client.PollInterpreter
+import com.francescozoccheddu.tdmclient.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.data.client.Server
 import com.francescozoccheddu.tdmclient.utils.dateParseISO
 import org.json.JSONObject
 import java.util.*
 
 private const val SERVICE_ADDRESS = "getcoverage"
+private val DEFAULT_RETRY_POLICY = RetryPolicy(3f)
 
 enum class CoverageRetrieveMode {
     POINTS, QUADS
@@ -52,4 +54,6 @@ private val INTERPRETER = object : PollInterpreter<CoverageRetrieveMode, Coverag
 typealias CoverageRetriever = Server.AutoPollService<CoverageRetrieveMode, CoverageData, JSONObject>
 
 fun makeCoverageRetriever(server: Server) =
-    server.AutoPollService(SERVICE_ADDRESS, CoverageRetrieveMode.POINTS, INTERPRETER)
+    server.AutoPollService(SERVICE_ADDRESS, CoverageRetrieveMode.POINTS, INTERPRETER).apply {
+        customRetryPolicy = DEFAULT_RETRY_POLICY
+    }

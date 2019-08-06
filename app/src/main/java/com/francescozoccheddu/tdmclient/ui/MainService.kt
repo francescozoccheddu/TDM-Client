@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.location.Location
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import com.francescozoccheddu.tdmclient.data.client.Server
 import com.francescozoccheddu.tdmclient.data.operation.CoverageRetrieveMode
 import com.francescozoccheddu.tdmclient.data.operation.CoverageRetriever
@@ -24,6 +25,7 @@ import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
+import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import org.json.JSONObject
@@ -42,7 +44,7 @@ class MainService : Service() {
         private const val COVERAGE_INTERVAL_TIME = 10f
         private const val COVERAGE_EXPIRATION_TIME = 60f
         private val COVERAGE_RETRIEVE_MODE = CoverageRetrieveMode.POINTS
-        private const val SERVER_ADDRESS = "http://localhost:8080/"
+        private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
         private val USER = SensorDriver.User(0, "0")
 
         val MAP_BOUNDS = LatLngBounds.Builder()
@@ -117,6 +119,8 @@ class MainService : Service() {
             if (value != field) {
                 field = value
                 connected = sensorDriver.reachable && value
+                coverageRetriever.periodicPoll = if (value && bound) COVERAGE_INTERVAL_TIME else null
+                sensorDriver.pushing = value
                 onOnlineChange(this)
             }
         }
@@ -157,8 +161,8 @@ class MainService : Service() {
         set(value) {
             if (value != field) {
                 field = value
-                notification.foreground = value
-                coverageRetriever.periodicPoll = if (value && connected) COVERAGE_INTERVAL_TIME else null
+                notification.foreground = !value
+                coverageRetriever.periodicPoll = if (value && online) COVERAGE_INTERVAL_TIME else null
             }
         }
 
@@ -207,7 +211,7 @@ class MainService : Service() {
 
         // Prepare callbacks
         run {
-            connectivityStatusReceiver.register(this) { connected = it && sensorDriver.reachable }
+            connectivityStatusReceiver.register(this) { online = it }
             locationStatusReceiver.register(this) { locatable = it }
 
             locationEngine = LocationEngineProvider.getBestLocationEngine(this)
@@ -227,16 +231,26 @@ class MainService : Service() {
             requestScoreUpdate()
         }
 
+        if (!PermissionsManager.areLocationPermissionsGranted(this)) {
+            Log.e(this::class.java.name, "Location access permissions are not granted")
+            stopSelf()
+        }
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_STICKY
     }
 
+    override fun onRebind(intent: Intent?) {
+        super.onRebind(intent)
+        bound = true
+    }
+
     override fun onUnbind(intent: Intent?): Boolean {
         bound = false
         sensorDriver.saveScore(this)
-        return false
+        return true
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
