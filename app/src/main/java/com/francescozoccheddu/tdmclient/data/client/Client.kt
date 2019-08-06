@@ -46,7 +46,7 @@ class Server(context: Context, val address: ServerAddress) {
 
     val onRequestStatusChanged = FuncEvent<Service<*, *>.Request>()
 
-    private val _pendingRequests = mutableSetOf<Server.Service<*, *>.Request>()
+    private val _pendingRequests = mutableSetOf<Service<*, *>.Request>()
     val pendingRequests = Collections.unmodifiableSet(_pendingRequests)
 
     private fun requestStatusChanged(request: Service<*, *>.Request) {

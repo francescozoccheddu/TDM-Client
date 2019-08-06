@@ -27,13 +27,13 @@ class Timer(looper: Looper = Looper.myLooper()!!) {
             get() = if (running)
                 _scheduleTime
             else
-                throw IllegalStateException("Not running")
+                throw IllegalStateException("Not measuring")
 
         val scheduleDelay
             get() = if (running)
                 _scheduleDelay
             else
-                throw IllegalStateException("Not running")
+                throw IllegalStateException("Not measuring")
 
         val elapsed get() = dateElapsed(scheduleTime)
         val remaining get() = max(scheduleDelay - elapsed, 0f)
@@ -47,7 +47,7 @@ class Timer(looper: Looper = Looper.myLooper()!!) {
             if (delay <= 0f)
                 throw IllegalArgumentException("Delay must be positive")
             if (running)
-                throw IllegalStateException("Already running")
+                throw IllegalStateException("Already measuring")
             running = true
             _scheduleDelay = delay
             _scheduleTime = Date()
@@ -58,7 +58,7 @@ class Timer(looper: Looper = Looper.myLooper()!!) {
             if (delay <= 0f)
                 throw IllegalArgumentException("Delay must be positive")
             if (!running)
-                throw IllegalStateException("Not running")
+                throw IllegalStateException("Not measuring")
             val newDelay = delay - elapsed
             _scheduleDelay = delay
             handler.removeCallbacks(internalRunnable)

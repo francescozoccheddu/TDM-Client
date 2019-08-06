@@ -21,7 +21,9 @@ fun dateAdd(date: Date, time: Float): Date {
 
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 private val datetimeFormat = SimpleDateFormat(dateFormat.toPattern() + "'T'HH:mm:ss")
-private val datetimezoneFormat = SimpleDateFormat(datetimeFormat.toPattern() + "ZZZZZ")
+private val datetimezoneFormat = SimpleDateFormat(datetimeFormat.toPattern() + "ZZZZZ").apply {
+    timeZone = TimeZone.getDefault()
+}
 
 fun dateParseISO(date: String): Date {
     var builder = StringBuilder(date.trim())
@@ -56,5 +58,7 @@ fun dateParseISO(date: String): Date {
     }
     return format.parse(builder.toString())!!
 }
+
+val Date.iso get() = datetimezoneFormat.format(this)
 
 fun toMillis(seconds: Float) = (seconds * 1000).roundToLong()
