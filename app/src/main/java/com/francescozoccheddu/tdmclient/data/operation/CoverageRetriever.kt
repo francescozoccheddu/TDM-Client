@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.data.retrieve
+package com.francescozoccheddu.tdmclient.data.operation
 
 import com.francescozoccheddu.tdmclient.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.data.client.PollInterpreter

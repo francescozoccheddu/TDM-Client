@@ -23,8 +23,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.knob.KnobView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.client.Server
-import com.francescozoccheddu.tdmclient.data.retrieve.CoverageRetrieveMode
-import com.francescozoccheddu.tdmclient.data.retrieve.makeCoverageRetriever
+import com.francescozoccheddu.tdmclient.data.operation.CoverageRetrieveMode
+import com.francescozoccheddu.tdmclient.data.operation.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.utils.boundingBox
 import com.francescozoccheddu.tdmclient.utils.point
 import com.google.android.material.floatingactionbutton.FloatingActionButton

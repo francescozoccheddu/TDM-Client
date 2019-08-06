@@ -15,8 +15,8 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.edit
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.data.operation.SensorDriver
 import com.francescozoccheddu.tdmclient.ui.MainActivity
 import com.francescozoccheddu.tdmclientservice.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclientservice.LocationStatusReceiver
@@ -41,10 +41,8 @@ class MainService : Service() {
         private const val LOCATION_POLL_INTERVAL = 1f
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
         private const val LOCATION_EXPIRATION_TIME = 15f
-        private const val MEASURE_INTERVAL_TIME = 2f
-        private const val CONNECTIVITY_RETRY_WAIT = 5f
-        private const val PREFS_SCORE_KEY = "score"
-        private const val PREFS_NAME = "ClientServicePreferences"
+        private const val MEASURE_INTERVAL_TIME = 3f
+        private val USER = SensorDriver.User(0, "0")
 
         fun bind(context: Context, connection: ServiceConnection) {
             val intent = Intent(context, MainService::class.java)
@@ -123,7 +121,6 @@ class MainService : Service() {
         }
 
     fun requestScoreUpdate() {
-
     }
 
     private val locationCallback = object : LocationEngineCallback<LocationEngineResult> {
@@ -140,7 +137,6 @@ class MainService : Service() {
 
     private lateinit var notification: Notification
     private lateinit var locationExpirationCountdown: Timer.Countdown
-    private lateinit var measureTicker: Timer.Ticker
     private val connectivityStatusReceiver = ConnectivityStatusReceiver()
     private val locationStatusReceiver = LocationStatusReceiver()
     private lateinit var locationEngine: LocationEngine
@@ -195,19 +191,18 @@ class MainService : Service() {
             locationEngine.requestLocationUpdates(request, locationCallback, mainLooper)
         }
 
-        // Prepare timers
+        // Prepare client
+        run {
+
+        }
+
+        // Prepare timer
         run {
             val timer = Timer()
             locationExpirationCountdown = timer.Countdown().apply {
                 time = LOCATION_EXPIRATION_TIME
                 runnable = Runnable {
                     location = null
-                }
-            }
-            measureTicker = timer.Ticker().apply {
-                tickInterval = MEASURE_INTERVAL_TIME
-                runnable = Runnable {
-
                 }
             }
         }
@@ -219,7 +214,6 @@ class MainService : Service() {
 
             locationEngine.getLastLocation(locationCallback)
 
-            score = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getInt(PREFS_SCORE_KEY, score)
             requestScoreUpdate()
         }
 
@@ -254,13 +248,9 @@ class MainService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         locationExpirationCountdown.cancel()
-        measureTicker.running = false
         locationEngine.removeLocationUpdates(locationCallback)
         connectivityStatusReceiver.unregister(this)
         locationStatusReceiver.unregister(this)
-        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
-            putInt(PREFS_SCORE_KEY, score)
-        }
     }
 
 }
