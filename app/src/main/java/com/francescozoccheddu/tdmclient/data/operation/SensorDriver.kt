@@ -226,9 +226,9 @@ class SensorDriver(context: Context, val user: User, val sensor: Sensor, looper:
 
     private var hasScore = false
 
-    private val onScoreChange = FuncEvent<SensorDriver>()
+    val onScoreChange = FuncEvent<SensorDriver>()
 
-    private val onConnectionChange = FuncEvent<SensorDriver>()
+    val onConnectionChange = FuncEvent<SensorDriver>()
 
     fun loadScore(prefs: SharedPreferences, key: String = DEFAULT_SCORE_PREF_KEY) {
         if (!hasScore && prefs.contains(key))
