@@ -150,7 +150,9 @@ class ServiceNotification(val service: MainService) {
             if (value != field) {
                 field = value
                 if (value)
-                    notify(FOREGROUND_NOTIFICATION_ID, notification)
+                    service.startForeground(FOREGROUND_NOTIFICATION_ID, notification)
+                else
+                    service.stopForeground(true)
             }
         }
 

@@ -87,7 +87,7 @@ class Timer(looper: Looper = Looper.myLooper()!!) {
                 task.runnable = value
             }
 
-        var time: Float = 0f
+        var time: Float = 10f
             set(value) {
                 if (value != field) {
                     if (value <= 0f)
@@ -126,7 +126,7 @@ class Timer(looper: Looper = Looper.myLooper()!!) {
 
         var runnable: Runnable? = null
 
-        var tickInterval: Float = 0f
+        var tickInterval: Float = 10f
             set(value) {
                 if (value != field) {
                     if (value <= 0f)
