@@ -15,6 +15,7 @@ class ServiceNotification(val service: MainService) {
 
         private const val NOTIFICATION_CHANNEL = "MainServiceNotificationChannel"
         private const val FOREGROUND_NOTIFICATION_ID = 1
+        private const val ENABLE_KILL_BUTTON = false
         private const val SENSOR_LOST_NOTIFICATION_ID = 2
 
         private fun notify(context: Context, id: Int, notification: Notification) {
