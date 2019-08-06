@@ -218,7 +218,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
         private set(value) {
             if (value != field) {
                 field = value
-                onConnectionChange(this)
+                onReachableChange(this)
             }
         }
 
@@ -226,7 +226,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
 
     val onScoreChange = FuncEvent<SensorDriver>()
 
-    val onConnectionChange = FuncEvent<SensorDriver>()
+    val onReachableChange = FuncEvent<SensorDriver>()
 
     fun loadScore(prefs: SharedPreferences, key: String = DEFAULT_SCORE_PREF_KEY) {
         if (!hasScore && prefs.contains(key))
