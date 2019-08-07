@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.utils
+package com.francescozoccheddu.tdmclient.utils.data
 
 import android.content.Context
 import android.location.Location
@@ -21,6 +21,8 @@ val LatLngBounds.boundingBox get() = BoundingBox.fromLngLats(lonWest, latSouth, 
 val LatLng.point get() = Point.fromLngLat(longitude, latitude)
 
 val Location.latLng get() = LatLng(this)
+
+val Location.array get() = arrayOf(this.longitude, this.longitude)
 
 val mapboxAccessToken get() = Mapbox.getAccessToken() ?: throw IllegalStateException("No access token registered")
 

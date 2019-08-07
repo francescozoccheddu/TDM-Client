@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.utils
+package com.francescozoccheddu.tdmclient.utils.commons
 
 abstract class WellSet<FunctionType> {
 
@@ -40,6 +40,15 @@ open class FuncEvent<ArgumentType> : WellSet<(ArgumentType) -> Unit>() {
     operator fun invoke(arg: ArgumentType) {
         for (handler in this)
             handler(arg)
+    }
+
+}
+
+open class FuncEvent2<ArgumentType1, ArgumentType2> : WellSet<(ArgumentType1, ArgumentType2) -> Unit>() {
+
+    operator fun invoke(arg1: ArgumentType1, arg2: ArgumentType2) {
+        for (handler in this)
+            handler(arg1, arg2)
     }
 
 }

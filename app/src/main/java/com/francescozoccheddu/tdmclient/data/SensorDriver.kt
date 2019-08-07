@@ -1,19 +1,20 @@
-package com.francescozoccheddu.tdmclient.data.operation
+package com.francescozoccheddu.tdmclient.data
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
 import android.os.Looper
-import com.francescozoccheddu.tdmclient.data.client.Interpreter
-import com.francescozoccheddu.tdmclient.data.client.PollInterpreter
-import com.francescozoccheddu.tdmclient.data.client.RetryPolicy
-import com.francescozoccheddu.tdmclient.data.client.Server
-import com.francescozoccheddu.tdmclient.data.client.error
-import com.francescozoccheddu.tdmclient.utils.FixedSizeSortedQueue
-import com.francescozoccheddu.tdmclient.utils.FuncEvent
-import com.francescozoccheddu.tdmclient.utils.dateElapsed
-import com.francescozoccheddu.tdmclient.utils.iso
-import com.francescozoccheddu.tdmclientservice.Timer
+import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
+import com.francescozoccheddu.tdmclient.utils.data.client.PollInterpreter
+import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
+import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.utils.data.client.error
+import com.francescozoccheddu.tdmclient.utils.commons.FixedSizeSortedQueue
+import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.data.array
+import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
+import com.francescozoccheddu.tdmclient.utils.commons.iso
+import com.francescozoccheddu.tdmclient.utils.android.Timer
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -79,9 +80,9 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
                     put("id", request.user.id)
                     put("passkey", request.user.passkey)
                     put("measurements", JSONArray(request.measurements.map {
-                        return JSONObject().apply {
+                        JSONObject().apply {
                             put("time", it.time.iso)
-                            put("location", JSONArray(arrayOf(it.location.longitude, it.location.latitude)))
+                            put("location", it.location.array)
                             put("altitude", it.measurement.altitude)
                             put("humidity", it.measurement.humidity)
                             put("pressure", it.measurement.pressure)
@@ -97,7 +98,10 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
                 response: JSONObject
             ): MeasurementPutResult {
                 try {
-                    return MeasurementPutResult(response["success"] as Boolean, response["score"] as Int)
+                    return MeasurementPutResult(
+                        response.getBoolean("success"),
+                        response.getInt("score")
+                    )
                 } catch (_: Exception) {
                     throw Interpreter.UninterpretableResponseException()
                 }
@@ -106,17 +110,21 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             onRequestStatusChanged += {
                 if (it.status.succeeded) {
                     scoreService.submit(it.startTime, it.response.score)
-                    failureCount = 0
                     reachable = true
+                    failureCount = 0
                 }
                 else if (it.status.error) {
                     failureCount++
                     if (failureCount > MAX_UNREACHABLE_ATTEMPTS)
                         reachable = false
                 }
+
                 if (!it.status.pending) {
-                    if (!it.status.succeeded)
-                        queue.addLocalized(it.request.measurements.filter { dateElapsed(it.time) < MAX_QUEUE_HOLD_TIME })
+                    if (!it.status.succeeded || !it.response.success)
+                        queue.addLocalized(it.request.measurements.filter { dateElapsed(
+                            it.time
+                        ) < MAX_QUEUE_HOLD_TIME
+                        })
                     updateBatch()
                 }
             }
@@ -153,7 +161,12 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
                     if (measurements.size >= MAX_PUT_REQUEST_SIZE)
                         break
                 }
-                measurementService.Request(MeasurementPutRequest(user, measurements)).start()
+                measurementService.Request(
+                    MeasurementPutRequest(
+                        user,
+                        measurements
+                    )
+                ).start()
                 requestCountdown.pull()
             }
             run {
@@ -186,7 +199,13 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
         }
         ticker = timer.Ticker().apply {
             runnable = Runnable {
-                queue.add(LocalizedMeasurement(Date(), location, sensor.measure()))
+                queue.add(
+                    LocalizedMeasurement(
+                        Date(),
+                        location,
+                        sensor.measure()
+                    )
+                )
                 updateBatch()
             }
         }

@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.data.client
+package com.francescozoccheddu.tdmclient.utils.data.client
 
 enum class Status {
     NETWORK_ERROR, NO_CONNECTION_ERROR, SURRENDED_ERROR, RESPONSE_ERROR, REQUEST_ERROR, SERVER_ERROR, RUNTIME_ERROR,

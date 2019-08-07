@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.data.client
+package com.francescozoccheddu.tdmclient.utils.data.client
 
 import android.content.Context
 import com.android.volley.AuthFailureError
@@ -13,10 +13,11 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.francescozoccheddu.tdmclient.utils.FuncEvent
-import com.francescozoccheddu.tdmclient.utils.ProcEvent
-import com.francescozoccheddu.tdmclient.utils.dateElapsed
-import com.francescozoccheddu.tdmclientservice.Timer
+import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.commons.LateInit
+import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
+import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
+import com.francescozoccheddu.tdmclient.utils.android.Timer
 import org.json.JSONException
 import org.json.JSONObject
 import java.nio.charset.Charset
@@ -60,8 +61,6 @@ class Server(context: Context, val address: ServerAddress) {
     var retryPolicy = RetryPolicy()
 
     private val nativeQueue = Volley.newRequestQueue(context)
-
-    private class Nullable<Type>(val value: Type)
 
     inner open class Service<RequestType, ResponseType>(
         val address: ServiceAddress,
@@ -112,12 +111,12 @@ class Server(context: Context, val address: ServerAddress) {
 
             private val nativeRequest: VolleyRequest<JSONObject>
 
-            val hasResponse get() = _response != null
+            private val _response = LateInit<ResponseType>()
 
-            val response: ResponseType
-                get() = _response?.value ?: throw IllegalStateException("Pending")
+            val hasResponse get() = _response.isInitialized
 
-            private var _response: Nullable<ResponseType>? = null
+            var response by _response
+                private set
 
             var status = Status.PLANNED
                 private set(value) {
@@ -136,7 +135,7 @@ class Server(context: Context, val address: ServerAddress) {
 
             private fun trySetResponse(body: JSONObject) {
                 try {
-                    _response = Nullable(interpreter.interpretResponse(request, body))
+                    response = interpreter.interpretResponse(request, body)
                 } catch (_: Interpreter.UninterpretableResponseException) {
                 }
             }
@@ -232,13 +231,13 @@ class Server(context: Context, val address: ServerAddress) {
             get() = if (hasData) field else throw IllegalStateException("No data")
             private set
 
-        val data
-            get() = _data?.value ?: throw IllegalStateException("No data")
+        private val _data = LateInit<DataType>()
+
+        var data by _data
+            private set
 
         val hasData
-            get() = _data != null
-
-        private var _data: Nullable<DataType>? = null
+            get() = _data.isInitialized
 
         val onData = FuncEvent<DataType>()
 
@@ -258,7 +257,7 @@ class Server(context: Context, val address: ServerAddress) {
         fun submit(time: Date, data: DataType) {
             if (!hasData || time > this.time) {
                 this.time = time
-                this._data = Nullable(data)
+                this.data = data
                 dataSubmitted()
                 onData(data)
             }

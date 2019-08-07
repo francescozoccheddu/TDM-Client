@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.utils
+package com.francescozoccheddu.tdmclient.utils.commons
 
 import java.text.ParseException
 import java.text.SimpleDateFormat

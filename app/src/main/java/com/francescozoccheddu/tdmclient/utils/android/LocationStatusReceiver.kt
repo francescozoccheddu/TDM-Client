@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclientservice
+package com.francescozoccheddu.tdmclient.utils.android
 
 import android.content.Context
 import android.content.Intent
@@ -19,6 +19,7 @@ class LocationStatusReceiver : Receiver<Boolean>() {
 
     override val intentFilter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
 
-    override fun onReceive(context: Context, intent: Intent) = isEnabled(context)
+    override fun onReceive(context: Context, intent: Intent) =
+        isEnabled(context)
 
 }
