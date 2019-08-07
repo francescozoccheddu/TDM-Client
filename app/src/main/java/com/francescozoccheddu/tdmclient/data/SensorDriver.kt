@@ -94,7 +94,6 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
 
             override fun interpretResponse(request: MeasurementPutRequest, response: JSONObject): Int {
                 try {
-                    println("Reponse:\n${response.toString(4)}\nRequest:${interpretRequest(request)?.toString(4)}")
                     return response.getInt("score")
                 } catch (_: Exception) {
                     throw Interpreter.UninterpretableResponseException()
@@ -140,11 +139,6 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
                 return if (oldestTime == null) null
                 else max(MAX_BATCH_HOLD_TIME - dateElapsed(oldestTime), 0f)
             }
-
-            /*val oldestTime = queue.last?.time
-            if (oldestTime != null)
-                print("SinceOldest=${dateElapsed(oldestTime).roundToInt()} ")
-            println("Queue=${queue.length} PendingReq=${measurementService.pendingRequests.size} Wait=${requestCountdown.running} Pushing=$pushing Measuring=$measuring")*/
 
             fun canPush() = measurementService.pendingRequests.size < MAX_MEASUREMENTS_REQUESTS
                     && !requestCountdown.running
