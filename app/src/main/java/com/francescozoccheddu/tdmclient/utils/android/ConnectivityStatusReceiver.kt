@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclientservice
+package com.francescozoccheddu.tdmclient.utils.android
 
 import android.content.Context
 import android.content.Intent
@@ -20,6 +20,7 @@ class ConnectivityStatusReceiver : Receiver<Boolean>() {
 
     override val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
 
-    override fun onReceive(context: Context, intent: Intent) = isOnline(context)
+    override fun onReceive(context: Context, intent: Intent) =
+        isOnline(context)
 
 }

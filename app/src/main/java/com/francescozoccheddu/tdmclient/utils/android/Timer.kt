@@ -1,9 +1,9 @@
-package com.francescozoccheddu.tdmclientservice
+package com.francescozoccheddu.tdmclient.utils.android
 
 import android.os.Handler
 import android.os.Looper
-import com.francescozoccheddu.tdmclient.utils.dateElapsed
-import com.francescozoccheddu.tdmclient.utils.toMillis
+import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
+import com.francescozoccheddu.tdmclient.utils.commons.toMillis
 import java.util.*
 import kotlin.math.max
 
@@ -152,7 +152,9 @@ class Timer(looper: Looper = Looper.myLooper()!!) {
         val timeSinceLastTick: Float
             get() {
                 val last = lastTick
-                return if (last == null) Float.POSITIVE_INFINITY else dateElapsed(last)
+                return if (last == null) Float.POSITIVE_INFINITY else dateElapsed(
+                    last
+                )
             }
 
         var running = false

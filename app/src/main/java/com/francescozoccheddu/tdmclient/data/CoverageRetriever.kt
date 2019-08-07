@@ -1,10 +1,10 @@
-package com.francescozoccheddu.tdmclient.data.operation
+package com.francescozoccheddu.tdmclient.data
 
-import com.francescozoccheddu.tdmclient.data.client.Interpreter
-import com.francescozoccheddu.tdmclient.data.client.PollInterpreter
-import com.francescozoccheddu.tdmclient.data.client.RetryPolicy
-import com.francescozoccheddu.tdmclient.data.client.Server
-import com.francescozoccheddu.tdmclient.utils.dateParseISO
+import com.francescozoccheddu.tdmclient.utils.commons.dateParseISO
+import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
+import com.francescozoccheddu.tdmclient.utils.data.client.PollInterpreter
+import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
+import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import org.json.JSONObject
 import java.util.*
 
@@ -23,21 +23,19 @@ private val INTERPRETER = object : PollInterpreter<CoverageRetrieveMode, Coverag
         return response.data
     }
 
-    override fun interpretRequest(request: CoverageRetrieveMode): JSONObject? {
-        val root = JSONObject()
-        root.put(
+    override fun interpretRequest(request: CoverageRetrieveMode) = JSONObject().apply {
+        put(
             "mode", when (request) {
                 CoverageRetrieveMode.POINTS -> "points"
                 CoverageRetrieveMode.QUADS -> "quads"
             }
         )
-        return root
     }
 
     override fun interpretResponse(request: CoverageRetrieveMode, response: JSONObject): CoverageData {
         try {
-            val data = response["data"] as JSONObject
-            val isotime = response["time"] as String
+            val data = response.getJSONObject("data")
+            val isotime = response.getString("time")
             return CoverageData(data, dateParseISO(isotime))
         } catch (_: Exception) {
             throw Interpreter.UninterpretableResponseException()
@@ -54,6 +52,10 @@ private val INTERPRETER = object : PollInterpreter<CoverageRetrieveMode, Coverag
 typealias CoverageRetriever = Server.AutoPollService<CoverageRetrieveMode, CoverageData, JSONObject>
 
 fun makeCoverageRetriever(server: Server) =
-    server.AutoPollService(SERVICE_ADDRESS, CoverageRetrieveMode.POINTS, INTERPRETER).apply {
+    server.AutoPollService(
+        SERVICE_ADDRESS,
+        CoverageRetrieveMode.POINTS,
+        INTERPRETER
+    ).apply {
         customRetryPolicy = DEFAULT_RETRY_POLICY
     }

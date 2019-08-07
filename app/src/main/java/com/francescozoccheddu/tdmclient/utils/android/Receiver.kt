@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclientservice
+package com.francescozoccheddu.tdmclient.utils.android
 
 import android.content.BroadcastReceiver
 import android.content.Context

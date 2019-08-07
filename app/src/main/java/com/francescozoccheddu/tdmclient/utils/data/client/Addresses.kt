@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.data.client
+package com.francescozoccheddu.tdmclient.utils.data.client
 
 import java.net.URI
 

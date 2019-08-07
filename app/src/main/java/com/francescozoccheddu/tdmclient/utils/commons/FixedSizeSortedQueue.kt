@@ -1,6 +1,6 @@
-package com.francescozoccheddu.tdmclient.utils
+package com.francescozoccheddu.tdmclient.utils.commons
 
-class FixedSizeSortedQueue<Type : Any>(val size: Int, val comparer: (Type, Type) -> Boolean) : MutableIterable<Type> {
+class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Boolean) : MutableIterable<Type> {
 
     companion object {
 
@@ -21,10 +21,10 @@ class FixedSizeSortedQueue<Type : Any>(val size: Int, val comparer: (Type, Type)
 
     }
 
-    private class Node<Type : Any> {
+    private class Node<Type> {
         var previous: Node<Type>? = null
         var next: Node<Type>? = null
-        lateinit var value: Type
+        var value: Type by LateInit()
     }
 
     private val nodePool = Array<Node<Type>?>(size) { Node() }
@@ -90,7 +90,7 @@ class FixedSizeSortedQueue<Type : Any>(val size: Int, val comparer: (Type, Type)
             if (comparer(value, tail!!.value))
                 remove(tail!!)
             else return null
-        val firstComparison = comparer(value, seek.value)
+        val firstComparison = comparer(value, seek!!.value)
         var node: Node<Type>? = seek
         var lastNode: Node<Type>
         do {

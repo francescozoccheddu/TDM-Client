@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -18,17 +17,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.knob.KnobView
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.data.client.Server
-import com.francescozoccheddu.tdmclient.data.operation.CoverageRetrieveMode
-import com.francescozoccheddu.tdmclient.data.operation.makeCoverageRetriever
-import com.francescozoccheddu.tdmclient.utils.boundingBox
-import com.francescozoccheddu.tdmclient.utils.point
+import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.data.CoverageRetrieveMode
+import com.francescozoccheddu.tdmclient.data.makeCoverageRetriever
+import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
+import com.francescozoccheddu.tdmclient.utils.data.point
+import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
@@ -57,6 +56,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.activity.mv_map
+import kotlinx.android.synthetic.main.bar.pb_search
 import kotlinx.android.synthetic.main.sheet_duration.bt_duration_ok
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_destination
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_nearby
@@ -65,18 +65,12 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
 
     private companion object {
 
-        private val MAP_BOUNDS = LatLngBounds.Builder()
-            .include(LatLng(39.267498, 9.181226))
-            .include(LatLng(39.176358, 9.054797))
-            .build()
-
         private const val MAP_STYLE_URI = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
         private const val MB_IMAGE_DESTINATION = "image_destination"
         private const val MB_SOURCE_DESTINATION = "source_destination"
         private const val MB_LAYER_DESTINATION = "source_destination"
         private const val MB_SOURCE_COVERAGE = "source_coverage"
         private const val MB_LAYER_COVERAGE = "layer_coverage"
-
     }
 
     private lateinit var map: MapboxMap
@@ -234,7 +228,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         }
 
         // Search view
-        searchProvider = LocationSearchProvider(MAP_BOUNDS.boundingBox)
+        searchProvider = LocationSearchProvider(MAP_BOUNDS)
         searchProvider.onLocationClick += {
             if (destinationPickEnabled)
                 destination = it.point
@@ -249,7 +243,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
 
         val ibSearchClose = findViewById<ImageButton>(R.id.ib_search_close)
         val ibSearchClear = findViewById<ImageButton>(R.id.ib_search_clear)
-        val pbSearch = findViewById<ProgressBar>(R.id.pb_search)
 
         ibSearchClose.setOnClickListener {
             etSearch.clearFocus()
@@ -260,12 +253,15 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         }
 
         etSearch = findViewById(R.id.et_search)
+
+        searchProvider.onLoadingChange += { pb_search.visible = it }
+
         etSearch.addTextChangedListener(object : TextWatcher {
 
             override fun afterTextChanged(s: Editable) {
-                pbSearch.visibility = View.VISIBLE
-                searchProvider.query(s.toString())
+                pb_search.visible = false
                 ibSearchClear.visibility = if (s.length > 0) View.VISIBLE else View.GONE
+                searchProvider.query = s.toString()
             }
 
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -283,13 +279,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             }
         }
 
-        searchProvider.onQueryCompleted += {
-            pbSearch.visibility = View.GONE
-        }
-
-        searchProvider.onQueryFailed += {
-            pbSearch.visibility = View.GONE
-        }
 
     }
 

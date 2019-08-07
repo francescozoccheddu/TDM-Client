@@ -9,23 +9,27 @@ import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.francescozoccheddu.tdmclient.data.client.Server
-import com.francescozoccheddu.tdmclient.data.operation.CoverageRetrieveMode
-import com.francescozoccheddu.tdmclient.data.operation.CoverageRetriever
-import com.francescozoccheddu.tdmclient.data.operation.FakeSensor
-import com.francescozoccheddu.tdmclient.data.operation.SensorDriver
-import com.francescozoccheddu.tdmclient.data.operation.makeCoverageRetriever
-import com.francescozoccheddu.tdmclient.utils.FuncEvent
-import com.francescozoccheddu.tdmclient.utils.latLng
-import com.francescozoccheddu.tdmclientservice.ConnectivityStatusReceiver
-import com.francescozoccheddu.tdmclientservice.LocationStatusReceiver
-import com.francescozoccheddu.tdmclientservice.Timer
+import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.data.CoverageRetrieveMode
+import com.francescozoccheddu.tdmclient.data.CoverageRetriever
+import com.francescozoccheddu.tdmclient.data.FakeSensor
+import com.francescozoccheddu.tdmclient.data.RouteRequest
+import com.francescozoccheddu.tdmclient.data.RouteRetriever
+import com.francescozoccheddu.tdmclient.data.SensorDriver
+import com.francescozoccheddu.tdmclient.data.makeCoverageRetriever
+import com.francescozoccheddu.tdmclient.data.makeRouteRetriever
+import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.data.latLng
+import com.francescozoccheddu.tdmclient.utils.android.ConnectivityStatusReceiver
+import com.francescozoccheddu.tdmclient.utils.android.LocationStatusReceiver
+import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import org.json.JSONObject
@@ -137,6 +141,23 @@ class MainService : Service() {
         sensorDriver.requestScoreUpdate()
     }
 
+    fun requestRoute(to: Location?, time: Float, callback: (RouteRequest, Collection<Point>?) -> Unit) {
+        val from = location
+        if (from != null) {
+            routeRetriever.Request(RouteRequest(from, to, time)).apply {
+                onStatusChange += {
+                    if (it.status.succeeded)
+                        callback(it.request, it.response)
+                    else if (!it.status.pending)
+                        callback(it.request, null)
+                }
+                start()
+            }
+        }
+        else
+            throw IllegalStateException("'${this::location.name}' is null")
+    }
+
     private val locationCallback = object : LocationEngineCallback<LocationEngineResult> {
         override fun onSuccess(result: LocationEngineResult?) {
             val location = result?.lastLocation
@@ -156,6 +177,7 @@ class MainService : Service() {
     private lateinit var server: Server
     private lateinit var sensorDriver: SensorDriver
     private lateinit var coverageRetriever: CoverageRetriever
+    private lateinit var routeRetriever: RouteRetriever
     private lateinit var notification: ServiceNotification
     private var bound = false
         set(value) {
@@ -190,18 +212,26 @@ class MainService : Service() {
 
         server = Server(this, SERVER_ADDRESS)
 
-        // Prepare retriever
-        coverageRetriever = makeCoverageRetriever(server).apply {
-            pollRequest = COVERAGE_RETRIEVE_MODE
-            expiration = COVERAGE_EXPIRATION_TIME
-            onData += { onCoverageDataChange(this@MainService) }
-            onExpire += { onCoverageDataChange(this@MainService) }
+        // Prepare retrievers
+        run {
+            coverageRetriever = makeCoverageRetriever(server).apply {
+                pollRequest = COVERAGE_RETRIEVE_MODE
+                expiration = COVERAGE_EXPIRATION_TIME
+                onData += { onCoverageDataChange(this@MainService) }
+                onExpire += { onCoverageDataChange(this@MainService) }
+            }
+
+            routeRetriever = makeRouteRetriever(server)
         }
 
         // Prepare sensor
         run {
             val fakeMeasurement = SensorDriver.Measurement(100f, 50f, 50f, 20f, 50f, 50f)
-            sensorDriver = SensorDriver(server, USER, FakeSensor(fakeMeasurement)).apply {
+            sensorDriver = SensorDriver(
+                server,
+                USER,
+                FakeSensor(fakeMeasurement)
+            ).apply {
                 onScoreChange += { this@MainService.score = it.score }
                 onReachableChange += { connected = it.reachable && online }
                 measureInterval = MEASURE_INTERVAL_TIME
