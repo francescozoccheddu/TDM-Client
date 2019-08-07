@@ -41,5 +41,12 @@
               android:id="@+id/tv_coverage"
               android:textSize="18dp"
     />
+    
+    <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bt_route"
+            android:enabled="false"
+            android:text="Route!"
+    />
 
 </LinearLayout>

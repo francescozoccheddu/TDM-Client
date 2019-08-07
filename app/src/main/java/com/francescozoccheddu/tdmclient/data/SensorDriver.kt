@@ -25,7 +25,14 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
     companion object {
         const val DEFAULT_PREFS_NAME = "tdmclient:SensorDriver:SharedPreferences"
         const val DEFAULT_SCORE_PREF_KEY = "$DEFAULT_PREFS_NAME.score"
+
         private const val MAX_SCORE_REQUESTS = 4
+        private const val SCORE_SERVICE_ADDRESS = "getuser"
+        private val SCORE_SERVICE_RETRY_POLICY = RetryPolicy(2f)
+
+        private const val MEASUREMENT_SERVICE_ADDRESS = "putmeasurements"
+        private val MEASUREMENT_SERVICE_RETRY_POLICY = RetryPolicy(4f)
+
         private const val MAX_MEASUREMENTS_REQUESTS = 4
         private const val MAX_UNREACHABLE_ATTEMPTS = 3
         private const val MAX_BATCH_HOLD_TIME = 10f
@@ -54,7 +61,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
     private val queue = FixedSizeSortedQueue.by(MAX_QUEUE_SIZE, true) { value: LocalizedMeasurement -> value.time }
 
     private val scoreService =
-        server.PollService("getuser", user, PollInterpreter.from(object : Interpreter<User, Int> {
+        server.PollService(SCORE_SERVICE_ADDRESS, user, PollInterpreter.from(object : Interpreter<User, Int> {
             override fun interpretRequest(request: User): JSONObject? =
                 JSONObject().apply {
                     put("id", request.id)
@@ -70,10 +77,10 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             }
         })).apply {
             onData += { score = it }
-            customRetryPolicy = RetryPolicy(2f)
+            customRetryPolicy = SCORE_SERVICE_RETRY_POLICY
         }
     private val measurementService =
-        server.Service("putmeasurements", object : Interpreter<MeasurementPutRequest, Int> {
+        server.Service(MEASUREMENT_SERVICE_ADDRESS, object : Interpreter<MeasurementPutRequest, Int> {
             override fun interpretRequest(request: MeasurementPutRequest): JSONObject? =
                 JSONObject().apply {
                     put("id", request.user.id)
@@ -120,7 +127,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
                     updateBatch()
                 }
             }
-            customRetryPolicy = RetryPolicy(6f)
+            customRetryPolicy = MEASUREMENT_SERVICE_RETRY_POLICY
         }
 
     private var failureCount = 0

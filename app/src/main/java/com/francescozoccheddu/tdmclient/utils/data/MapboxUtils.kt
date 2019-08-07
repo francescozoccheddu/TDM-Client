@@ -23,6 +23,8 @@ val LatLng.point get() = Point.fromLngLat(longitude, latitude)
 
 val Location.latLng get() = LatLng(this)
 
+val Location.point get() = Point.fromLngLat(longitude, latitude)
+
 val Location.json get() = JSONArray(arrayOf(longitude, latitude))
 
 val mapboxAccessToken get() = Mapbox.getAccessToken() ?: throw IllegalStateException("No access token registered")

@@ -14,7 +14,6 @@ class Geocoder(val bounds: LatLngBounds?) {
 
     private companion object {
         private const val MAX_RESULTS = 4
-        private val LANGUAGE = Locale.getDefault()
         private const val CACHE_SIZE = 100
     }
 
@@ -29,7 +28,7 @@ class Geocoder(val bounds: LatLngBounds?) {
         .accessToken(mapboxAccessToken)
         .autocomplete(true)
         .limit(MAX_RESULTS)
-        .languages(LANGUAGE)
+        .languages(Locale.getDefault())
         .geocodingTypes("district", "place", "locality", "neighborhood", "address", "poi").apply {
             if (bounds != null)
                 bbox(bounds.boundingBox)

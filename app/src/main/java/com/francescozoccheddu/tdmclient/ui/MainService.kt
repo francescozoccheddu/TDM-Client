@@ -9,7 +9,6 @@ import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import com.francescozoccheddu.tdmclient.data.CoverageRetrieveMode
 import com.francescozoccheddu.tdmclient.data.CoverageRetriever
 import com.francescozoccheddu.tdmclient.data.FakeSensor
@@ -18,11 +17,12 @@ import com.francescozoccheddu.tdmclient.data.RouteRetriever
 import com.francescozoccheddu.tdmclient.data.SensorDriver
 import com.francescozoccheddu.tdmclient.data.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.data.makeRouteRetriever
-import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
-import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.android.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclient.utils.android.LocationStatusReceiver
 import com.francescozoccheddu.tdmclient.utils.android.Timer
+import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -141,7 +141,7 @@ class MainService : Service() {
         sensorDriver.requestScoreUpdate()
     }
 
-    fun requestRoute(to: Location?, time: Float, callback: (RouteRequest, Collection<Point>?) -> Unit) {
+    fun requestRoute(to: Location?, time: Float, callback: (RouteRequest, List<Point>?) -> Unit) {
         val from = location
         if (from != null) {
             routeRetriever.Request(RouteRequest(from, to, time)).apply {
