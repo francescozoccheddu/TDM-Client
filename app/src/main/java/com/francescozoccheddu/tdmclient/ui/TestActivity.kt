@@ -9,6 +9,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.data.getDirections
+import com.francescozoccheddu.tdmclient.utils.data.point
+import kotlinx.android.synthetic.main.testactivity.bt_route
 import kotlinx.android.synthetic.main.testactivity.tv_connected
 import kotlinx.android.synthetic.main.testactivity.tv_coverage
 import kotlinx.android.synthetic.main.testactivity.tv_locatable
@@ -32,6 +35,7 @@ class TestActivity : AppCompatActivity() {
             service.onCoverageDataChange -= this@TestActivity::onCoverageDataChange
             service.onScoreChange -= this@TestActivity::onScoreChange
             service.onLocationChange -= this@TestActivity::onLocationChange
+            bt_route.isEnabled = false
         }
 
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
@@ -49,6 +53,7 @@ class TestActivity : AppCompatActivity() {
             onCoverageDataChange(service)
             onScoreChange(service)
             onLocationChange(service)
+            bt_route.isEnabled = true
         }
 
     }
@@ -82,6 +87,21 @@ class TestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.testactivity)
+        bt_route.setOnClickListener {
+            bt_route.isEnabled = false
+            service.requestRoute(null, 3600f) { req, res ->
+                if (res != null)
+                    getDirections(req.from.point, res) {
+                        val ok = it != null
+                        Toast.makeText(this@TestActivity, "Directions=$ok", Toast.LENGTH_SHORT).show()
+                        bt_route.isEnabled = true
+                    }
+                else
+                    bt_route.isEnabled = true
+                val ok = res != null
+                Toast.makeText(this@TestActivity, "Route=$ok", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun TextView.change(text: String) {

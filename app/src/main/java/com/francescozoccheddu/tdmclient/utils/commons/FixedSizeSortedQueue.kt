@@ -46,6 +46,7 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
 
     private var head: Node<Type>? = null
     private var tail: Node<Type>? = null
+    private val tailOrHead get() = tail ?: head
 
     private fun addFirst(value: Type) {
         if (tail == null)
@@ -76,7 +77,7 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     }
 
     private fun addLast(value: Type) {
-        val node = borrowNode(value, tail ?: head, null)
+        val node = borrowNode(value, tailOrHead, null)
         tail?.next = node
         tail = node
     }
@@ -126,7 +127,7 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
 
     private fun next(node: Node<Type>?, reverse: Boolean) =
         if (node == null) {
-            if (reverse) tail ?: head else head
+            if (reverse) tailOrHead else head
         }
         else {
             if (reverse) node.previous else node.next
