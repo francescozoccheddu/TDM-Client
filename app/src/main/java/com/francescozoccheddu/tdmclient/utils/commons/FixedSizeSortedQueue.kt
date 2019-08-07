@@ -31,7 +31,11 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     private var poolSize = size
 
     private fun borrowNode(value: Type, previous: Node<Type>?, next: Node<Type>?) =
-        nodePool[--poolSize].apply { this!!.value = value }
+        nodePool[--poolSize]!!.apply {
+            this.value = value
+            this.next = next
+            this.previous = previous
+        }
 
     private fun returnNode(node: Node<Type>) {
         nodePool[poolSize++] = node
@@ -44,9 +48,9 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     private var tail: Node<Type>? = null
 
     private fun addFirst(value: Type) {
-        head = borrowNode(value, null, head)
         if (tail == null)
             tail = head
+        head = borrowNode(value, null, head)
     }
 
     private fun addBefore(node: Node<Type>, value: Type) {
@@ -70,16 +74,16 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     }
 
     private fun addLast(value: Type) {
-        tail = borrowNode(value, tail, null)
-        if (head == null)
-            head = tail
+        tail = borrowNode(value, tail ?: head, null)
     }
 
     private fun remove(node: Node<Type>) {
         if (head == node)
             head = node.next
-        if (tail == node)
+        else if (tail == node)
             tail = node.previous
+        if (tail == head)
+            tail = null
         node.next?.previous = node.previous
         node.previous?.next = node.next
         returnNode(node)
@@ -118,7 +122,7 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
 
     private fun next(node: Node<Type>?, reverse: Boolean) =
         if (node == null) {
-            if (reverse) tail else head
+            if (reverse) tail ?: head else head
         }
         else {
             if (reverse) node.previous else node.next
@@ -127,20 +131,22 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
 
     private open inner class QueueIterator(val reverse: Boolean) : Iterator<Type> {
 
-        protected var current: Node<Type>? = null
+        protected lateinit var current: Node<Type>
+        private var next: Node<Type>? = next(null, reverse)
 
-        override fun hasNext() = next(current, reverse) != null
+        override fun hasNext() = next != null
 
         override fun next(): Type {
-            current = next(current, reverse)
-            return current!!.value
+            current = next!!
+            next = next(next, reverse)
+            return current.value
         }
     }
 
     private inner class MutableQueueIterator(reverse: Boolean) : QueueIterator(reverse), MutableIterator<Type> {
 
         override fun remove() {
-            remove(current!!)
+            remove(current)
         }
 
     }

@@ -10,6 +10,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import org.json.JSONArray
 
 
 val Point.latlng get() = LatLng(latitude(), longitude())
@@ -22,7 +23,7 @@ val LatLng.point get() = Point.fromLngLat(longitude, latitude)
 
 val Location.latLng get() = LatLng(this)
 
-val Location.array get() = arrayOf(this.longitude, this.longitude)
+val Location.json get() = JSONArray(arrayOf(longitude, latitude))
 
 val mapboxAccessToken get() = Mapbox.getAccessToken() ?: throw IllegalStateException("No access token registered")
 

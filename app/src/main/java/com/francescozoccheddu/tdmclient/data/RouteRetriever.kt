@@ -4,7 +4,7 @@ import android.location.Location
 import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
-import com.francescozoccheddu.tdmclient.utils.data.array
+import com.francescozoccheddu.tdmclient.utils.data.json
 import com.mapbox.geojson.Point
 import org.json.JSONObject
 
@@ -17,9 +17,9 @@ private val INTERPRETER = object : Interpreter<RouteRequest, Collection<Point>> 
 
     override fun interpretRequest(request: RouteRequest) =
         JSONObject().apply {
-            put("from", request.from.array)
+            put("from", request.from.json)
             if (request.to != null)
-                put("to", request.from.array)
+                put("to", request.from.json)
             put("time", request.time)
         }
 
