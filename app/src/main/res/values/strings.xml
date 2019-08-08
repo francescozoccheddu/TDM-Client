@@ -5,9 +5,20 @@
     <string name="mapbox_access_token">
         pk.eyJ1IjoiZnJhbmNlc2NvenoiLCJhIjoiY2pzYndrOTg5MGVrdzN5cGR2ZjdkY3ZnMiJ9.MCiDPh-MIjlWxN1IdzrYSg
     </string>
-    <string name="user_location_permission_explanation">TDM-Client ha bisogno di conoscere la tua posizione per poter ottimizzare il tuo percorso</string>
+    <string name="user_location_permission_explanation">TDM-Client ha bisogno di conoscere la tua posizione per poter
+        ottimizzare il tuo percorso
+    </string>
     <string name="problem_offline">Nessuna connessione ad Internet</string>
     <string name="problem_location_permission">Permesso di accededere alla posizione negato</string>
     <string name="problem_location_permission_action">Concedi</string>
     <string name="service_notification_channel">Notifiche</string>
+    <string name="notification_title">TDM Client</string>
+    <string name="notification_content_ok">In esecuzione</string>
+    <string name="notification_content_unknown_location">Localizzazione in corso</string>
+    <string name="notification_content_unreachable">Servizio non disponibile</string>
+    <string name="notification_content_offline">Nessuna connessiona ad Internet</string>
+    <string name="notification_content_unlocatable">Servizi di localizzazione disattivati</string>
+    <string name="notification_action_unlocatable">Abilita</string>
+    <string name="notification_content_device_lost">Connessione col sensore persa</string>
+    <string name="notification_action_kill">Interrompi</string>
 </resources>

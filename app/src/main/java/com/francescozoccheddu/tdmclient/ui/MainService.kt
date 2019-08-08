@@ -50,11 +50,21 @@ class MainService : Service() {
         private val COVERAGE_RETRIEVE_MODE = CoverageRetrieveMode.POINTS
         private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
         private val USER = SensorDriver.User(0, "0")
+        private val STOP_ACTION = "IntentActionStop"
+        private val START_ACTIVITY_ACTION = "IntentActionStartActivity"
 
         val MAP_BOUNDS = LatLngBounds.Builder()
             .include(LatLng(39.267498, 9.181226))
             .include(LatLng(39.176358, 9.054797))
             .build()
+
+        fun makeStopIntent(context: Context) = Intent(context, MainService::class.java).apply {
+            action = STOP_ACTION
+        }
+
+        fun makeStartActivityIntent(context: Context) = Intent(context, MainService::class.java).apply {
+            action = START_ACTIVITY_ACTION
+        }
 
         fun bind(context: Context, connection: ServiceConnection) {
             val intent = Intent(context, MainService::class.java)
@@ -269,6 +279,14 @@ class MainService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            STOP_ACTION -> stopSelf()
+            START_ACTIVITY_ACTION -> {
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+            }
+        }
         return START_STICKY
     }
 

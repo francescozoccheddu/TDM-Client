@@ -3,11 +3,18 @@ package com.francescozoccheddu.tdmclient.ui
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.utils.android.addAction
+import com.francescozoccheddu.tdmclient.utils.android.makeActivityIntent
+import com.francescozoccheddu.tdmclient.utils.android.setContentText
+import com.francescozoccheddu.tdmclient.utils.android.setContentTitle
 
 class ServiceNotification(val service: MainService) {
 
@@ -15,20 +22,35 @@ class ServiceNotification(val service: MainService) {
 
         private const val NOTIFICATION_CHANNEL = "MainServiceNotificationChannel"
         private const val FOREGROUND_NOTIFICATION_ID = 1
-        private const val ENABLE_KILL_BUTTON = false
+        private const val ENABLE_KILL_BUTTON = true
         private const val SENSOR_LOST_NOTIFICATION_ID = 2
 
         private fun notify(context: Context, id: Int, notification: Notification) {
             NotificationManagerCompat.from(context).notify(id, notification)
         }
 
+        private fun NotificationCompat.Builder.addStopServiceAction() =
+            if (ENABLE_KILL_BUTTON)
+                addAction(
+                    R.drawable.ic_launcher_foreground, R.string.notification_action_kill,
+                    PendingIntent.getService(
+                        mContext, 0, MainService.makeStopIntent(mContext),
+                        PendingIntent.FLAG_CANCEL_CURRENT
+                    )
+                )
+            else this
+
+        private fun makeBuilder(context: Context) =
+            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
+                .setContentIntent(makeActivityIntent(context, TestActivity::class.java))
+                .setContentTitle(R.string.notification_title)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+
         fun notifySensorConnectionLost(context: Context) {
             notify(
                 context, SENSOR_LOST_NOTIFICATION_ID,
-                NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
-                    .setContentTitle("TDM Client")
-                    .setContentText("Device lost")
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                makeBuilder(context)
+                    .setContentText(R.string.notification_content_device_lost)
                     .build()
             )
         }
@@ -44,39 +66,45 @@ class ServiceNotification(val service: MainService) {
         update()
     }
 
+    private val builder get() = makeBuilder(service)
+
     private val okNotification by lazy {
-        NotificationCompat.Builder(service, NOTIFICATION_CHANNEL)
-            .setContentTitle("TDM Client")
-            .setContentText("OK")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+        builder
+            .setContentText(R.string.notification_content_ok)
+            .addStopServiceAction()
             .build()
     }
+
     private val unknownLocationNotification by lazy {
-        NotificationCompat.Builder(service, NOTIFICATION_CHANNEL)
-            .setContentTitle("TDM Client")
-            .setContentText("Unknown")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+        builder
+            .setContentText(R.string.notification_content_unknown_location)
+            .addStopServiceAction()
             .build()
     }
+
     private val unlocatableNotification by lazy {
-        NotificationCompat.Builder(service, NOTIFICATION_CHANNEL)
-            .setContentTitle("TDM Client")
-            .setContentText("Unlocatable")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+        builder
+            .setContentText(R.string.notification_content_unlocatable)
+            .addStopServiceAction()
+            .addAction(
+                R.drawable.ic_launcher_foreground,
+                R.string.notification_action_unlocatable,
+                PendingIntent.getActivity(service, 0, Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0)
+            )
             .build()
     }
+
     private val offlineNotification by lazy {
-        NotificationCompat.Builder(service, NOTIFICATION_CHANNEL)
-            .setContentTitle("TDM Client")
-            .setContentText("Offline")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+        builder
+            .setContentText(R.string.notification_content_offline)
+            .addStopServiceAction()
             .build()
     }
+
     private val unreachableNotification by lazy {
-        NotificationCompat.Builder(service, NOTIFICATION_CHANNEL)
-            .setContentTitle("TDM Client")
-            .setContentText("Unreachable")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+        builder
+            .setContentText(R.string.notification_content_unreachable)
+            .addStopServiceAction()
             .build()
     }
 
