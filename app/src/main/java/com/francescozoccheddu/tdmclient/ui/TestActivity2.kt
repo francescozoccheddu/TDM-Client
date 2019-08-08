@@ -8,6 +8,9 @@ import com.francescozoccheddu.tdmclient.utils.commons.FixedSizeSortedQueue
 import kotlinx.android.synthetic.main.testactivity2.cb_reversed
 import kotlinx.android.synthetic.main.testactivity2.np_input
 import kotlinx.android.synthetic.main.testactivity2.tv_queue
+import kotlin.math.log10
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 class TestActivity2 : AppCompatActivity() {
 
@@ -20,7 +23,7 @@ class TestActivity2 : AppCompatActivity() {
         update()
     }
 
-    private val queue = FixedSizeSortedQueue.by<Int>(10, false)
+    private val queue = FixedSizeSortedQueue.by<Int>(3, false)
 
     private val input get() = np_input.value
     private val reversed get() = cb_reversed.isChecked
@@ -46,6 +49,14 @@ class TestActivity2 : AppCompatActivity() {
         val iterator = queue.mutableIterator(reversed)
         for (i in iterator)
             iterator.remove()
+        update()
+    }
+
+    fun addRandom(view: View) {
+        for (i in 0..100) {
+            val q = log10(Random.nextDouble(1.0, 100.0)) / 2f
+            queue.add((q * 10).roundToInt())
+        }
         update()
     }
 
