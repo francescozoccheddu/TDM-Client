@@ -59,18 +59,24 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
         if (head == null)
             head = borrowNode(value, null, null)
         else {
-            if (tail == null)
-                tail = borrowNode(value, head, null)
+            if (tail == null) {
+                tail = head
+                head = borrowNode(value, null, tail)
+            }
             else
                 head = borrowNode(value, null, head)
         }
     }
 
     private fun addLast(value: Type) {
-        if (head == null || tail == null)
-            addFirst(value)
-        else
-            tail = borrowNode(value, tail, null)
+        if (head == null)
+            head = borrowNode(value, null, null)
+        else {
+            if (tail == null)
+                tail = borrowNode(value, head, null)
+            else
+                tail = borrowNode(value, tail, null)
+        }
     }
 
     private fun addBefore(node: Node<Type>, value: Type) {
@@ -110,8 +116,8 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     private fun insert(value: Type, seek: Node<Type>): Node<Type>? {
         var node: Node<Type>? = seek
         if (poolSize == 0)
-            if (comparer(value, tail!!.value)) {
-                if (seek == tail) {
+            if (comparer(value, tailOrHead!!.value)) {
+                if (seek == tailOrHead) {
                     if (size == 1) {
                         seek.value = value
                         return seek
