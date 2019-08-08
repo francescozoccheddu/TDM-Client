@@ -44,16 +44,49 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     val length
         get() = size - poolSize
 
+    // TODO Simplify
+    // TODO Link inside borrowNode?
+
     private var head: Node<Type>? = null
     private var tail: Node<Type>? = null
     private val tailOrHead get() = tail ?: head
 
     private fun addFirst(value: Type) {
-        if (tail == null)
-            tail = head
-        val node = borrowNode(value, null, head)
-        head?.previous = node
-        head = node
+        if (head == null) {
+            head = borrowNode(value, null, null)
+            tail = null
+        }
+        else {
+            if (tail == null) {
+                tail = borrowNode(value, head, null)
+                head!!.next = tail
+            }
+            else {
+                val prevHead = head
+                val newHead = borrowNode(value, null, prevHead)
+                prevHead!!.previous = newHead
+                head = newHead
+            }
+        }
+    }
+
+    private fun addLast(value: Type) {
+        if (head == null) {
+            head = borrowNode(value, null, null)
+            tail = null
+        }
+        else {
+            if (tail == null) {
+                tail = borrowNode(value, head, null)
+                head!!.next = tail
+            }
+            else {
+                val prevTail = tail
+                val newTail = borrowNode(value, prevTail, null)
+                prevTail!!.next = newTail
+                tail = newTail
+            }
+        }
     }
 
     private fun addBefore(node: Node<Type>, value: Type) {
@@ -67,7 +100,7 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     }
 
     private fun addAfter(node: Node<Type>, value: Type) {
-        if (node == tail)
+        if (node == tailOrHead)
             addLast(value)
         else {
             val newNode = borrowNode(value, node, node.next)
@@ -76,21 +109,23 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
         }
     }
 
-    private fun addLast(value: Type) {
-        val node = borrowNode(value, tailOrHead, null)
-        tail?.next = node
-        tail = node
-    }
-
     private fun remove(node: Node<Type>) {
-        if (head == node)
-            head = node.next
-        else if (tail == node)
-            tail = node.previous
-        if (tail == head)
+        val prevNode = node.previous
+        val nextNode = node.next
+        if (prevNode == null) {
+            head = nextNode
+            head?.previous = null
+        }
+        else if (nextNode == null) {
+            tail = prevNode
+            tail?.next = null
+        }
+        else {
+            prevNode.next = nextNode
+            nextNode.previous = prevNode
+        }
+        if (head == tail)
             tail = null
-        node.next?.previous = node.previous
-        node.previous?.next = node.next
         returnNode(node)
     }
 
@@ -178,7 +213,16 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     fun mutableIterator(reverse: Boolean = false): MutableIterator<Type> = MutableQueueIterator(reverse)
 
     val first get() = head?.value
-    val last get() = tail?.value
+    val last get() = tailOrHead?.value
+
+    fun print(): String {
+        val b = StringBuilder()
+        for (i in this)
+            b.append("$i   ")
+        b.appendln()
+        b.append("${head?.value}   ${tail?.value}")
+        return b.toString()
+    }
 
 }
 
