@@ -53,7 +53,6 @@ class TestActivity : AppCompatActivity() {
             onCoverageDataChange(service)
             onScoreChange(service)
             onLocationChange(service)
-            bt_route.isEnabled = true
         }
 
     }
@@ -67,6 +66,7 @@ class TestActivity : AppCompatActivity() {
     }
 
     private fun onLocationChange(service: MainService) {
+        bt_route.isEnabled = service.location != null
         tv_location.change("Location=${service.location?.latitude};${service.location?.longitude}")
         tv_locationInArea.change("InArea=${service.insideMeasurementArea}")
     }
