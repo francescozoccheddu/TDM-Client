@@ -21,6 +21,11 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
 
     }
 
+    init {
+        if (size <= 0)
+            throw IllegalArgumentException("'${this::size}' must be positive")
+    }
+
     private class Node<Type> {
         var previous: Node<Type>? = null
         var next: Node<Type>? = null
@@ -46,43 +51,26 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
     val length
         get() = size - poolSize
 
-    // TODO Simplify
-    // TODO Link inside borrowNode?
-
     private var head: Node<Type>? = null
     private var tail: Node<Type>? = null
     private val tailOrHead get() = tail ?: head
 
     private fun addFirst(value: Type) {
-        if (head == null) {
+        if (head == null)
             head = borrowNode(value, null, null)
-            tail = null
-        }
         else {
             if (tail == null)
                 tail = borrowNode(value, head, null)
-            else {
-                val prevHead = head
-                val newHead = borrowNode(value, null, prevHead)
-                head = newHead
-            }
+            else
+                head = borrowNode(value, null, head)
         }
     }
 
     private fun addLast(value: Type) {
-        if (head == null) {
-            head = borrowNode(value, null, null)
-            tail = null
-        }
-        else {
-            if (tail == null)
-                tail = borrowNode(value, head, null)
-            else {
-                val prevTail = tail
-                val newTail = borrowNode(value, prevTail, null)
-                tail = newTail
-            }
-        }
+        if (head == null || tail == null)
+            addFirst(value)
+        else
+            tail = borrowNode(value, tail, null)
     }
 
     private fun addBefore(node: Node<Type>, value: Type) {
@@ -124,9 +112,9 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
         if (poolSize == 0)
             if (comparer(value, tail!!.value)) {
                 if (seek == tail) {
-                    if (length == 1) {
-                        tail!!.value = value
-                        return tail
+                    if (size == 1) {
+                        seek.value = value
+                        return seek
                     }
                     else
                         node = seek.previous

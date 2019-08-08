@@ -39,5 +39,11 @@
             android:text="Clear"
             android:onClick="removeAll"
     />
+    
+    <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add random"
+            android:onClick="addRandom"
+    />
 
 </LinearLayout>
