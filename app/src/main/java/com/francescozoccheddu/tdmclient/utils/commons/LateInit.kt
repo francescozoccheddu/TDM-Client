@@ -2,9 +2,9 @@ package com.francescozoccheddu.tdmclient.utils.commons
 
 import kotlin.reflect.KProperty
 
-class LateInit<Type> {
+data class Nullable<Type>(var value: Type)
 
-    private data class Nullable<Type>(var value: Type)
+class LateInit<Type> {
 
     private lateinit var _value: Nullable<Type>
 

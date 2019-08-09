@@ -10,23 +10,17 @@ import com.android.volley.ParseError
 import com.android.volley.ServerError
 import com.android.volley.TimeoutError
 import com.android.volley.VolleyError
-import com.android.volley.toolbox.HttpHeaderParser
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.commons.LateInit
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
-import com.francescozoccheddu.tdmclient.utils.android.Timer
-import org.json.JSONException
-import org.json.JSONObject
-import java.nio.charset.Charset
-import java.nio.charset.IllegalCharsetNameException
-import java.nio.charset.UnsupportedCharsetException
 import java.util.*
 import kotlin.math.roundToInt
 import com.android.volley.Request as VolleyRequest
 import com.android.volley.Response as VolleyResponse
+
 
 class Server(context: Context, val address: ServerAddress) {
 
@@ -104,12 +98,16 @@ class Server(context: Context, val address: ServerAddress) {
 
         var customRetryPolicy: RetryPolicy? = null
 
+        protected open fun getBody(request: RequestType): String {
+            return VolleyAdapterRequest.toJSON(interpreter.interpretRequest(request))
+        }
+
         inner class Request(
             val request: RequestType,
             val retryPolicy: RetryPolicy = this@Service.retryPolicy
         ) {
 
-            private val nativeRequest: VolleyRequest<JSONObject>
+            private val nativeRequest: VolleyRequest<*>
 
             private val _response = LateInit<ResponseType>()
 
@@ -133,22 +131,17 @@ class Server(context: Context, val address: ServerAddress) {
                 get() = if (status.pending) throw IllegalStateException("Pending") else field
                 private set
 
-            private fun trySetResponse(body: JSONObject) {
-                try {
-                    response = interpreter.interpretResponse(request, body)
-                } catch (_: Interpreter.UninterpretableResponseException) {
-                }
-            }
-
             init {
-                nativeRequest = JsonObjectRequest(
-                    VolleyRequest.Method.POST,
+                nativeRequest = VolleyAdapterRequest(
                     this@Server.address.resolveService(this@Service.address),
-                    this@Service.interpreter.interpretRequest(request),
-                    VolleyResponse.Listener<JSONObject>
+                    getBody(request),
+                    {
+                        interpreter.interpretResponse(request, it)
+                    },
+                    VolleyResponse.Listener
                     {
                         endTime = Date()
-                        trySetResponse(it)
+                        response = it
                         if (hasResponse) {
                             status = Status.SUCCESS
                         }
@@ -161,17 +154,11 @@ class Server(context: Context, val address: ServerAddress) {
                         endTime = Date()
                         val networkResponse = it.networkResponse
                         if (networkResponse?.data != null) {
-                            var body: JSONObject? = null
-                            try {
-                                val charsetName = HttpHeaderParser.parseCharset(networkResponse.headers, "utf-8")
-                                val charset = Charset.forName(charsetName)
-                                body = JSONObject(String(networkResponse.data, charset))
-                            } catch (_: JSONException) {
-                            } catch (_: IllegalCharsetNameException) {
-                            } catch (_: UnsupportedCharsetException) {
+                            val body = VolleyAdapterRequest.parseResponse(networkResponse) {
+                                interpreter.interpretResponse(request, it)
                             }
                             if (body != null)
-                                trySetResponse(body)
+                                response = body.value
                         }
                         status = when (it) {
                             is AuthFailureError, is ClientError -> Status.REQUEST_ERROR
@@ -226,6 +213,19 @@ class Server(context: Context, val address: ServerAddress) {
             interpreter: PollInterpreter<RequestType, ResponseType, DataType>
         ) : this(ServiceAddress(address), pollRequest, interpreter)
 
+        override final fun getBody(request: RequestType): String {
+            return if (request == pollRequest) {
+                if (!this::cachedBody.isInitialized || cachedBodyRequest != pollRequest) {
+                    cachedBody = super.getBody(pollRequest)
+                    cachedBodyRequest = pollRequest
+                }
+                cachedBody
+            }
+            else super.getBody(request)
+        }
+
+        private var cachedBodyRequest = pollRequest
+        private lateinit var cachedBody: String
 
         var time = Date()
             get() = if (hasData) field else throw IllegalStateException("No data")
@@ -354,47 +354,8 @@ class Server(context: Context, val address: ServerAddress) {
 
     }
 
-
 }
 
-interface Interpreter<RequestType, ResponseType> {
-
-    companion object {
-        val IDENTITY = object : Interpreter<JSONObject?, JSONObject> {
-            override fun interpretRequest(request: JSONObject?) = request
-            override fun interpretResponse(request: JSONObject?, response: JSONObject) = response
-        }
-    }
-
-    class UninterpretableResponseException : Exception()
-
-    fun interpretRequest(request: RequestType): JSONObject?
-
-    fun interpretResponse(request: RequestType, response: JSONObject): ResponseType
-
-}
-
-interface PollInterpreter<RequestType, ResponseType, DataType> : Interpreter<RequestType, ResponseType> {
-
-    companion object {
-
-        fun <RequestType, ResponseType> from(interpreter: Interpreter<RequestType, ResponseType>)
-                : PollInterpreter<RequestType, ResponseType, ResponseType> =
-            object : PollInterpreter<RequestType, ResponseType, ResponseType>,
-                Interpreter<RequestType, ResponseType> by interpreter {
-
-                override fun interpretData(response: ResponseType) = response
-
-            }
-
-        val IDENTITY = from(Interpreter.IDENTITY)
-    }
-
-    fun interpretTime(request: Server.Service<RequestType, ResponseType>.Request) = request.startTime
-
-    fun interpretData(response: ResponseType): DataType
-
-}
 
 data class RetryPolicy(val timeout: Float = 5f, val attempts: Int = 1, val backoffMultiplier: Float = 1.0f) {
     init {

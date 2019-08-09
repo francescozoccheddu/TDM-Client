@@ -13,6 +13,7 @@ import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.PollInterpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.utils.data.client.SimpleInterpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.error
 import com.francescozoccheddu.tdmclient.utils.data.json
 import org.json.JSONArray
@@ -61,7 +62,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
     private val queue = FixedSizeSortedQueue.by(MAX_QUEUE_SIZE, true) { value: LocalizedMeasurement -> value.time }
 
     private val scoreService =
-        server.PollService(SCORE_SERVICE_ADDRESS, user, PollInterpreter.from(object : Interpreter<User, Int> {
+        server.PollService(SCORE_SERVICE_ADDRESS, user, PollInterpreter.from(object : SimpleInterpreter<User, Int>() {
             override fun interpretRequest(request: User): JSONObject? =
                 JSONObject().apply {
                     put("id", request.id)
@@ -80,7 +81,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             customRetryPolicy = SCORE_SERVICE_RETRY_POLICY
         }
     private val measurementService =
-        server.Service(MEASUREMENT_SERVICE_ADDRESS, object : Interpreter<MeasurementPutRequest, Int> {
+        server.Service(MEASUREMENT_SERVICE_ADDRESS, object : SimpleInterpreter<MeasurementPutRequest, Int>() {
             override fun interpretRequest(request: MeasurementPutRequest): JSONObject? =
                 JSONObject().apply {
                     put("id", request.user.id)
