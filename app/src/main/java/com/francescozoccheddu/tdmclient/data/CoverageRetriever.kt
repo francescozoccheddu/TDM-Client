@@ -2,9 +2,9 @@ package com.francescozoccheddu.tdmclient.data
 
 import com.francescozoccheddu.tdmclient.utils.commons.dateParseISO
 import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
-import com.francescozoccheddu.tdmclient.utils.data.client.PollInterpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.utils.data.client.SimplePollInterpreter
 import org.json.JSONObject
 import java.util.*
 
@@ -17,7 +17,7 @@ enum class CoverageRetrieveMode {
 
 data class CoverageData(val data: JSONObject, val time: Date)
 
-private val INTERPRETER = object : PollInterpreter<CoverageRetrieveMode, CoverageData, JSONObject> {
+private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, CoverageData, JSONObject>() {
 
     override fun interpretData(response: CoverageData): JSONObject {
         return response.data
@@ -40,7 +40,6 @@ private val INTERPRETER = object : PollInterpreter<CoverageRetrieveMode, Coverag
         } catch (_: Exception) {
             throw Interpreter.UninterpretableResponseException()
         }
-
     }
 
     override fun interpretTime(request: Server.Service<CoverageRetrieveMode, CoverageData>.Request): Date {

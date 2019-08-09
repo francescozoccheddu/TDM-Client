@@ -4,6 +4,7 @@ import android.location.Location
 import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.utils.data.client.SimpleInterpreter
 import com.francescozoccheddu.tdmclient.utils.data.json
 import com.francescozoccheddu.tdmclient.utils.data.mapboxAccessToken
 import com.francescozoccheddu.tdmclient.utils.data.point
@@ -24,7 +25,7 @@ private val DEFAULT_RETRY_POLICY = RetryPolicy(6f)
 
 data class RouteRequest(val from: Location, val to: Location?, val time: Float)
 
-private val INTERPRETER = object : Interpreter<RouteRequest, List<Point>> {
+private val INTERPRETER = object : SimpleInterpreter<RouteRequest, List<Point>>() {
 
     override fun interpretRequest(request: RouteRequest) =
         JSONObject().apply {
