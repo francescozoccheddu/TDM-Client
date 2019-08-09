@@ -42,7 +42,7 @@ class ServiceNotification(val service: MainService) {
 
         private fun makeBuilder(context: Context) =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
-                .setContentIntent(makeActivityIntent(context, TestActivity::class.java))
+                .setContentIntent(makeActivityIntent(context, MainActivity::class.java))
                 .setContentTitle(R.string.notification_title)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
 

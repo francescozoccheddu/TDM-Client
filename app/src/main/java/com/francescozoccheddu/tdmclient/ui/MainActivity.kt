@@ -1,31 +1,22 @@
 package com.francescozoccheddu.tdmclient.ui
 
 import android.content.Context
-import android.content.res.ColorStateList
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.francescozoccheddu.knob.KnobView
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.utils.data.client.Server
-import com.francescozoccheddu.tdmclient.data.CoverageRetrieveMode
-import com.francescozoccheddu.tdmclient.data.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
-import com.francescozoccheddu.tdmclient.utils.data.point
 import com.francescozoccheddu.tdmclient.utils.android.visible
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.mapbox.android.core.permissions.PermissionsListener
-import com.mapbox.android.core.permissions.PermissionsManager
+import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -55,13 +46,20 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import kotlinx.android.synthetic.main.activity.cl_root
+import kotlinx.android.synthetic.main.activity.fab
 import kotlinx.android.synthetic.main.activity.mv_map
+import kotlinx.android.synthetic.main.activity.v_fabSheetDuration
+import kotlinx.android.synthetic.main.activity.v_fabSheetWalkMode
+import kotlinx.android.synthetic.main.bar.et_search
+import kotlinx.android.synthetic.main.bar.l_search_bar
 import kotlinx.android.synthetic.main.bar.pb_search
+import kotlinx.android.synthetic.main.bar.rv_search
 import kotlinx.android.synthetic.main.sheet_duration.bt_duration_ok
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_destination
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_nearby
 
-class MainActivity : AppCompatActivity(), PermissionsListener {
+class MainActivity : AppCompatActivity() {
 
     private companion object {
 
@@ -74,45 +72,14 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     }
 
     private lateinit var map: MapboxMap
-
-    private lateinit var rvSearchList: RecyclerView
     private lateinit var searchProvider: LocationSearchProvider
+    private lateinit var snackbar: ServiceSnackbar
+    private val permissions = Permissions(this)
 
-    private lateinit var kvDuration: KnobView
-    private lateinit var vFabSheetWalkMode: View
-    private lateinit var vFabSheetWalkDuration: View
-    private lateinit var fab: FloatingActionButton
-    private lateinit var etSearch: EditText
-    private lateinit var vgSearchBar: ViewGroup
-
-    private lateinit var permissionManager: PermissionsManager
-
-    private fun setFabIcon(icon: Int) {
-        fab.setImageDrawable(ContextCompat.getDrawable(this@MainActivity, icon))
-    }
-
-    private fun setFabColor(color: Int) {
-        fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, color))
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity)
-
-        //Retriever
-        val server = Server(this, "http://localhost:8080/")
-        val service = makeCoverageRetriever(server)
-        service.pollRequest = CoverageRetrieveMode.POINTS
-        service.onData += { data ->
-            val json = data.toString()
-            map.getStyle { style ->
-                val oldSource = style.getSource("coverage")
-                if (oldSource is GeoJsonSource)
-                    oldSource.setGeoJson(json)
-                else
-                    style.addSource(GeoJsonSource("coverage", json))
-            }
-        }
 
         // Map
         mv_map.apply {
@@ -174,7 +141,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
                     ) { style ->
                         enableLocationComponent(style)
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
-                        service.periodicPoll = 2f
                     }
                     addOnMapClickListener {
                         if (destinationPickEnabled)
@@ -184,101 +150,111 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
                 }
             }
         }
-
         // Fab
+        run {
 
-        vgSearchBar = findViewById(R.id.l_search_bar)
-
-        vFabSheetWalkMode = findViewById(R.id.v_fabSheetWalkMode)
-        vFabSheetWalkDuration = findViewById(R.id.v_fabSheetDuration)
-
-        fab = findViewById(R.id.fab)
-        fab.setOnClickListener {
-            if (route != null)
-                route = null
-            else if (destinationPickEnabled) {
-                if (destination != null) {
-                    fabSheetMode = FabSheetMode.WALK_DURATION
-                    fab.isExpanded = true
+            fab.setOnClickListener {
+                if (route != null)
+                    route = null
+                else if (destinationPickEnabled) {
+                    if (destination != null) {
+                        fabSheetMode = FabSheetMode.WALK_DURATION
+                        fab.isExpanded = true
+                    }
+                    else {
+                        destination = null
+                        destinationPickEnabled = false
+                        fab.isExpanded = false
+                    }
                 }
                 else {
-                    destination = null
-                    destinationPickEnabled = false
-                    fab.isExpanded = false
+                    fabSheetMode = FabSheetMode.WALK_MODE
+                    fab.isExpanded = true
                 }
             }
-            else {
-                fabSheetMode = FabSheetMode.WALK_MODE
-                fab.isExpanded = true
+
+            bt_duration_ok.setOnClickListener {
+                fab.isExpanded = false
             }
-        }
 
-        bt_duration_ok.setOnClickListener {
-            fab.isExpanded = false
-        }
+            li_walktype_destination.setOnClickListener {
+                destination = null
+                fab.isExpanded = false
+                destinationPickEnabled = true
+            }
 
-        li_walktype_destination.setOnClickListener {
-            destination = null
-            fab.isExpanded = false
-            destinationPickEnabled = true
-        }
+            li_walktype_nearby.setOnClickListener {
+                fabSheetMode = FabSheetMode.WALK_DURATION
+            }
 
-        li_walktype_nearby.setOnClickListener {
-            fabSheetMode = FabSheetMode.WALK_DURATION
         }
-
         // Search view
-        searchProvider = LocationSearchProvider(MAP_BOUNDS)
-        searchProvider.onLocationClick += {
-            if (destinationPickEnabled)
-                destination = it.point
-            etSearch.clearFocus()
-        }
+        run {
 
-        rvSearchList = findViewById(R.id.rv_search)
-        rvSearchList.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
-            adapter = searchProvider.adapter
-        }
-
-        val ibSearchClose = findViewById<ImageButton>(R.id.ib_search_close)
-        val ibSearchClear = findViewById<ImageButton>(R.id.ib_search_clear)
-
-        ibSearchClose.setOnClickListener {
-            etSearch.clearFocus()
-        }
-
-        ibSearchClear.setOnClickListener {
-            etSearch.text.clear()
-        }
-
-        etSearch = findViewById(R.id.et_search)
-
-        searchProvider.onLoadingChange += { pb_search.visible = it }
-
-        etSearch.addTextChangedListener(object : TextWatcher {
-
-            override fun afterTextChanged(s: Editable) {
-                pb_search.visible = false
-                ibSearchClear.visibility = if (s.length > 0) View.VISIBLE else View.GONE
-                searchProvider.query = s.toString()
+            searchProvider = LocationSearchProvider(MAP_BOUNDS)
+            searchProvider.onLocationClick += {
+                if (destinationPickEnabled)
+                    destination = it.point
+                et_search.clearFocus()
             }
 
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            rv_search.apply {
+                layoutManager = LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
+                adapter = searchProvider.adapter
+            }
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            val ibSearchClose = findViewById<ImageButton>(R.id.ib_search_close)
+            val ibSearchClear = findViewById<ImageButton>(R.id.ib_search_clear)
 
-        })
+            ibSearchClose.setOnClickListener {
+                et_search.clearFocus()
+            }
 
-        etSearch.setOnFocusChangeListener { _, focused ->
-            rvSearchList.visibility = if (focused) View.VISIBLE else View.GONE
-            ibSearchClose.visibility = if (focused) View.VISIBLE else View.GONE
-            if (!focused) {
-                val service = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                service.hideSoftInputFromWindow(etSearch.windowToken, 0)
+            ibSearchClear.setOnClickListener {
+                et_search.text.clear()
+            }
+
+            searchProvider.onLoadingChange += { pb_search.visible = it }
+
+            et_search.addTextChangedListener(object : TextWatcher {
+
+                override fun afterTextChanged(s: Editable) {
+                    pb_search.visible = false
+                    ibSearchClear.visibility = if (s.length > 0) View.VISIBLE else View.GONE
+                    searchProvider.query = s.toString()
+                }
+
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
+            })
+
+            et_search.setOnFocusChangeListener { _, focused ->
+                rv_search.visibility = if (focused) View.VISIBLE else View.GONE
+                ibSearchClose.visibility = if (focused) View.VISIBLE else View.GONE
+                if (!focused) {
+                    val service = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    service.hideSoftInputFromWindow(et_search.windowToken, 0)
+                }
             }
         }
 
+        snackbar = ServiceSnackbar(cl_root)
+        snackbar.onLocationEnableRequest += {
+            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            Toast.makeText(this, R.string.toast_location_settings_overlay, Toast.LENGTH_LONG).show()
+        }
+        snackbar.onPermissionAskRequest += {
+            if (permissions.canAsk)
+                permissions.ask(this::onPermissionsChanged)
+            else
+                permissions.openSettings()
+        }
+
+    }
+
+    private fun updateSnackbar() {
 
     }
 
@@ -295,51 +271,11 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     private var fabSheetMode = FabSheetMode.WALK_MODE
         set(value) {
             field = value
-            when (value) {
-                FabSheetMode.WALK_MODE -> {
-                    vFabSheetWalkDuration.visibility = View.GONE
-                    vFabSheetWalkMode.visibility = View.VISIBLE
-                }
-                FabSheetMode.WALK_DURATION -> {
-                    vFabSheetWalkMode.visibility = View.GONE
-                    vFabSheetWalkDuration.visibility = View.VISIBLE
-                }
-            }
+            v_fabSheetWalkMode.visible = value == FabSheetMode.WALK_MODE
+            v_fabSheetDuration.visible = value == FabSheetMode.WALK_DURATION
         }
 
     private fun updateFab() {
-        var show = true
-        if (route != null) {
-            setFabIcon(R.drawable.ic_cancel)
-            setFabColor(R.color.fab_cancel)
-        }
-        if (destinationPickEnabled) {
-            if (destination != null) {
-                setFabIcon(R.drawable.ic_done)
-                setFabColor(R.color.fab_ok)
-            }
-            else {
-                setFabIcon(R.drawable.ic_cancel)
-                setFabColor(R.color.fab_cancel)
-            }
-        }
-        else {
-            if (PermissionsManager.areLocationPermissionsGranted(this)) {
-                setFabIcon(R.drawable.ic_walk)
-                setFabColor(R.color.colorPrimary)
-            }
-            else {
-                show = false
-            }
-        }
-        if (show) {
-            if (!fab.isOrWillBeShown())
-                fab.show()
-        }
-        else {
-            if (!fab.isOrWillBeHidden())
-                fab.hide()
-        }
     }
 
     private var destination: LatLng? = null
@@ -361,12 +297,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     private var destinationPickEnabled = false
         set(value) {
             field = value
-            if (value) {
-                vgSearchBar.visibility = View.VISIBLE
-            }
-            else {
-                vgSearchBar.visibility = View.GONE
-            }
+            l_search_bar.visible = value
             updateFab()
         }
 
@@ -381,45 +312,39 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             }
         }
 
-    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-        Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_LONG).show()
-    }
+    private fun onPermissionsChanged(granted: Boolean) {
+        if (granted) {
+            if (snackbar.state == ServiceSnackbar.State.PERMISSIONS_UNGRANTED) {
+                snackbar.state = null
+                updateSnackbar()
+            }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
+        }
+        else
+            snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED
 
-    override fun onPermissionResult(granted: Boolean) {
-        if (granted)
-            map.getStyle { enableLocationComponent(it) }
     }
 
     @SuppressWarnings("MissingPermission")
     private fun enableLocationComponent(style: Style) {
-        if (PermissionsManager.areLocationPermissionsGranted(this)) {
-            val locationComponent = map.locationComponent
+        val locationComponent = map.locationComponent
 
-            val locationComponentActivationOptions =
-                LocationComponentActivationOptions.builder(this, style)
-                    .useDefaultLocationEngine(false)
-                    .build()
+        val locationComponentActivationOptions =
+            LocationComponentActivationOptions.builder(this, style)
+                .useDefaultLocationEngine(true)
+                .build()
 
-            locationComponent.activateLocationComponent(locationComponentActivationOptions)
-            locationComponent.setLocationComponentEnabled(true)
-            locationComponent.setCameraMode(CameraMode.NONE)
-            locationComponent.setRenderMode(RenderMode.COMPASS)
-        }
-        else {
-            permissionManager = PermissionsManager(this)
-            permissionManager.requestLocationPermissions(this)
-        }
+        locationComponent.activateLocationComponent(locationComponentActivationOptions)
+        locationComponent.setLocationComponentEnabled(true)
+        locationComponent.setCameraMode(CameraMode.NONE)
+        locationComponent.setRenderMode(RenderMode.COMPASS)
     }
 
     override fun onBackPressed() {
         if (fab.isExpanded)
             fab.isExpanded = false
-        else if (etSearch.hasFocus())
-            etSearch.clearFocus()
+        else if (et_search.hasFocus())
+            et_search.clearFocus()
         else if (destinationPickEnabled) {
             if (destination != null)
                 destination = null
@@ -430,6 +355,10 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             super.onBackPressed()
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        this.permissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     public override fun onStart() {
         super.onStart()
         mv_map.onStart()
@@ -437,6 +366,14 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
 
     public override fun onResume() {
         super.onResume()
+        if (permissions.granted)
+            onPermissionsChanged(true)
+        else if (snackbar.state != ServiceSnackbar.State.PERMISSIONS_UNGRANTED) {
+            if (permissions.canAsk)
+                permissions.ask(this::onPermissionsChanged)
+            else
+                snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED
+        }
         mv_map.onResume()
     }
 
