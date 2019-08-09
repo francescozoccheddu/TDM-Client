@@ -3,6 +3,7 @@
     <color name="colorPrimary">#2196F3</color>
     <color name="colorPrimaryDark">#01579B</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="fab_ok">#4CAF50</color>
-    <color name="fab_cancel">#FF5722</color>
+    <color name="semantic_ok">#4CAF50</color>
+    <color name="semantic_warning">#FF5722</color>
+    <color name="semantic_error">#FF5722</color>
 </resources>
