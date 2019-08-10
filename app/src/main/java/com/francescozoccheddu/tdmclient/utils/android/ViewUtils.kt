@@ -4,12 +4,19 @@ import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.core.text.TextUtilsCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.setPadding
+import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import kotlin.math.roundToInt
 
 var View.visible
     get() = visibility == View.VISIBLE
@@ -35,10 +42,28 @@ fun ImageView.setImageDrawable(icon: Int) {
     setImageDrawable(ContextCompat.getDrawable(context, icon))
 }
 
-fun FloatingActionButton.setBackgroundColor(color: Int) {
-    backgroundTintList = ColorStateList.valueOf(color)
-}
-
-fun FloatingActionButton.setBackgroundColorRes(color: Int) {
+fun View.setBackgroundColorRes(color: Int) {
     setBackgroundColor(ContextCompat.getColor(context, color))
 }
+
+fun Snackbar.addView(view: View, size : Int = LinearLayout.LayoutParams.WRAP_CONTENT): Snackbar {
+    val contentLay = this.view.findViewById<View>(com.google.android.material.R.id.snackbar_text).parent as ViewGroup
+    view.layoutParams = LinearLayout.LayoutParams(size, size).apply {
+        gravity = Gravity.CENTER
+    }
+    if (TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_LTR)
+        contentLay.addView(view, 0)
+    else
+        contentLay.addView(view)
+    return this
+}
+
+fun Snackbar.setBackgroundColor(color: Int) = view.setBackgroundColor(color)
+
+fun Snackbar.setBackgroundColorRes(color: Int) = view.setBackgroundColorRes(color)
+
+fun Snackbar.setTextColorRes(color: Int) = setTextColor(ContextCompat.getColor(context, color))
+
+fun Snackbar.setActionTextColorRes(color: Int) = setActionTextColor(ContextCompat.getColor(context, color))
+
+fun View.setPaddingRes(dimens: Int) = setPadding(context.resources.getDimension(dimens).roundToInt())

@@ -20,7 +20,7 @@ import com.francescozoccheddu.tdmclient.data.makeRouteRetriever
 import com.francescozoccheddu.tdmclient.utils.android.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclient.utils.android.LocationStatusReceiver
 import com.francescozoccheddu.tdmclient.utils.android.Timer
-import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.mapbox.android.core.location.LocationEngine
@@ -85,12 +85,12 @@ class MainService : Service() {
         val service get() = this@MainService
     }
 
-    val onLocationChange = FuncEvent<MainService>()
-    val onLocatableChange = FuncEvent<MainService>()
-    val onConnectedChange = FuncEvent<MainService>()
-    val onOnlineChange = FuncEvent<MainService>()
-    val onScoreChange = FuncEvent<MainService>()
-    val onCoverageDataChange = FuncEvent<MainService>()
+    val onLocationChange = ProcEvent()
+    val onLocatableChange = ProcEvent()
+    val onConnectedChange = ProcEvent()
+    val onOnlineChange = ProcEvent()
+    val onScoreChange = ProcEvent()
+    val onCoverageDataChange = ProcEvent()
 
     val coverageData: JSONObject?
         get() = if (coverageRetriever.hasData && !coverageRetriever.expired) coverageRetriever.data else null
@@ -108,7 +108,7 @@ class MainService : Service() {
                 if (value != null)
                     sensorDriver.location = value
                 sensorDriver.measuring = insideMeasurementArea
-                onLocationChange(this)
+                onLocationChange()
             }
         }
 
@@ -116,7 +116,7 @@ class MainService : Service() {
         private set(value) {
             if (value != field) {
                 field = value
-                onLocatableChange(this)
+                onLocatableChange()
             }
         }
 
@@ -124,7 +124,7 @@ class MainService : Service() {
         private set(value) {
             if (value != field) {
                 field = value
-                onConnectedChange(this)
+                onConnectedChange()
             }
         }
 
@@ -135,7 +135,7 @@ class MainService : Service() {
                 connected = sensorDriver.reachable && value
                 coverageRetriever.periodicPoll = if (value && bound) COVERAGE_INTERVAL_TIME else null
                 sensorDriver.pushing = value
-                onOnlineChange(this)
+                onOnlineChange()
             }
         }
 
@@ -143,7 +143,7 @@ class MainService : Service() {
         private set(value) {
             if (value != field) {
                 field = value
-                onScoreChange(this)
+                onScoreChange()
             }
         }
 
@@ -227,8 +227,8 @@ class MainService : Service() {
             coverageRetriever = makeCoverageRetriever(server).apply {
                 pollRequest = COVERAGE_RETRIEVE_MODE
                 expiration = COVERAGE_EXPIRATION_TIME
-                onData += { onCoverageDataChange(this@MainService) }
-                onExpire += { onCoverageDataChange(this@MainService) }
+                onData += { onCoverageDataChange() }
+                onExpire += { onCoverageDataChange() }
             }
 
             routeRetriever = makeRouteRetriever(server)

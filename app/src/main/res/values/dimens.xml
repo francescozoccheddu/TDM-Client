@@ -4,4 +4,5 @@
     <dimen name="bar_padding">4dp</dimen>
     <dimen name="bar_elevation">4dp</dimen>
     <dimen name="bar_margin">10dp</dimen>
+    <dimen name="snackbar_loading_size">20dp</dimen>
 </resources>

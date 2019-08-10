@@ -5,8 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.widget.Toast
-import com.francescozoccheddu.tdmclient.R
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 
@@ -40,7 +38,6 @@ class Permissions(val activity: Activity) {
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 .setData(Uri.fromParts("package", activity.packageName, null))
         )
-        Toast.makeText(activity, R.string.toast_permissions_settings_overlay, Toast.LENGTH_LONG).show()
     }
 
     fun ask(callback: (Boolean) -> Unit) {
