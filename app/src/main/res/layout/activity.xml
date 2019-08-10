@@ -5,7 +5,6 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorAccent"
         tools:context=".ui.MainActivity">
     
     <com.mapbox.mapboxsdk.maps.MapView
@@ -46,7 +45,7 @@
                 android:layout_gravity="bottom|end"
                 android:src="@drawable/ic_walk"
                 android:layout_margin="16dp"
-                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTint="@color/background"
         />
         
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView
@@ -58,7 +57,7 @@
                 android:layout_margin="16dp"
                 android:id="@+id/sheet"
                 android:checkable="false"
-                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardBackgroundColor="@color/background"
         >
             
             <FrameLayout

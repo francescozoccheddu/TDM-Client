@@ -46,7 +46,7 @@ fun View.setBackgroundColorRes(color: Int) {
     setBackgroundColor(ContextCompat.getColor(context, color))
 }
 
-fun Snackbar.addView(view: View, size : Int = LinearLayout.LayoutParams.WRAP_CONTENT): Snackbar {
+fun Snackbar.addView(view: View, size: Int = LinearLayout.LayoutParams.WRAP_CONTENT): Snackbar {
     val contentLay = this.view.findViewById<View>(com.google.android.material.R.id.snackbar_text).parent as ViewGroup
     view.layoutParams = LinearLayout.LayoutParams(size, size).apply {
         gravity = Gravity.CENTER
@@ -58,9 +58,9 @@ fun Snackbar.addView(view: View, size : Int = LinearLayout.LayoutParams.WRAP_CON
     return this
 }
 
-fun Snackbar.setBackgroundColor(color: Int) = view.setBackgroundColor(color)
+fun Snackbar.setBackgroundColor(color: Int) = this.apply { view.setBackgroundColor(color) }
 
-fun Snackbar.setBackgroundColorRes(color: Int) = view.setBackgroundColorRes(color)
+fun Snackbar.setBackgroundColorRes(color: Int) = this.apply { view.setBackgroundColorRes(color) }
 
 fun Snackbar.setTextColorRes(color: Int) = setTextColor(ContextCompat.getColor(context, color))
 
