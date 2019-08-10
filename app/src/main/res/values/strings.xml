@@ -21,8 +21,10 @@
     <string name="notification_action_unlocatable">Abilita</string>
     <string name="notification_content_device_lost">Connessione col sensore persa</string>
     <string name="notification_action_kill">Interrompi</string>
+    <!--
     <string name="toast_permissions_settings_overlay">Concedi il permesso di accedere alla tua posizione</string>
     <string name="toast_location_settings_overlay">Abilita i servizi di localizzazione</string>
+    -->
     <string name="snackbar_locating">Localizzazione in corso</string>
     <string name="snackbar_offline">Nessuna connessiona ad Internet</string>
     <string name="snackbar_unlocatable">Servizi di localizzazione disattivati</string>
@@ -31,4 +33,6 @@
     <string name="snackbar_permissions_ungranted">Permesso negato</string>
     <string name="snackbar_action_permissions_ungranted">Concedi</string>
     <string name="snackbar_routing_failed">Direzionamento fallito</string>
+    <string name="snackbar_action_routing_failed">Riprova</string>
+    <string name="snackbar_outside_area">Sei fuori dall\'area di interesse</string>
 </resources>

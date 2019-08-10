@@ -58,11 +58,10 @@ class ServiceNotification(val service: MainService) {
     }
 
     init {
-        val listener = { _: MainService -> update() }
-        service.onConnectedChange += listener
-        service.onOnlineChange += listener
-        service.onLocatableChange += listener
-        service.onLocationChange += listener
+        service.onConnectedChange += this::update
+        service.onOnlineChange += this::update
+        service.onLocatableChange += this::update
+        service.onLocationChange += this::update
         update()
     }
 

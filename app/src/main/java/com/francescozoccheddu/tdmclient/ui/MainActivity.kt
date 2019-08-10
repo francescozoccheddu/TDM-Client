@@ -1,15 +1,17 @@
 package com.francescozoccheddu.tdmclient.ui
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -58,6 +60,7 @@ import kotlinx.android.synthetic.main.bar.rv_search
 import kotlinx.android.synthetic.main.sheet_duration.bt_duration_ok
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_destination
 import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_nearby
+import ui.ServiceSnackbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -138,9 +141,10 @@ class MainActivity : AppCompatActivity() {
                                         )
                                     )
                             )
-                    ) { style ->
-                        enableLocationComponent(style)
+                    ) {
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
+                        if (permissions.granted)
+                            enableLocationComponent(it)
                     }
                     addOnMapClickListener {
                         if (destinationPickEnabled)
@@ -154,6 +158,8 @@ class MainActivity : AppCompatActivity() {
         run {
 
             fab.setOnClickListener {
+                snackbar.notifyRoutingFailure(null)
+                /*
                 if (route != null)
                     route = null
                 else if (destinationPickEnabled) {
@@ -170,7 +176,7 @@ class MainActivity : AppCompatActivity() {
                 else {
                     fabSheetMode = FabSheetMode.WALK_MODE
                     fab.isExpanded = true
-                }
+                }*/
             }
 
             bt_duration_ok.setOnClickListener {
@@ -243,7 +249,6 @@ class MainActivity : AppCompatActivity() {
         snackbar = ServiceSnackbar(cl_root)
         snackbar.onLocationEnableRequest += {
             startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-            Toast.makeText(this, R.string.toast_location_settings_overlay, Toast.LENGTH_LONG).show()
         }
         snackbar.onPermissionAskRequest += {
             if (permissions.canAsk)
@@ -254,8 +259,31 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun updateSnackbar() {
+    private var routing = false
 
+    private fun updateSnackbar() {
+        val service = this.service
+        snackbar.state = if (service != null) {
+            if (permissions.granted) {
+                if (service.locatable) {
+                    if (service.online) {
+                        if (service.location != null) {
+                            if (routing)
+                                ServiceSnackbar.State.ROUTING
+                            else if (service.insideMeasurementArea)
+                                null
+                            else ServiceSnackbar.State.OUTSIDE_AREA
+
+                        }
+                        else ServiceSnackbar.State.LOCATING
+                    }
+                    else ServiceSnackbar.State.OFFLINE
+                }
+                else ServiceSnackbar.State.UNLOCATABLE
+            }
+            else ServiceSnackbar.State.PERMISSIONS_UNGRANTED
+        }
+        else null
     }
 
     private var route: Any? = null
@@ -312,13 +340,74 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    private fun onLocationChanged() {
+        updateSnackbar()
+    }
+
+    private fun onLocatableChange() {
+        updateSnackbar()
+    }
+
+    private fun onOnlineChange() {
+        updateSnackbar()
+    }
+
+    private fun onScoreChange() {
+
+    }
+
+    private fun onCoverageDataChange() {
+
+    }
+
+    private var service: MainService? = null
+        set(value) {
+            if (value != field) {
+                val old = field
+                field = value
+                if (old != null) {
+                    old.onLocationChange -= this::onLocationChanged
+                    old.onLocatableChange -= this::onLocatableChange
+                    old.onOnlineChange -= this::onOnlineChange
+                    old.onScoreChange -= this::onScoreChange
+                    old.onCoverageDataChange -= this::onCoverageDataChange
+                }
+                if (value != null) {
+                    value.onLocationChange += this::onLocationChanged
+                    value.onLocatableChange += this::onLocatableChange
+                    value.onOnlineChange += this::onOnlineChange
+                    value.onScoreChange += this::onScoreChange
+                    value.onCoverageDataChange += this::onCoverageDataChange
+                    onLocationChanged()
+                    onLocatableChange()
+                    onOnlineChange()
+                    onScoreChange()
+                    onCoverageDataChange()
+                }
+            }
+        }
+
+    private val serviceConnection = object : ServiceConnection {
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            service = null
+        }
+
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            service = (binder as MainService.Binding).service
+        }
+
+    }
+
     private fun onPermissionsChanged(granted: Boolean) {
         if (granted) {
             if (snackbar.state == ServiceSnackbar.State.PERMISSIONS_UNGRANTED) {
                 snackbar.state = null
                 updateSnackbar()
             }
-
+            if (this::map.isInitialized)
+                map.getStyle { enableLocationComponent(it) }
+            MainService.bind(this, serviceConnection)
         }
         else
             snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED
@@ -327,17 +416,19 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressWarnings("MissingPermission")
     private fun enableLocationComponent(style: Style) {
-        val locationComponent = map.locationComponent
-
-        val locationComponentActivationOptions =
-            LocationComponentActivationOptions.builder(this, style)
-                .useDefaultLocationEngine(true)
-                .build()
-
-        locationComponent.activateLocationComponent(locationComponentActivationOptions)
-        locationComponent.setLocationComponentEnabled(true)
-        locationComponent.setCameraMode(CameraMode.NONE)
-        locationComponent.setRenderMode(RenderMode.COMPASS)
+        map.locationComponent.apply {
+            if (!isLocationComponentActivated) {
+                activateLocationComponent(
+                    LocationComponentActivationOptions
+                        .builder(this@MainActivity, style)
+                        .useDefaultLocationEngine(true)
+                        .build()
+                )
+                setLocationComponentEnabled(true)
+                setCameraMode(CameraMode.NONE)
+                setRenderMode(RenderMode.COMPASS)
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -355,7 +446,11 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         this.permissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
@@ -379,6 +474,10 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onPause() {
         super.onPause()
+        if (service != null) {
+            service = null
+            unbindService(serviceConnection)
+        }
         mv_map.onPause()
     }
 
