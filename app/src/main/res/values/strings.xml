@@ -30,6 +30,7 @@
     <string name="snackbar_unlocatable">Servizi di localizzazione disattivati</string>
     <string name="snackbar_action_unlocatable">Abilita</string>
     <string name="snackbar_routing">Direzionamento in corso</string>
+    <string name="snackbar_action_routing">Annulla</string>
     <string name="snackbar_permissions_ungranted">Permesso negato</string>
     <string name="snackbar_action_permissions_ungranted">Concedi</string>
     <string name="snackbar_routing_failed">Direzionamento fallito</string>

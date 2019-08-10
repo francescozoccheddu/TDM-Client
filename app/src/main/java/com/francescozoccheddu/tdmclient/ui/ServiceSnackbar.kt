@@ -1,12 +1,13 @@
 package ui
 
-import android.app.ProgressDialog.show
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.utils.android.addView
+import com.francescozoccheddu.tdmclient.utils.android.setActionTextColorRes
 import com.francescozoccheddu.tdmclient.utils.android.setBackgroundColorRes
+import com.francescozoccheddu.tdmclient.utils.android.setTextColorRes
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -19,6 +20,7 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
         private fun Snackbar.addIcon(icon: Int): Snackbar {
             val item = ImageView(context)
             item.setImageResource(icon)
+            val size = context.resources.getDimension(R.dimen.snackbar_icon_size).roundToInt()
             return addView(item)
         }
 
@@ -26,6 +28,12 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
             val item = ProgressBar(context)
             val size = context.resources.getDimension(R.dimen.snackbar_loading_size).roundToInt()
             return addView(item, size)
+        }
+
+        private fun Snackbar.setColorRes(color: Int): Snackbar {
+            setTextColorRes(R.color.foreground)
+            setActionTextColorRes(R.color.foreground)
+            return setBackgroundColorRes(color)
         }
 
     }
@@ -44,27 +52,31 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
         if (state != null)
             snackbar = when (state) {
                 State.LOCATING -> make(R.string.snackbar_locating)
-                    .setBackgroundColorRes(R.color.background)
+                    .setColorRes(R.color.background)
                     .addLoading()
                 State.UNLOCATABLE -> make(R.string.snackbar_unlocatable)
-                    .setBackgroundColorRes(R.color.backgroundError)
+                    .setColorRes(R.color.backgroundError)
                     .setAction(R.string.snackbar_action_unlocatable) {
                         this.state = null
                         onLocationEnableRequest()
                     }
                 State.PERMISSIONS_UNGRANTED -> make(R.string.snackbar_permissions_ungranted)
-                    .setBackgroundColorRes(R.color.backgroundError)
+                    .setColorRes(R.color.backgroundError)
                     .setAction(R.string.snackbar_action_permissions_ungranted) {
                         this.state = null
                         onPermissionAskRequest()
                     }
                 State.ROUTING -> make(R.string.snackbar_routing)
-                    .setBackgroundColorRes(R.color.background)
+                    .setColorRes(R.color.background)
                     .addLoading()
+                    .setAction(R.string.snackbar_action_routing) {
+                        this.state = null
+                        onRoutingAbortRequest()
+                    }
                 State.OFFLINE -> make(R.string.snackbar_offline)
-                    .setBackgroundColorRes(R.color.backgroundError)
+                    .setColorRes(R.color.backgroundError)
                 State.OUTSIDE_AREA -> make(R.string.snackbar_outside_area)
-                    .setBackgroundColorRes(R.color.backgroundError)
+                    .setColorRes(R.color.backgroundError)
             }.apply {
                 show()
             }
@@ -82,8 +94,8 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
         }
 
     val onPermissionAskRequest = ProcEvent()
-
     val onLocationEnableRequest = ProcEvent()
+    val onRoutingAbortRequest = ProcEvent()
 
     private var routingFailure = false
 
@@ -100,7 +112,7 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
                 }
 
             })
-            setBackgroundColorRes(R.color.backgroundError)
+            setColorRes(R.color.backgroundError)
             if (retryCallback != null)
                 setAction(R.string.snackbar_routing_failed) { retryCallback() }
             show()

@@ -9,5 +9,5 @@
              android:top="@dimen/bar_padding"
     />
     <corners android:radius="@dimen/bar_corner_radius"/>
-    <solid android:color="@color/design_default_color_surface"/>
+    <solid android:color="@color/background"/>
 </shape>
