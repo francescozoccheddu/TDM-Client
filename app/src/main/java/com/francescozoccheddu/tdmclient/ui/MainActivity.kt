@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
+import com.francescozoccheddu.tdmclient.utils.android.setBackgroundColorRes
+import com.francescozoccheddu.tdmclient.utils.android.setImageDrawable
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.geojson.FeatureCollection
@@ -158,8 +160,6 @@ class MainActivity : AppCompatActivity() {
         run {
 
             fab.setOnClickListener {
-                snackbar.notifyRoutingFailure(null)
-                /*
                 if (route != null)
                     route = null
                 else if (destinationPickEnabled) {
@@ -170,17 +170,18 @@ class MainActivity : AppCompatActivity() {
                     else {
                         destination = null
                         destinationPickEnabled = false
-                        fab.isExpanded = false
                     }
                 }
                 else {
                     fabSheetMode = FabSheetMode.WALK_MODE
                     fab.isExpanded = true
-                }*/
+                }
+                updateFab()
             }
 
             bt_duration_ok.setOnClickListener {
-                fab.isExpanded = false
+                routing = true
+                destinationPickEnabled = false
             }
 
             li_walktype_destination.setOnClickListener {
@@ -246,20 +247,37 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        snackbar = ServiceSnackbar(cl_root)
-        snackbar.onLocationEnableRequest += {
-            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-        }
-        snackbar.onPermissionAskRequest += {
-            if (permissions.canAsk)
-                permissions.ask(this::onPermissionsChanged)
-            else
-                permissions.openSettings()
+        snackbar = ServiceSnackbar(cl_root).apply {
+
+            onLocationEnableRequest += {
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            onPermissionAskRequest += {
+                if (permissions.canAsk)
+                    permissions.ask(this@MainActivity::onPermissionsChanged)
+                else
+                    permissions.openSettings()
+            }
+            onRoutingAbortRequest += {
+                routing = false
+            }
+
         }
 
     }
 
     private var routing = false
+        set(value) {
+            if (value != field) {
+                field = value
+                if (!value) {
+                    destinationPickEnabled = false
+                    destination = null
+                }
+                updateSnackbar()
+                updateFab()
+            }
+        }
 
     private fun updateSnackbar() {
         val service = this.service
@@ -304,6 +322,43 @@ class MainActivity : AppCompatActivity() {
         }
 
     private fun updateFab() {
+        fab.apply {
+            var shown = true
+            var collapse = true
+            if (route != null) {
+                setImageDrawable(R.drawable.ic_cancel)
+                setBackgroundColorRes(R.color.backgroundWarning)
+            }
+            else {
+                if (destinationPickEnabled) {
+                    if (destination != null) {
+                        setImageDrawable(R.drawable.ic_done)
+                        setBackgroundColorRes(R.color.backgroundOk)
+                        collapse = false
+                    }
+                    else {
+                        setImageDrawable(R.drawable.ic_cancel)
+                        setBackgroundColorRes(R.color.backgroundWarning)
+                    }
+                }
+                else {
+                    val service = this@MainActivity.service
+                    if (!routing && service != null && service.online && service.locatable && service.location != null) {
+                        setImageDrawable(R.drawable.ic_walk)
+                        setBackgroundColorRes(R.color.background)
+                        collapse = false
+                    }
+                    else
+                        shown = false
+                }
+            }
+            if (!shown || collapse)
+                setExpanded(false)
+            if (shown)
+                show()
+            else
+                hide()
+        }
     }
 
     private var destination: LatLng? = null
@@ -340,16 +395,32 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    private fun ensureRoutable() {
+        if (!routing && route == null) {
+            val service = this@MainActivity.service
+            if (service == null || service.location == null || !service.online) {
+                destinationPickEnabled = false
+                destination = null
+            }
+        }
+    }
+
     private fun onLocationChanged() {
+        ensureRoutable()
         updateSnackbar()
+        updateFab()
     }
 
     private fun onLocatableChange() {
+        ensureRoutable()
         updateSnackbar()
+        updateFab()
     }
 
     private fun onOnlineChange() {
+        ensureRoutable()
         updateSnackbar()
+        updateFab()
     }
 
     private fun onScoreChange() {

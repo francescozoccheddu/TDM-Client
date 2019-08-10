@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.TextUtilsCompat
@@ -46,8 +47,12 @@ fun View.setBackgroundColorRes(color: Int) {
     setBackgroundColor(ContextCompat.getColor(context, color))
 }
 
+private val Snackbar.textView
+    get() =
+        this.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+
 fun Snackbar.addView(view: View, size: Int = LinearLayout.LayoutParams.WRAP_CONTENT): Snackbar {
-    val contentLay = this.view.findViewById<View>(com.google.android.material.R.id.snackbar_text).parent as ViewGroup
+    val contentLay = textView.parent as ViewGroup
     view.layoutParams = LinearLayout.LayoutParams(size, size).apply {
         gravity = Gravity.CENTER
     }
@@ -62,7 +67,7 @@ fun Snackbar.setBackgroundColor(color: Int) = this.apply { view.setBackgroundCol
 
 fun Snackbar.setBackgroundColorRes(color: Int) = this.apply { view.setBackgroundColorRes(color) }
 
-fun Snackbar.setTextColorRes(color: Int) = setTextColor(ContextCompat.getColor(context, color))
+fun Snackbar.setTextColorRes(color: Int) = textView.setTextColor(ContextCompat.getColor(context, color))
 
 fun Snackbar.setActionTextColorRes(color: Int) = setActionTextColor(ContextCompat.getColor(context, color))
 
