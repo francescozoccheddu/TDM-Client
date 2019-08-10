@@ -4,9 +4,10 @@
     <style name="AppTheme"
            parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/background</item>
+        <item name="colorPrimaryDark">@color/backgroundDark</item>
+        <item name="colorAccent">@color/foreground</item>
+        <item name="android:textColor">@color/foreground</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>

@@ -1,9 +1,9 @@
 package ui
 
+import android.app.ProgressDialog.show
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.utils.android.addView
 import com.francescozoccheddu.tdmclient.utils.android.setBackgroundColorRes
@@ -28,13 +28,6 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
             return addView(item, size)
         }
 
-        private fun Snackbar.setColorRes(color: Int): Snackbar {
-            val foreground = ContextCompat.getColor(context, R.color.foreground)
-            setTextColor(foreground)
-            setActionTextColor(foreground)
-            setBackgroundColorRes(color)
-            return this
-        }
     }
 
     enum class State {
@@ -51,27 +44,27 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
         if (state != null)
             snackbar = when (state) {
                 State.LOCATING -> make(R.string.snackbar_locating)
-                    .setColorRes(R.color.colorPrimary)
+                    .setBackgroundColorRes(R.color.background)
                     .addLoading()
                 State.UNLOCATABLE -> make(R.string.snackbar_unlocatable)
-                    .setColorRes(R.color.semantic_error)
+                    .setBackgroundColorRes(R.color.backgroundError)
                     .setAction(R.string.snackbar_action_unlocatable) {
                         this.state = null
                         onLocationEnableRequest()
                     }
                 State.PERMISSIONS_UNGRANTED -> make(R.string.snackbar_permissions_ungranted)
-                    .setColorRes(R.color.semantic_error)
+                    .setBackgroundColorRes(R.color.backgroundError)
                     .setAction(R.string.snackbar_action_permissions_ungranted) {
                         this.state = null
                         onPermissionAskRequest()
                     }
                 State.ROUTING -> make(R.string.snackbar_routing)
-                    .setColorRes(R.color.colorPrimary)
+                    .setBackgroundColorRes(R.color.background)
                     .addLoading()
                 State.OFFLINE -> make(R.string.snackbar_offline)
-                    .setColorRes(R.color.semantic_error)
+                    .setBackgroundColorRes(R.color.backgroundError)
                 State.OUTSIDE_AREA -> make(R.string.snackbar_outside_area)
-                    .setColorRes(R.color.semantic_error)
+                    .setBackgroundColorRes(R.color.backgroundError)
             }.apply {
                 show()
             }
@@ -107,7 +100,7 @@ class ServiceSnackbar(val layout: CoordinatorLayout) {
                 }
 
             })
-            setColorRes(R.color.semantic_error)
+            setBackgroundColorRes(R.color.backgroundError)
             if (retryCallback != null)
                 setAction(R.string.snackbar_routing_failed) { retryCallback() }
             show()

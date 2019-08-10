@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2196F3</color>
-    <color name="colorPrimaryDark">#0D47A1</color>
-    <color name="colorAccent">#FFF</color>
+    <color name="background">#2196F3</color>
+    <color name="backgroundDark">#0D47A1</color>
     <color name="foreground">#FFF</color>
-    <color name="semantic_ok">#4CAF50</color>
-    <color name="semantic_warning">#FF9800</color>
-    <color name="semantic_error">#F44336</color>
+    <color name="backgroundOk">#4CAF50</color>
+    <color name="backgroundWarning">#FF9800</color>
+    <color name="backgroundError">#F44336</color>
 </resources>
