@@ -18,8 +18,6 @@ class DurationComponent @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.bg_duration, this)
-        bg_duration_cancel.setOnClickListener { onCancel?.invoke() }
-        bg_duration_confirm.setOnClickListener { onConfirm?.invoke() }
     }
 
     private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
@@ -44,7 +42,7 @@ class DurationComponent @JvmOverloads constructor(
         }
     }
 
-    var onConfirm: (() -> Unit)? = null
-    var onCancel: (() -> Unit)? = null
+    inline fun onCancel(crossinline callback: () -> Unit) = bg_duration_cancel.setOnClickListener { callback() }
+    inline fun onConfirm(crossinline callback: () -> Unit) = bg_duration_confirm.setOnClickListener { callback() }
 
 }

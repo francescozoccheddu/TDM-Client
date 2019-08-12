@@ -81,4 +81,6 @@ class InfoComponent @JvmOverloads constructor(
             }
         }
 
+    inline fun onAction(crossinline callback: () -> Unit) = bg_info_bt.setOnClickListener { callback() }
+
 }

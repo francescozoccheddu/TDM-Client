@@ -19,8 +19,6 @@ class WalkComponent @JvmOverloads constructor(
         orientation = VERTICAL
         View.inflate(context, R.layout.bg_walk, this)
 
-        bg_walk_nearby.setOnClickListener { onChoose?.invoke(RoutingMode.NEARBY) }
-        bg_walk_destination.setOnClickListener { onChoose?.invoke(RoutingMode.DESTINATION) }
 
     }
 
@@ -50,6 +48,10 @@ class WalkComponent @JvmOverloads constructor(
         NEARBY, DESTINATION
     }
 
-    var onChoose: ((RoutingMode) -> Unit)? = null
+
+    inline fun onChoose(crossinline callback: ((RoutingMode) -> Unit)) {
+        bg_walk_nearby.setOnClickListener { callback(RoutingMode.NEARBY) }
+        bg_walk_destination.setOnClickListener { callback(RoutingMode.DESTINATION) }
+    }
 
 }
