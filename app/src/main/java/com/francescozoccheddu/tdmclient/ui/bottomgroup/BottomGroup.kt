@@ -58,7 +58,6 @@ class BottomGroup @JvmOverloads constructor(
         setTransition(mode.state, mode.state)
         transitionToEnd()
 
-        bg_scrim.setOnClickListener { onDismiss?.invoke() }
     }
 
     val action = bg_action
@@ -137,7 +136,8 @@ class BottomGroup @JvmOverloads constructor(
             bg_scrim.isClickable = value
         }
 
-    var onDismiss: (() -> Unit)? = null
+    inline fun onDismiss(crossinline callback: (() -> Unit)) = bg_scrim.setOnClickListener { callback() }
+
 }
 
 

@@ -17,7 +17,6 @@ class ActionComponent @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.bg_action, this)
-        setOnClickListener { onClick?.invoke() }
     }
 
     private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
@@ -43,6 +42,6 @@ class ActionComponent @JvmOverloads constructor(
         }
     }
 
-    var onClick: (() -> Unit)? = null
+    inline fun onClick(crossinline callback: () -> Unit) = setOnClickListener { callback() }
 
 }
