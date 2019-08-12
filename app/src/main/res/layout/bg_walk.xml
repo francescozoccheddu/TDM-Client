@@ -2,6 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
+            android:id="@+id/bg_walk_nearby"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:background="?selectableItemBackground"
@@ -30,6 +31,7 @@
     </LinearLayout>
 
     <LinearLayout
+            android:id="@+id/bg_walk_destination"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:background="?selectableItemBackground"

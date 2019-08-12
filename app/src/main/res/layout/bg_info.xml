@@ -13,14 +13,14 @@
         <ProgressBar
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:id="@+id/info_pb"
+                android:id="@+id/bg_info_pb"
                 android:indeterminateOnly="true"
                 android:indeterminate="true"
                 android:layout_gravity="center"
         />
 
         <ImageView
-                android:id="@+id/info_iv"
+                android:id="@+id/bg_info_iv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -33,7 +33,7 @@
               android:layout_height="wrap_content"
               android:text="Boh roba. sto caricando.."
               android:layout_marginEnd="10dp"
-              android:id="@+id/ag_info"
+              android:id="@+id/bg_info_tv"
               android:layout_gravity="center_vertical|start"
               style="@style/TextAppearance.MaterialComponents.Body1"
     />

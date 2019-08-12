@@ -3,14 +3,18 @@ package com.francescozoccheddu.tdmclient.ui.bottomgroup
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.motion.widget.MotionLayout
 import com.francescozoccheddu.animatorhelpers.SpringColor
 import com.francescozoccheddu.tdmclient.R
-import kotlinx.android.synthetic.main.bg.view.ag_action
-import kotlinx.android.synthetic.main.bg.view.ag_duration
-import kotlinx.android.synthetic.main.bg.view.ag_info
-import kotlinx.android.synthetic.main.bg.view.ag_root
-import kotlinx.android.synthetic.main.bg.view.ag_walk
+import com.francescozoccheddu.tdmclient.utils.android.getNavigationBarHeight
+import kotlinx.android.synthetic.main.bg.view.bg_action
+import kotlinx.android.synthetic.main.bg.view.bg_duration
+import kotlinx.android.synthetic.main.bg.view.bg_info
+import kotlinx.android.synthetic.main.bg.view.bg_navbar
+import kotlinx.android.synthetic.main.bg.view.bg_root
+import kotlinx.android.synthetic.main.bg.view.bg_scrim
+import kotlinx.android.synthetic.main.bg.view.bg_walk
 
 class BottomGroup @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -23,9 +27,21 @@ class BottomGroup @JvmOverloads constructor(
 
     }
 
+    var mode: Mode = Mode.HIDDEN
+        set(value) {
+            if (value != field) {
+                field = value
+                root.isClickable = root.isClickable && isClickable(value)
+                updateAnimation()
+            }
+        }
+
+    private val root: CardView
 
     init {
         View.inflate(context, R.layout.bg, this)
+        bg_navbar.layoutParams.height = getNavigationBarHeight(context)
+        root = bg_root
         loadLayoutDescription(R.xml.bg_motion)
         setTransitionListener(object : TransitionListener {
 
@@ -39,7 +55,7 @@ class BottomGroup @JvmOverloads constructor(
                 val mode = fromState(state)
                 if (mode == this@BottomGroup.mode) {
                     changingLayout = false
-                    ag_root.isClickable = isClickable(mode)
+                    root.isClickable = isClickable(mode)
                 }
                 if (mode == Mode.HIDDEN)
                     _color.reach()
@@ -47,9 +63,17 @@ class BottomGroup @JvmOverloads constructor(
             }
 
         })
-        setTransition(Mode.ACTION.state, Mode.ACTION.state)
+        setTransition(mode.state, mode.state)
         transitionToEnd()
+
+        root.setOnClickListener { onClick?.invoke() }
+        bg_scrim.setOnClickListener { onDismiss?.invoke() }
     }
+
+    val action = bg_action
+    val duration = bg_duration
+    val info = bg_info
+    val walk = bg_walk
 
     enum class Mode {
         ACTION, INFO, WALK, DURATION, HIDDEN
@@ -57,26 +81,26 @@ class BottomGroup @JvmOverloads constructor(
 
     private val Mode.state
         get() = when (this) {
-            Mode.ACTION -> R.id.cs_ag_action
-            Mode.INFO -> R.id.cs_ag_info
-            Mode.WALK -> R.id.cs_ag_walk
-            Mode.DURATION -> R.id.cs_ag_duration
-            Mode.HIDDEN -> R.id.cs_ag_hidden
+            Mode.ACTION -> R.id.bg_cs_action
+            Mode.INFO -> R.id.bg_cs_info
+            Mode.WALK -> R.id.bg_cs_walk
+            Mode.DURATION -> R.id.bg_cs_duration
+            Mode.HIDDEN -> R.id.bg_cs_hidden
         }
 
     private fun fromState(state: Int) = when (state) {
-        R.id.cs_ag_action -> Mode.ACTION
-        R.id.cs_ag_info -> Mode.INFO
-        R.id.cs_ag_walk -> Mode.WALK
-        R.id.cs_ag_duration -> Mode.DURATION
-        R.id.cs_ag_hidden -> Mode.HIDDEN
+        R.id.bg_cs_action -> Mode.ACTION
+        R.id.bg_cs_info -> Mode.INFO
+        R.id.bg_cs_walk -> Mode.WALK
+        R.id.bg_cs_duration -> Mode.DURATION
+        R.id.bg_cs_hidden -> Mode.HIDDEN
         else -> throw IllegalArgumentException("Not a state")
     }
 
-    private val actionView = setOf<View>(ag_action)
-    private val infoView = setOf<View>(ag_info, ag_action)
-    private val walkView = setOf<View>(ag_walk)
-    private val durationView = setOf<View>(ag_duration)
+    private val actionView = setOf<View>(action)
+    private val infoView = setOf<View>(info, action)
+    private val walkView = setOf<View>(walk)
+    private val durationView = setOf<View>(duration)
     private val hiddenView = emptySet<View>()
 
     private val Mode.views
@@ -92,7 +116,7 @@ class BottomGroup @JvmOverloads constructor(
         IN, OUT
     }
 
-    private var views = actionView.toMutableSet<View>()
+    private var views = actionView.toMutableSet()
 
     private fun updateAnimation() {
         if (progress != 0f && progress != 1f)
@@ -132,19 +156,11 @@ class BottomGroup @JvmOverloads constructor(
     private var changingLayout = false
 
     private fun isClickable(mode: Mode) =
-        mode == Mode.ACTION || (mode == Mode.INFO && clickableSnackbar)
+        mode == Mode.ACTION || (mode == Mode.INFO && clickableInfo)
 
-    var mode: Mode = Mode.ACTION
-        set(value) {
-            if (value != field) {
-                field = value
-                ag_root.isClickable = ag_root.isClickable && isClickable(value)
-                updateAnimation()
-            }
-        }
 
-    private val _color = SpringColor(ag_root.cardBackgroundColor.defaultColor).apply {
-        onUpdate = { ag_root.setCardBackgroundColor(it.value) }
+    private val _color = SpringColor(root.cardBackgroundColor.defaultColor).apply {
+        onUpdate = { root.setCardBackgroundColor(it.value) }
         acceleration = 100f
         maxVelocity = 1000f
     }
@@ -157,13 +173,25 @@ class BottomGroup @JvmOverloads constructor(
                 _color.reach()
         }
 
-    var clickableSnackbar = true
+    var clickableInfo = true
         set(value) {
             if (value != field) {
                 field = value
                 if (mode == Mode.INFO && !changingLayout)
-                    ag_root.isClickable = isClickable(mode)
+                    root.isClickable = isClickable(mode)
             }
         }
+
+    var modal = false
+        set(value) {
+            if (value != field) {
+                field = value
+                bg_scrim.isClickable = value
+            }
+        }
+
+    var onClick: (() -> Unit)? = null
+    var onDismiss: (() -> Unit)? = null
+
 
 }

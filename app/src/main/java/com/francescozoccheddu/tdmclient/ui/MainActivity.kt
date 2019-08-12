@@ -7,6 +7,7 @@ import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
+import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.geojson.FeatureCollection
@@ -39,6 +40,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.bar.l_search_bar
+import kotlinx.android.synthetic.main.ma.ma_bg
 import kotlinx.android.synthetic.main.ma.ma_map
 
 class MainActivity : AppCompatActivity() {
@@ -59,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     //private lateinit var snackbar: ServiceSnackbar
     //private val permissions = Permissions(this)
 
+    private lateinit var routingController: RoutingController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -245,6 +248,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         */
+
+        routingController = RoutingController(ma_bg)
 
     }
 
