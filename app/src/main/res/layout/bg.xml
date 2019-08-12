@@ -30,7 +30,6 @@
             app:cardBackgroundColor="@color/background"
             android:clickable="true"
             app:layout_constraintBottom_toTopOf="@id/bg_navbar"
-            android:foreground="?android:attr/selectableItemBackground"
     >
         
         <com.francescozoccheddu.tdmclient.ui.bottomgroup.DurationComponent
