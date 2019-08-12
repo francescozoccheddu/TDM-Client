@@ -54,6 +54,7 @@ class BottomGroupController(val group: BottomGroup) {
             group.info.text = getString(R.string.snackbar_routing_failed)
             group.info.icon = R.drawable.ic_warning
             group.modal = false
+            group.clickableCard = true
         }
         else {
             group.mode = when (state) {
@@ -73,8 +74,9 @@ class BottomGroupController(val group: BottomGroup) {
                 State.OUTSIDE_AREA, State.PICKING_DESTINATION, State.ROUTED -> getColor(R.color.backgroundWarning)
                 State.CONFIRMING_DESTINATION -> getColor(R.color.backgroundOk)
             }
-            group.clickableInfo = when (state) {
-                State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED, State.ROUTING, State.CONFIRMING_DESTINATION -> true
+            group.clickableCard = when (state) {
+                State.PICKING_DESTINATION, State.IDLE, State.ROUTED, State.UNLOCATABLE,
+                State.PERMISSIONS_UNGRANTED, State.ROUTING, State.CONFIRMING_DESTINATION -> true
                 else -> false
             }
             group.info.text = when (state) {
@@ -119,7 +121,6 @@ class BottomGroupController(val group: BottomGroup) {
     }
 
     init {
-        updateState()
         group.onClick = {
             if (routingFailed)
                 onRetryRouting?.invoke()
@@ -133,10 +134,12 @@ class BottomGroupController(val group: BottomGroup) {
                 }
             }
         }
-        group.onDismiss = { onCancelRouting?.invoke() }
-        group.duration.onCancel = { onCancelRouting?.invoke() }
-        group.duration.onConfirm = { onConfirmRouting?.invoke() }
-        group.walk.onChoose = { onSelectRoutingMode?.invoke(it) }
+        group.onDismiss =
+            { if (state == State.CHOOSING_DURATION || state == State.CHOOSING_WALK_MODE) onCancelRouting?.invoke() }
+        group.duration.onCancel = { if (state == State.CHOOSING_DURATION) onCancelRouting?.invoke() }
+        group.duration.onConfirm = { if (state == State.CHOOSING_DURATION) onConfirmRouting?.invoke() }
+        group.walk.onChoose = { if (state == State.CHOOSING_WALK_MODE) onSelectRoutingMode?.invoke(it) }
+        updateState()
     }
 
 }

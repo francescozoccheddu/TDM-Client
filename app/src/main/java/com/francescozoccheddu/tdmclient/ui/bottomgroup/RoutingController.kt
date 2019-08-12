@@ -15,9 +15,21 @@ class RoutingController(group: BottomGroup) {
                 WalkComponent.RoutingMode.DESTINATION -> BottomGroupController.State.PICKING_DESTINATION
             }
         }
+        ui.onConfirmRouting = {
+            ui.state = BottomGroupController.State.ROUTING
+        }
         ui.onCancelRouting = {
             ui.state = BottomGroupController.State.IDLE
         }
+        ui.onDestinationConfirmed = {
+            ui.state = BottomGroupController.State.CHOOSING_DURATION
+        }
     }
+
+    enum class Problem {
+        OFFLINE, UNLOCATABLE, LOCATING, PERMISSIONS_UNGRANTED
+    }
+
+    var problem: Problem? = null
 
 }

@@ -2,9 +2,11 @@ package com.francescozoccheddu.tdmclient.ui.bottomgroup
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.ContextCompat
 import com.francescozoccheddu.animatorhelpers.SpringColor
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.utils.android.getNavigationBarHeight
@@ -31,7 +33,6 @@ class BottomGroup @JvmOverloads constructor(
         set(value) {
             if (value != field) {
                 field = value
-                root.isClickable = root.isClickable && isClickable(value)
                 updateAnimation()
             }
         }
@@ -52,13 +53,6 @@ class BottomGroup @JvmOverloads constructor(
             override fun onTransitionChange(ml: MotionLayout?, from: Int, to: Int, progress: Float) {}
 
             override fun onTransitionCompleted(ml: MotionLayout?, state: Int) {
-                val mode = fromState(state)
-                if (mode == this@BottomGroup.mode) {
-                    changingLayout = false
-                    root.isClickable = isClickable(mode)
-                }
-                if (mode == Mode.HIDDEN)
-                    _color.reach()
                 updateAnimation()
             }
 
@@ -66,9 +60,23 @@ class BottomGroup @JvmOverloads constructor(
         setTransition(mode.state, mode.state)
         transitionToEnd()
 
-        root.setOnClickListener { onClick?.invoke() }
+        root.setOnClickListener { if (_cardClickable) onClick?.invoke() }
         bg_scrim.setOnClickListener { onDismiss?.invoke() }
     }
+
+    private val rippleDrawable = run {
+        val outValue = TypedValue()
+        getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+        ContextCompat.getDrawable(context, outValue.resourceId)
+    }
+
+    private var _cardClickable = false
+        set(value) {
+            if (value != field) {
+                field = value
+                root.foreground = if (value) rippleDrawable else null
+            }
+        }
 
     val action = bg_action
     val duration = bg_duration
@@ -118,9 +126,13 @@ class BottomGroup @JvmOverloads constructor(
 
     private var views = actionView.toMutableSet()
 
+    private var changingLayout = false
+
     private fun updateAnimation() {
         if (progress != 0f && progress != 1f)
             return
+        changingLayout = true
+        _cardClickable = false
         run {
             // Remove
             val exViews = views - mode.views
@@ -138,9 +150,15 @@ class BottomGroup @JvmOverloads constructor(
         run {
             // Transition
             if (currentState != mode.state) {
-                changingLayout = true
+                _cardClickable = false
                 transitionToState(mode.state)
                 return
+            }
+            else {
+                _cardClickable = clickableCard
+                changingLayout = false
+                if (mode == Mode.HIDDEN)
+                    _color.reach()
             }
         }
         run {
@@ -152,12 +170,6 @@ class BottomGroup @JvmOverloads constructor(
                 })
         }
     }
-
-    private var changingLayout = false
-
-    private fun isClickable(mode: Mode) =
-        mode == Mode.ACTION || (mode == Mode.INFO && clickableInfo)
-
 
     private val _color = SpringColor(root.cardBackgroundColor.defaultColor).apply {
         onUpdate = { root.setCardBackgroundColor(it.value) }
@@ -173,25 +185,23 @@ class BottomGroup @JvmOverloads constructor(
                 _color.reach()
         }
 
-    var clickableInfo = true
+    var clickableCard = false
         set(value) {
             if (value != field) {
                 field = value
-                if (mode == Mode.INFO && !changingLayout)
-                    root.isClickable = isClickable(mode)
+                if (!changingLayout)
+                    _cardClickable = value
             }
         }
 
-    var modal = false
+    var modal
+        get() = bg_scrim.isClickable
         set(value) {
-            if (value != field) {
-                field = value
-                bg_scrim.isClickable = value
-            }
+            bg_scrim.isClickable = value
         }
 
     var onClick: (() -> Unit)? = null
     var onDismiss: (() -> Unit)? = null
-
-
 }
+
+
