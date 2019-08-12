@@ -8,14 +8,18 @@ import android.widget.LinearLayout
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.utils.android.visible
+import kotlinx.android.synthetic.main.bg_info.view.bg_info_iv
+import kotlinx.android.synthetic.main.bg_info.view.bg_info_pb
+import kotlinx.android.synthetic.main.bg_info.view.bg_info_tv
 
-class WalkView @JvmOverloads constructor(
+class InfoComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr), BottomGroup.Component {
 
+
     init {
-        orientation = VERTICAL
-        View.inflate(context, R.layout.bg_walk, this)
+        orientation = HORIZONTAL
+        View.inflate(context, R.layout.bg_info, this)
     }
 
     private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
@@ -39,5 +43,30 @@ class WalkView @JvmOverloads constructor(
             BottomGroup.AnimationMode.OUT -> 0f
         }
     }
+
+    var text = ""
+        set(value) {
+            if (value != field) {
+                field = value
+                bg_info_tv.text = value
+            }
+        }
+
+    var loading = true
+        set(value) {
+            if (value != field) {
+                field = value
+                bg_info_pb.visible = value
+                bg_info_iv.visible = !value
+            }
+        }
+
+    var icon: Int = R.drawable.ic_back
+        set(value) {
+            if (field != value) {
+                field = value
+                bg_info_iv.setImageResource(value)
+            }
+        }
 
 }

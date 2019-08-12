@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import androidx.core.view.setPadding
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
 import kotlin.math.roundToInt
+
 
 var View.visible
     get() = visibility == View.VISIBLE
@@ -72,3 +74,17 @@ fun Snackbar.setTextColorRes(color: Int) = textView.setTextColor(ContextCompat.g
 fun Snackbar.setActionTextColorRes(color: Int) = setActionTextColor(ContextCompat.getColor(context, color))
 
 fun View.setPaddingRes(dimens: Int) = setPadding(context.resources.getDimension(dimens).roundToInt())
+
+fun getNavigationBarHeight(context: Context): Int {
+    val resources = context.resources
+    val orientation = resources.configuration.orientation
+    val id = resources.getIdentifier(
+        if (orientation == Configuration.ORIENTATION_PORTRAIT)
+            "navigation_bar_height"
+        else
+            "navigation_bar_height_landscape",
+        "dimen",
+        "android"
+    )
+    return if (id > 0) resources.getDimensionPixelSize(id) else 0
+}

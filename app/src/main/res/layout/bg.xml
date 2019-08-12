@@ -4,37 +4,50 @@
 >
     
     <View
-            android:id="@+id/ag_scrim"
+            android:id="@+id/bg_scrim"
             android:background="@android:color/black"
             android:alpha="0"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
     />
     
+    <Space
+            android:id="@+id/bg_navbar"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+    />
+    
     <androidx.cardview.widget.CardView
-            android:id="@+id/ag_root"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:id="@+id/bg_root"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginBottom="48dp"
             android:elevation="10dp"
             app:cardBackgroundColor="@color/background"
             android:clickable="true"
+            app:layout_constraintBottom_toTopOf="@id/bg_navbar"
             android:foreground="?android:attr/selectableItemBackground"
     >
         
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.DurationView
-                android:id="@+id/ag_duration"
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.DurationComponent
+                android:id="@+id/bg_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:gravity="center"
                 android:layout_gravity="center"
-                android:layout_margin="16dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
         />
         
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.WalkView
-                android:id="@+id/ag_walk"
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.WalkComponent
+                android:id="@+id/bg_walk"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"
@@ -42,8 +55,8 @@
                 android:layout_gravity="center"
         />
         
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.InfoView
-                android:id="@+id/ag_info"
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.InfoComponent
+                android:id="@+id/bg_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
@@ -52,8 +65,8 @@
                 android:layout_margin="10dp"
         />
         
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.ActionView
-                android:id="@+id/ag_action"
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.ActionComponent
+                android:id="@+id/bg_action"
                 android:layout_width="64dp"
                 android:layout_height="match_parent"
                 android:visibility="visible"

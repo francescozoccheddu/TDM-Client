@@ -1,5 +1,7 @@
 package com.francescozoccheddu.tdmclient.utils.commons
 
+import kotlin.reflect.KProperty
+
 abstract class WellSet<FunctionType> {
 
     private val handlers = mutableSetOf<FunctionType>()
@@ -24,6 +26,8 @@ abstract class WellSet<FunctionType> {
 
     protected operator fun iterator() = handlers.iterator()
 
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) = this
+
 }
 
 open class ProcEvent : WellSet<() -> Unit>() {
@@ -31,6 +35,14 @@ open class ProcEvent : WellSet<() -> Unit>() {
     operator fun invoke() {
         for (handler in this)
             handler()
+    }
+
+    operator fun plusAssign(handler: ProcEvent) {
+        add(handler::invoke)
+    }
+
+    operator fun minusAssign(handler: ProcEvent) {
+        remove(handler::invoke)
     }
 
 }
@@ -42,6 +54,14 @@ open class FuncEvent<ArgumentType> : WellSet<(ArgumentType) -> Unit>() {
             handler(arg)
     }
 
+    operator fun plusAssign(handler: FuncEvent<ArgumentType>) {
+        add(handler::invoke)
+    }
+
+    operator fun minusAssign(handler: FuncEvent<ArgumentType>) {
+        remove(handler::invoke)
+    }
+
 }
 
 open class FuncEvent2<ArgumentType1, ArgumentType2> : WellSet<(ArgumentType1, ArgumentType2) -> Unit>() {
@@ -49,6 +69,14 @@ open class FuncEvent2<ArgumentType1, ArgumentType2> : WellSet<(ArgumentType1, Ar
     operator fun invoke(arg1: ArgumentType1, arg2: ArgumentType2) {
         for (handler in this)
             handler(arg1, arg2)
+    }
+
+    operator fun plusAssign(handler: FuncEvent2<ArgumentType1, ArgumentType2>) {
+        add(handler::invoke)
+    }
+
+    operator fun minusAssign(handler: FuncEvent2<ArgumentType1, ArgumentType2>) {
+        remove(handler::invoke)
     }
 
 }
