@@ -52,16 +52,16 @@ class BottomGroupController(val group: BottomGroup) {
             group.mode = BottomGroup.Mode.INFO
             group.color = getColor(R.color.backgroundError)
             group.info.text = getString(R.string.snackbar_routing_failed)
+            group.info.action = getString(R.string.snackbar_action_routing_failed)
             group.info.icon = R.drawable.ic_warning
             group.modal = false
-            group.clickableCard = true
         }
         else {
             group.mode = when (state) {
-                State.LOCATING, State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED,
+                State.PICKING_DESTINATION, State.LOCATING, State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED,
                 State.ROUTING, State.OFFLINE, State.OUTSIDE_AREA -> BottomGroup.Mode.INFO
                 State.HIDDEN -> BottomGroup.Mode.HIDDEN
-                State.PICKING_DESTINATION, State.IDLE, State.ROUTED -> BottomGroup.Mode.ACTION
+                State.IDLE, State.ROUTED -> BottomGroup.Mode.ACTION
                 State.CONFIRMING_DESTINATION -> if (destinationName != null) BottomGroup.Mode.INFO else BottomGroup.Mode.ACTION
                 State.CHOOSING_DURATION -> BottomGroup.Mode.DURATION
                 State.CHOOSING_WALK_MODE -> BottomGroup.Mode.WALK
@@ -74,12 +74,8 @@ class BottomGroupController(val group: BottomGroup) {
                 State.OUTSIDE_AREA, State.PICKING_DESTINATION, State.ROUTED -> getColor(R.color.backgroundWarning)
                 State.CONFIRMING_DESTINATION -> getColor(R.color.backgroundOk)
             }
-            group.clickableCard = when (state) {
-                State.PICKING_DESTINATION, State.IDLE, State.ROUTED, State.UNLOCATABLE,
-                State.PERMISSIONS_UNGRANTED, State.ROUTING, State.CONFIRMING_DESTINATION -> true
-                else -> false
-            }
             group.info.text = when (state) {
+                State.PICKING_DESTINATION -> getString(R.string.snackbar_picking)
                 State.LOCATING -> getString(R.string.snackbar_locating)
                 State.UNLOCATABLE -> getString(R.string.snackbar_unlocatable)
                 State.PERMISSIONS_UNGRANTED -> getString(R.string.snackbar_permissions_ungranted)
@@ -104,6 +100,15 @@ class BottomGroupController(val group: BottomGroup) {
                 State.CHOOSING_DURATION, State.CHOOSING_WALK_MODE -> true
                 else -> false
             }
+            group.info.action = when (state) {
+                State.UNLOCATABLE -> getString(R.string.snackbar_action_unlocatable)
+                State.PERMISSIONS_UNGRANTED -> getString(R.string.snackbar_action_permissions_ungranted)
+                State.ROUTING -> getString(R.string.snackbar_action_routing)
+                State.PICKING_DESTINATION -> getString(R.string.snackbar_action_picking)
+                State.CONFIRMING_DESTINATION -> getString(R.string.snackbar_action_destinated)
+                State.ROUTED -> getString(R.string.snackbar_action_routed)
+                else -> null
+            }
         }
     }
 
@@ -121,19 +126,7 @@ class BottomGroupController(val group: BottomGroup) {
     }
 
     init {
-        group.onClick = {
-            if (routingFailed)
-                onRetryRouting?.invoke()
-            else {
-                when (state) {
-                    State.UNLOCATABLE -> onLocationEnableIntent?.invoke()
-                    State.PERMISSIONS_UNGRANTED -> onPermissionGrantIntent?.invoke()
-                    State.ROUTING, State.PICKING_DESTINATION, State.ROUTED -> onCancelRouting?.invoke()
-                    State.CONFIRMING_DESTINATION -> onDestinationConfirmed?.invoke()
-                    State.IDLE -> onWalkIntent?.invoke()
-                }
-            }
-        }
+        group.action.onClick = { if (state == State.IDLE) onWalkIntent?.invoke() }
         group.onDismiss =
             { if (state == State.CHOOSING_DURATION || state == State.CHOOSING_WALK_MODE) onCancelRouting?.invoke() }
         group.duration.onCancel = { if (state == State.CHOOSING_DURATION) onCancelRouting?.invoke() }

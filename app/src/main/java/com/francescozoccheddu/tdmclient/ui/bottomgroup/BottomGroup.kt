@@ -2,11 +2,9 @@ package com.francescozoccheddu.tdmclient.ui.bottomgroup
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.content.ContextCompat
 import com.francescozoccheddu.animatorhelpers.SpringColor
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.utils.android.getNavigationBarHeight
@@ -60,71 +58,33 @@ class BottomGroup @JvmOverloads constructor(
         setTransition(mode.state, mode.state)
         transitionToEnd()
 
-        root.setOnClickListener { if (_cardClickable) onClick?.invoke() }
         bg_scrim.setOnClickListener { onDismiss?.invoke() }
     }
-
-    private val rippleDrawable = run {
-        val outValue = TypedValue()
-        getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
-        ContextCompat.getDrawable(context, outValue.resourceId)
-    }
-
-    private var _cardClickable = false
-        set(value) {
-            if (value != field) {
-                field = value
-                root.foreground = if (value) rippleDrawable else null
-            }
-        }
 
     val action = bg_action
     val duration = bg_duration
     val info = bg_info
     val walk = bg_walk
 
-    enum class Mode {
-        ACTION, INFO, WALK, DURATION, HIDDEN
+    enum class Mode(val state: Int) {
+        ACTION(R.id.bg_cs_action), INFO(R.id.bg_cs_info),
+        WALK(R.id.bg_cs_walk), DURATION(R.id.bg_cs_duration), HIDDEN(R.id.bg_cs_hidden)
     }
 
-    private val Mode.state
+    private val Mode.view: View?
         get() = when (this) {
-            Mode.ACTION -> R.id.bg_cs_action
-            Mode.INFO -> R.id.bg_cs_info
-            Mode.WALK -> R.id.bg_cs_walk
-            Mode.DURATION -> R.id.bg_cs_duration
-            Mode.HIDDEN -> R.id.bg_cs_hidden
-        }
-
-    private fun fromState(state: Int) = when (state) {
-        R.id.bg_cs_action -> Mode.ACTION
-        R.id.bg_cs_info -> Mode.INFO
-        R.id.bg_cs_walk -> Mode.WALK
-        R.id.bg_cs_duration -> Mode.DURATION
-        R.id.bg_cs_hidden -> Mode.HIDDEN
-        else -> throw IllegalArgumentException("Not a state")
-    }
-
-    private val actionView = setOf<View>(action)
-    private val infoView = setOf<View>(info, action)
-    private val walkView = setOf<View>(walk)
-    private val durationView = setOf<View>(duration)
-    private val hiddenView = emptySet<View>()
-
-    private val Mode.views
-        get() = when (this) {
-            Mode.ACTION -> actionView
-            Mode.INFO -> infoView
-            Mode.WALK -> walkView
-            Mode.DURATION -> durationView
-            Mode.HIDDEN -> hiddenView
+            Mode.ACTION -> action
+            Mode.INFO -> info
+            Mode.WALK -> walk
+            Mode.DURATION -> duration
+            Mode.HIDDEN -> null
         }
 
     enum class AnimationMode {
         IN, OUT
     }
 
-    private var views = actionView.toMutableSet()
+    private var currentView: View? = null
 
     private var changingLayout = false
 
@@ -132,42 +92,28 @@ class BottomGroup @JvmOverloads constructor(
         if (progress != 0f && progress != 1f)
             return
         changingLayout = true
-        _cardClickable = false
-        run {
-            // Remove
-            val exViews = views - mode.views
-            val nViews = views - exViews
-            for (view in exViews)
-                (view as Component).animate(AnimationMode.OUT) {
-                    views.remove(view)
-                    updateAnimation()
-                }
-            for (view in nViews)
-                (view as Component).animate(AnimationMode.IN)
-            if (exViews.isNotEmpty())
-                return
-        }
-        run {
-            // Transition
-            if (currentState != mode.state) {
-                _cardClickable = false
-                transitionToState(mode.state)
-                return
+        // Remove
+        val currentCurrentView = currentView
+        if (mode.view != currentView && currentCurrentView != null) {
+            (currentView as Component).animate(AnimationMode.OUT) {
+                if (currentView == currentCurrentView)
+                    currentView = null
+                updateAnimation()
             }
+        }
+        else {
+            // Transition
+            if (currentState != mode.state)
+                transitionToState(mode.state)
             else {
-                _cardClickable = clickableCard
                 changingLayout = false
                 if (mode == Mode.HIDDEN)
                     _color.reach()
+                currentView = mode.view
+                val currentCurrentView = currentView
+                if (currentCurrentView != null)
+                    (currentCurrentView as Component).animate(AnimationMode.IN)
             }
-        }
-        run {
-            // Add
-            val nViews = mode.views - views
-            for (view in nViews)
-                views.add(view.apply {
-                    (this as Component).animate(AnimationMode.IN)
-                })
         }
     }
 
@@ -185,22 +131,12 @@ class BottomGroup @JvmOverloads constructor(
                 _color.reach()
         }
 
-    var clickableCard = false
-        set(value) {
-            if (value != field) {
-                field = value
-                if (!changingLayout)
-                    _cardClickable = value
-            }
-        }
-
     var modal
         get() = bg_scrim.isClickable
         set(value) {
             bg_scrim.isClickable = value
         }
 
-    var onClick: (() -> Unit)? = null
     var onDismiss: (() -> Unit)? = null
 }
 
