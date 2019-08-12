@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+            android:id="@+id/agc_duration_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quanto tempo vuoi dedicarmi?"
+            style="@style/TextAppearance.MaterialComponents.Body1"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+    />
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/agc_duration_bt_start"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Inizia!"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+    />
+
+    <com.google.android.material.button.MaterialButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:text="Annulla"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+    />
+
+    <com.francescozoccheddu.knob.KnobView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/agc_duration_bt_start"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_below="@+id/agc_duration_tv"
+    />
+
+</merge>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+>
+    
+    <View
+            android:id="@+id/ag_scrim"
+            android:background="@android:color/black"
+            android:alpha="0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+    />
+    
+    <androidx.cardview.widget.CardView
+            android:id="@+id/ag_root"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="10dp"
+            app:cardBackgroundColor="@color/background"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+    >
+        
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.DurationView
+                android:id="@+id/ag_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+        />
+        
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.WalkView
+                android:id="@+id/ag_walk"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:gravity="center"
+                android:layout_gravity="center"
+        />
+        
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.InfoView
+                android:id="@+id/ag_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:gravity="center|start"
+                android:layout_gravity="start|center_vertical"
+                android:layout_margin="10dp"
+        />
+        
+        <com.francescozoccheddu.tdmclient.ui.bottomgroup.ActionView
+                android:id="@+id/ag_action"
+                android:layout_width="64dp"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:gravity="center"
+                android:layout_gravity="end|center_vertical"
+        />
+    
+    </androidx.cardview.widget.CardView>
+
+</merge>
