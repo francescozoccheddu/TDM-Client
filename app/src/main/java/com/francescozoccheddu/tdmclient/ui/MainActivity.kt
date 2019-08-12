@@ -1,24 +1,12 @@
 package com.francescozoccheddu.tdmclient.ui
 
 import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.provider.Settings
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
-import com.francescozoccheddu.tdmclient.utils.android.setBackgroundColorRes
-import com.francescozoccheddu.tdmclient.utils.android.setImageDrawable
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.geojson.FeatureCollection
@@ -50,19 +38,8 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import kotlinx.android.synthetic.main.activity.cl_root
-import kotlinx.android.synthetic.main.activity.fab
-import kotlinx.android.synthetic.main.activity.mv_map
-import kotlinx.android.synthetic.main.activity.v_fabSheetDuration
-import kotlinx.android.synthetic.main.activity.v_fabSheetWalkMode
-import kotlinx.android.synthetic.main.bar.et_search
 import kotlinx.android.synthetic.main.bar.l_search_bar
-import kotlinx.android.synthetic.main.bar.pb_search
-import kotlinx.android.synthetic.main.bar.rv_search
-import kotlinx.android.synthetic.main.sheet_duration.bt_duration_ok
-import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_destination
-import kotlinx.android.synthetic.main.sheet_walktype.li_walktype_nearby
-import ui.ServiceSnackbar
+import kotlinx.android.synthetic.main.ma.ma_map
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,20 +51,21 @@ class MainActivity : AppCompatActivity() {
         private const val MB_LAYER_DESTINATION = "source_destination"
         private const val MB_SOURCE_COVERAGE = "source_coverage"
         private const val MB_LAYER_COVERAGE = "layer_coverage"
+
     }
 
     private lateinit var map: MapboxMap
-    private lateinit var searchProvider: LocationSearchProvider
-    private lateinit var snackbar: ServiceSnackbar
-    private val permissions = Permissions(this)
+    //private lateinit var searchProvider: LocationSearchProvider
+    //private lateinit var snackbar: ServiceSnackbar
+    //private val permissions = Permissions(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity)
+        setContentView(R.layout.ma)
 
         // Map
-        mv_map.apply {
+        ma_map.apply {
             onCreate(savedInstanceState)
             getMapAsync { map ->
                 this@MainActivity.map = map.apply {
@@ -145,8 +123,8 @@ class MainActivity : AppCompatActivity() {
                             )
                     ) {
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
-                        if (permissions.granted)
-                            enableLocationComponent(it)
+                        /*if (permissions.granted)
+                            enableLocationComponent(it)*/
                     }
                     addOnMapClickListener {
                         if (destinationPickEnabled)
@@ -156,6 +134,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        /*
         // Fab
         run {
 
@@ -264,6 +244,8 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        */
+
     }
 
     private var routing = false
@@ -280,7 +262,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     private fun updateSnackbar() {
-        val service = this.service
+        /*val service = this.service
         snackbar.state = if (service != null) {
             if (permissions.granted) {
                 if (service.locatable) {
@@ -301,7 +283,7 @@ class MainActivity : AppCompatActivity() {
             }
             else ServiceSnackbar.State.PERMISSIONS_UNGRANTED
         }
-        else null
+        else null*/
     }
 
     private var route: Any? = null
@@ -317,12 +299,12 @@ class MainActivity : AppCompatActivity() {
     private var fabSheetMode = FabSheetMode.WALK_MODE
         set(value) {
             field = value
-            v_fabSheetWalkMode.visible = value == FabSheetMode.WALK_MODE
-            v_fabSheetDuration.visible = value == FabSheetMode.WALK_DURATION
+            /*v_fabSheetWalkMode.visible = value == FabSheetMode.WALK_MODE
+            v_fabSheetDuration.visible = value == FabSheetMode.WALK_DURATION*/
         }
 
     private fun updateFab() {
-        fab.apply {
+        /*fab.apply {
             var shown = true
             var collapse = true
             if (route != null) {
@@ -358,7 +340,7 @@ class MainActivity : AppCompatActivity() {
                 show()
             else
                 hide()
-        }
+        }*/
     }
 
     private var destination: LatLng? = null
@@ -391,7 +373,7 @@ class MainActivity : AppCompatActivity() {
                     field = value
                 else
                     field = null
-                searchProvider.userLocation = field
+                //searchProvider.userLocation = field
             }
         }
 
@@ -471,7 +453,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onPermissionsChanged(granted: Boolean) {
-        if (granted) {
+        /*if (granted) {
             if (snackbar.state == ServiceSnackbar.State.PERMISSIONS_UNGRANTED) {
                 snackbar.state = null
                 updateSnackbar()
@@ -481,7 +463,7 @@ class MainActivity : AppCompatActivity() {
             MainService.bind(this, serviceConnection)
         }
         else
-            snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED
+            snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED*/
 
     }
 
@@ -503,7 +485,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (fab.isExpanded)
+        /*if (fab.isExpanded)
             fab.isExpanded = false
         else if (et_search.hasFocus())
             et_search.clearFocus()
@@ -514,7 +496,7 @@ class MainActivity : AppCompatActivity() {
                 destinationPickEnabled = false
         }
         else
-            super.onBackPressed()
+            super.onBackPressed()*/
     }
 
     override fun onRequestPermissionsResult(
@@ -522,25 +504,25 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        this.permissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        //this.permissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     public override fun onStart() {
         super.onStart()
-        mv_map.onStart()
+        ma_map.onStart()
     }
 
     public override fun onResume() {
         super.onResume()
-        if (permissions.granted)
+        /*if (permissions.granted)
             onPermissionsChanged(true)
         else if (snackbar.state != ServiceSnackbar.State.PERMISSIONS_UNGRANTED) {
             if (permissions.canAsk)
                 permissions.ask(this::onPermissionsChanged)
             else
                 snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED
-        }
-        mv_map.onResume()
+        }*/
+        ma_map.onResume()
     }
 
     public override fun onPause() {
@@ -549,27 +531,27 @@ class MainActivity : AppCompatActivity() {
             service = null
             unbindService(serviceConnection)
         }
-        mv_map.onPause()
+        ma_map.onPause()
     }
 
     public override fun onStop() {
         super.onStop()
-        mv_map.onStop()
+        ma_map.onStop()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mv_map.onLowMemory()
+        ma_map.onLowMemory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mv_map.onDestroy()
+        ma_map.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mv_map.onSaveInstanceState(outState)
+        ma_map.onSaveInstanceState(outState)
     }
 
 }

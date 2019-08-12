@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.MainActivity">
+    
+    <com.mapbox.mapboxsdk.maps.MapView
+            xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/ma_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            mapbox:mapbox_uiCompass="false"
+            mapbox:mapbox_cameraZoomMin="10"
+            mapbox:mapbox_cameraZoomMax="18"
+            mapbox:mapbox_uiRotateGestures="false"
+            mapbox:mapbox_uiTiltGestures="false"
+            mapbox:mapbox_uiLogo="false"
+            mapbox:mapbox_uiAttribution="false"
+            mapbox:mapbox_compassAnimationEnabled="true"
+            mapbox:mapbox_accuracyAnimationEnabled="true"
+    />
+    
+    <com.francescozoccheddu.tdmclient.ui.bottomgroup.BottomGroup
+            android:id="@+id/ma_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+</FrameLayout>
