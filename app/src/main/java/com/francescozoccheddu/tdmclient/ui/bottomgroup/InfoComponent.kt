@@ -4,21 +4,21 @@ package com.francescozoccheddu.tdmclient.ui.bottomgroup
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.utils.android.visible
+import kotlinx.android.synthetic.main.bg_info.view.bg_info_bt
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_iv
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_pb
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_tv
 
 class InfoComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), BottomGroup.Component {
+) : RelativeLayout(context, attrs, defStyleAttr), BottomGroup.Component {
 
 
     init {
-        orientation = HORIZONTAL
         View.inflate(context, R.layout.bg_info, this)
     }
 
@@ -27,17 +27,17 @@ class InfoComponent @JvmOverloads constructor(
             alpha = it.value
             visible = it.value != 0f
             if (!it.running) {
-                callback?.invoke()
-                callback = null
+                animationCallback?.invoke()
+                animationCallback = null
             }
         }
         speed = 6f
     }
 
-    var callback: (() -> Unit)? = null
+    private var animationCallback: (() -> Unit)? = null
 
     override fun animate(mode: BottomGroup.AnimationMode, callback: (() -> Unit)?) {
-        this.callback = callback
+        this.animationCallback = callback
         animationAlpha = when (mode) {
             BottomGroup.AnimationMode.IN -> 1f
             BottomGroup.AnimationMode.OUT -> 0f
@@ -49,6 +49,18 @@ class InfoComponent @JvmOverloads constructor(
             if (value != field) {
                 field = value
                 bg_info_tv.text = value
+            }
+        }
+
+    var action: String? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                bg_info_bt.apply {
+                    visible = value != null
+                    if (value != null)
+                        text = value
+                }
             }
         }
 

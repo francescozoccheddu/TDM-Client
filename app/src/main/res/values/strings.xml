@@ -36,4 +36,8 @@
     <string name="snackbar_routing_failed">Direzionamento fallito</string>
     <string name="snackbar_action_routing_failed">Riprova</string>
     <string name="snackbar_outside_area">Sei fuori dall\'area di interesse</string>
+    <string name="snackbar_picking">Scegli la destinazione</string>
+    <string name="snackbar_action_picking">Annulla</string>
+    <string name="snackbar_action_destinated">Conferma</string>
+    <string name="snackbar_action_routed">Termina</string>
 </resources>

@@ -26,9 +26,12 @@
             android:layout_height="0dp"
             android:layout_marginEnd="48dp"
             android:layout_marginBottom="48dp"
+            android:padding="0dp"
+            app:contentPadding="0dp"
             android:elevation="10dp"
             app:cardBackgroundColor="@color/background"
             android:clickable="true"
+            app:cardUseCompatPadding="false"
             app:layout_constraintBottom_toTopOf="@id/bg_navbar"
     >
         
@@ -59,18 +62,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:gravity="center|start"
+                android:gravity="center_vertical|start"
                 android:layout_gravity="start|center_vertical"
                 android:layout_margin="10dp"
         />
         
         <com.francescozoccheddu.tdmclient.ui.bottomgroup.ActionComponent
                 android:id="@+id/bg_action"
-                android:layout_width="64dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:gravity="center"
-                android:layout_gravity="end|center_vertical"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
         />
     
     </androidx.cardview.widget.CardView>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-
+    
     <FrameLayout
             android:layout_width="44dp"
             android:layout_height="44dp"
@@ -8,8 +8,12 @@
             android:padding="2dp"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="8dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/bg_info_ind"
     >
-
+        
         <ProgressBar
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
@@ -17,18 +21,19 @@
                 android:indeterminateOnly="true"
                 android:indeterminate="true"
                 android:layout_gravity="center"
+                android:visibility="gone"
         />
-
+        
         <ImageView
                 android:id="@+id/bg_info_iv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_launcher_foreground"
+                android:src="@drawable/ic_back"
         />
-
+    
     </FrameLayout>
-
+    
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="Boh roba. sto caricando.."
@@ -36,6 +41,21 @@
               android:id="@+id/bg_info_tv"
               android:layout_gravity="center_vertical|start"
               style="@style/TextAppearance.MaterialComponents.Body1"
+              android:layout_centerVertical="true"
+              android:layout_alignWithParentIfMissing="true"
+              android:layout_toEndOf="@+id/bg_info_ind"
+              android:layout_toStartOf="@+id/bg_info_bt"
+    />
+    
+    <com.google.android.material.button.MaterialButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bg_info_bt"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
     />
 
 </merge>

@@ -17,6 +17,7 @@ class ActionComponent @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.bg_action, this)
+        setOnClickListener { onClick?.invoke() }
     }
 
     private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
@@ -24,22 +25,24 @@ class ActionComponent @JvmOverloads constructor(
             alpha = it.value
             visible = it.value != 0f
             if (!it.running) {
-                callback?.invoke()
-                callback = null
+                animationCallback?.invoke()
+                animationCallback = null
             }
         }
         val x = CardView(context)
         speed = 6f
     }
 
-    var callback: (() -> Unit)? = null
+    private var animationCallback: (() -> Unit)? = null
 
     override fun animate(mode: BottomGroup.AnimationMode, callback: (() -> Unit)?) {
-        this.callback = callback
+        this.animationCallback = callback
         animationAlpha = when (mode) {
             BottomGroup.AnimationMode.IN -> 1f
             BottomGroup.AnimationMode.OUT -> 0f
         }
     }
+
+    var onClick: (() -> Unit)? = null
 
 }

@@ -29,17 +29,17 @@ class WalkComponent @JvmOverloads constructor(
             alpha = it.value
             visible = it.value != 0f
             if (!it.running) {
-                callback?.invoke()
-                callback = null
+                animationCallback?.invoke()
+                animationCallback = null
             }
         }
         speed = 6f
     }
 
-    var callback: (() -> Unit)? = null
+    private var animationCallback: (() -> Unit)? = null
 
     override fun animate(mode: BottomGroup.AnimationMode, callback: (() -> Unit)?) {
-        this.callback = callback
+        this.animationCallback = callback
         animationAlpha = when (mode) {
             BottomGroup.AnimationMode.IN -> 1f
             BottomGroup.AnimationMode.OUT -> 0f
