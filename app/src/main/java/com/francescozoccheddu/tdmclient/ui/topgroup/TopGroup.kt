@@ -19,7 +19,7 @@ class TopGroup @JvmOverloads constructor(
         SCORE(R.id.tg_cs_score, R.id.tg_score),
         SEARCH(R.id.tg_cs_search, R.id.tg_search),
         SEARCHING(R.id.tg_cs_searching, R.id.tg_search),
-        HIDDEN(R.id.tg_cs_hidden, null)
+        HIDDEN(R.id.tg_cs_hidden, R.id.tg_score)
     }
 
     private val root: CardView

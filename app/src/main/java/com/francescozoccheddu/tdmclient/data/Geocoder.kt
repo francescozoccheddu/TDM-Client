@@ -44,7 +44,7 @@ class Geocoder(val bounds: LatLngBounds?) {
             val clean = value.trim().toLowerCase()
             if (clean != field) {
                 field = clean
-                val cachedResult = cache[query]
+                val cachedResult = if (clean.isEmpty()) emptyList() else cache[query]
                 if (cachedResult == null)
                     request(clean)
                 else
@@ -70,10 +70,10 @@ class Geocoder(val bounds: LatLngBounds?) {
                 call: retrofit2.Call<GeocodingResponse>,
                 response: retrofit2.Response<GeocodingResponse>
             ) {
-                val list = response.body()!!.features()!!
-                    .asSequence()
-                    .sortedBy { it.relevance() }
-                    .map {
+                val list = response.body()?.features()
+                    ?.asSequence()
+                    ?.sortedBy { it.relevance() }
+                    ?.map {
                         var type = Location.Type.UNKNOWN
                         for (typeDesc in it.placeType()!!) {
                             type = when (typeDesc.trim().toLowerCase()) {
@@ -88,7 +88,7 @@ class Geocoder(val bounds: LatLngBounds?) {
                             it.center()!!.latlng,
                             type
                         )
-                    }.toList()
+                    }?.toList() ?: emptyList()
                 cache[query] = list
                 if (query == this@Geocoder.query)
                     onCurrentQueryEnd(list)
