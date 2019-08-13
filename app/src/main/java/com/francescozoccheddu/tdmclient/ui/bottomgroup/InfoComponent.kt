@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.ui.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_bt
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_iv
@@ -15,7 +16,7 @@ import kotlinx.android.synthetic.main.bg_info.view.bg_info_tv
 
 class InfoComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : RelativeLayout(context, attrs, defStyleAttr), BottomGroup.Component {
+) : RelativeLayout(context, attrs, defStyleAttr), GroupStateManager.GroupComponent {
 
 
     init {
@@ -36,11 +37,11 @@ class InfoComponent @JvmOverloads constructor(
 
     private var animationCallback: (() -> Unit)? = null
 
-    override fun animate(mode: BottomGroup.AnimationMode, callback: (() -> Unit)?) {
+    override fun animate(mode: GroupStateManager.GroupComponent.Mode, callback: (() -> Unit)?) {
         this.animationCallback = callback
         animationAlpha = when (mode) {
-            BottomGroup.AnimationMode.IN -> 1f
-            BottomGroup.AnimationMode.OUT -> 0f
+            GroupStateManager.GroupComponent.Mode.IN -> 1f
+            GroupStateManager.GroupComponent.Mode.OUT -> 0f
         }
     }
 

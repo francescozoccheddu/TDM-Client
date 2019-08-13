@@ -4,14 +4,12 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
-import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.data.point
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
@@ -39,7 +37,6 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import kotlinx.android.synthetic.main.bar.l_search_bar
 import kotlinx.android.synthetic.main.ma.ma_bg
 import kotlinx.android.synthetic.main.ma.ma_map
 
@@ -59,13 +56,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map: MapboxMap
     //private lateinit var searchProvider: LocationSearchProvider
     //private lateinit var snackbar: ServiceSnackbar
-    //private val permissions = Permissions(this)
-
+    private val permissions = Permissions(this)
     private lateinit var routingController: RoutingController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ma)
+
+        routingController = RoutingController(ma_bg)
+        routingController.onDestinationChanged += {
+            if (this::map.isInitialized) {
+                map.getStyle {
+                    val source = it.getSource(MB_SOURCE_DESTINATION) as GeoJsonSource
+                    val geometry = routingController.destination?.point
+                    //source.setGeoJson(Feature.fromGeometry(geometry))
+                }
+            }
+        }
 
         // Map
         ma_map.apply {
@@ -126,59 +133,25 @@ class MainActivity : AppCompatActivity() {
                             )
                     ) {
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
-                        /*if (permissions.granted)
-                            enableLocationComponent(it)*/
+                        if (permissions.granted)
+                            enableLocationComponent(it)
+                        val source = it.getSource(MB_SOURCE_DESTINATION) as GeoJsonSource
+                        val geometry = routingController.destination?.point
+                        //source.setGeoJson(Feature.fromGeometry(geometry))
                     }
-                    addOnMapClickListener {
-                        if (destinationPickEnabled)
-                            destination = it
-                        destinationPickEnabled
+
+                    addOnMapClickListener { click ->
+                        if (MainService.MAP_BOUNDS.contains(click)) {
+                            val name = service?.getDistrictName(click)
+                            Toast.makeText(this@MainActivity, name, Toast.LENGTH_SHORT).show()
+                        }
+                        routingController.pickingDestination
                     }
                 }
             }
         }
-
         /*
-        // Fab
-        run {
-
-            fab.setOnClickListener {
-                if (route != null)
-                    route = null
-                else if (destinationPickEnabled) {
-                    if (destination != null) {
-                        fabSheetMode = FabSheetMode.WALK_DURATION
-                        fab.isExpanded = true
-                    }
-                    else {
-                        destination = null
-                        destinationPickEnabled = false
-                    }
-                }
-                else {
-                    fabSheetMode = FabSheetMode.WALK_MODE
-                    fab.isExpanded = true
-                }
-                updateFab()
-            }
-
-            bt_duration_ok.setOnClickListener {
-                routing = true
-                destinationPickEnabled = false
-            }
-
-            li_walktype_destination.setOnClickListener {
-                destination = null
-                fab.isExpanded = false
-                destinationPickEnabled = true
-            }
-
-            li_walktype_nearby.setOnClickListener {
-                fabSheetMode = FabSheetMode.WALK_DURATION
-            }
-
-        }
-        // Search view
+        // Search component
         run {
 
             searchProvider = LocationSearchProvider(MAP_BOUNDS)
@@ -249,169 +222,41 @@ class MainActivity : AppCompatActivity() {
 
         */
 
-        routingController = RoutingController(ma_bg)
 
     }
 
-    private var routing = false
-        set(value) {
-            if (value != field) {
-                field = value
-                if (!value) {
-                    destinationPickEnabled = false
-                    destination = null
-                }
-                updateSnackbar()
-                updateFab()
-            }
-        }
-
-    private fun updateSnackbar() {
-        /*val service = this.service
-        snackbar.state = if (service != null) {
-            if (permissions.granted) {
-                if (service.locatable) {
-                    if (service.online) {
-                        if (service.location != null) {
-                            if (routing)
-                                ServiceSnackbar.State.ROUTING
-                            else if (service.insideMeasurementArea)
-                                null
-                            else ServiceSnackbar.State.OUTSIDE_AREA
-
-                        }
-                        else ServiceSnackbar.State.LOCATING
-                    }
-                    else ServiceSnackbar.State.OFFLINE
-                }
-                else ServiceSnackbar.State.UNLOCATABLE
-            }
-            else ServiceSnackbar.State.PERMISSIONS_UNGRANTED
-        }
-        else null*/
-    }
-
-    private var route: Any? = null
-        set(value) {
-            field = value
-            updateFab()
-        }
-
-    private enum class FabSheetMode {
-        WALK_MODE, WALK_DURATION
-    }
-
-    private var fabSheetMode = FabSheetMode.WALK_MODE
-        set(value) {
-            field = value
-            /*v_fabSheetWalkMode.visible = value == FabSheetMode.WALK_MODE
-            v_fabSheetDuration.visible = value == FabSheetMode.WALK_DURATION*/
-        }
-
-    private fun updateFab() {
-        /*fab.apply {
-            var shown = true
-            var collapse = true
-            if (route != null) {
-                setImageDrawable(R.drawable.ic_cancel)
-                setBackgroundColorRes(R.color.backgroundWarning)
-            }
-            else {
-                if (destinationPickEnabled) {
-                    if (destination != null) {
-                        setImageDrawable(R.drawable.ic_done)
-                        setBackgroundColorRes(R.color.backgroundOk)
-                        collapse = false
-                    }
-                    else {
-                        setImageDrawable(R.drawable.ic_cancel)
-                        setBackgroundColorRes(R.color.backgroundWarning)
-                    }
-                }
-                else {
-                    val service = this@MainActivity.service
-                    if (!routing && service != null && service.online && service.locatable && service.location != null) {
-                        setImageDrawable(R.drawable.ic_walk)
-                        setBackgroundColorRes(R.color.background)
-                        collapse = false
-                    }
-                    else
-                        shown = false
-                }
-            }
-            if (!shown || collapse)
-                setExpanded(false)
-            if (shown)
-                show()
-            else
-                hide()
-        }*/
-    }
-
-    private var destination: LatLng? = null
-        set(value) {
-            field = value
-            map.getStyle { style ->
-                val source = style.getSource(MB_SOURCE_DESTINATION)
-                if (source is GeoJsonSource) {
-                    if (value == null)
-                        source.setGeoJson(null as FeatureCollection?)
-                    else
-                        source.setGeoJson(value.point)
-                }
-            }
-            updateFab()
-        }
-
-
-    private var destinationPickEnabled = false
-        set(value) {
-            field = value
-            l_search_bar.visible = value
-            updateFab()
-        }
-
-    private var userLocation: LatLng? = null
-        set(value) {
-            if (field != value) {
-                if (value != null && MAP_BOUNDS.contains(value))
-                    field = value
-                else
-                    field = null
-                //searchProvider.userLocation = field
-            }
-        }
-
-    private fun ensureRoutable() {
-        if (!routing && route == null) {
-            val service = this@MainActivity.service
-            if (service == null || service.location == null || !service.online) {
-                destinationPickEnabled = false
-                destination = null
-            }
+    private fun updateRouting() {
+        routingController.problem = if (!permissions.granted)
+            RoutingController.Problem.PERMISSIONS_UNGRANTED
+        else {
+            val service = this.service
+            if (service == null)
+                RoutingController.Problem.UNBOUND
+            else if (!service.locatable)
+                RoutingController.Problem.UNLOCATABLE
+            else if (!service.online)
+                RoutingController.Problem.OFFLINE
+            else if (service.location == null)
+                RoutingController.Problem.LOCATING
+            else if (!service.insideMeasurementArea)
+                RoutingController.Problem.OUTSIDE_AREA
+            else null
         }
     }
 
     private fun onLocationChanged() {
-        ensureRoutable()
-        updateSnackbar()
-        updateFab()
+        updateRouting()
     }
 
     private fun onLocatableChange() {
-        ensureRoutable()
-        updateSnackbar()
-        updateFab()
+        updateRouting()
     }
 
     private fun onOnlineChange() {
-        ensureRoutable()
-        updateSnackbar()
-        updateFab()
+        updateRouting()
     }
 
     private fun onScoreChange() {
-
     }
 
     private fun onCoverageDataChange() {
@@ -442,6 +287,7 @@ class MainActivity : AppCompatActivity() {
                     onScoreChange()
                     onCoverageDataChange()
                 }
+                updateRouting()
             }
         }
 
@@ -458,18 +304,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onPermissionsChanged(granted: Boolean) {
-        /*if (granted) {
-            if (snackbar.state == ServiceSnackbar.State.PERMISSIONS_UNGRANTED) {
-                snackbar.state = null
-                updateSnackbar()
-            }
+        if (granted) {
             if (this::map.isInitialized)
                 map.getStyle { enableLocationComponent(it) }
             MainService.bind(this, serviceConnection)
         }
-        else
-            snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED*/
-
+        updateRouting()
     }
 
     @SuppressWarnings("MissingPermission")
@@ -490,18 +330,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        /*if (fab.isExpanded)
-            fab.isExpanded = false
-        else if (et_search.hasFocus())
-            et_search.clearFocus()
-        else if (destinationPickEnabled) {
-            if (destination != null)
-                destination = null
-            else
-                destinationPickEnabled = false
-        }
-        else
-            super.onBackPressed()*/
+        if (routingController.onBack())
+            return
+        super.onBackPressed()
     }
 
     override fun onRequestPermissionsResult(
@@ -509,7 +340,7 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        //this.permissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        this.permissions.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     public override fun onStart() {
@@ -519,14 +350,14 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onResume() {
         super.onResume()
-        /*if (permissions.granted)
+        if (permissions.granted)
             onPermissionsChanged(true)
-        else if (snackbar.state != ServiceSnackbar.State.PERMISSIONS_UNGRANTED) {
+        else if (routingController.problem != RoutingController.Problem.PERMISSIONS_UNGRANTED) {
             if (permissions.canAsk)
                 permissions.ask(this::onPermissionsChanged)
             else
-                snackbar.state = ServiceSnackbar.State.PERMISSIONS_UNGRANTED
-        }*/
+                updateRouting()
+        }
         ma_map.onResume()
     }
 

@@ -1,24 +1,31 @@
-package com.francescozoccheddu.tdmclient.ui.bottomgroup
+package com.francescozoccheddu.tdmclient.ui.topgroup
 
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.widget.RelativeLayout
 import com.francescozoccheddu.animatorhelpers.ABFloat
-import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
-import kotlinx.android.synthetic.main.bg_duration.view.bg_duration_cancel
-import kotlinx.android.synthetic.main.bg_duration.view.bg_duration_confirm
+import com.robinhood.ticker.TickerUtils
+import kotlinx.android.synthetic.main.tg_score.view.tg_score_tv
+import kotlin.random.Random
 
-class DurationComponent @JvmOverloads constructor(
+
+class ScoreComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr), GroupStateManager.GroupComponent {
 
 
     init {
-        View.inflate(context, R.layout.bg_duration, this)
+        View.inflate(context, com.francescozoccheddu.tdmclient.R.layout.tg_score, this)
+        tg_score_tv.apply {
+            setCharacterLists(TickerUtils.provideNumberList())
+            text = score.toString()
+            animationInterpolator = OvershootInterpolator()
+        }
     }
 
     private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
@@ -41,9 +48,15 @@ class DurationComponent @JvmOverloads constructor(
             GroupStateManager.GroupComponent.Mode.IN -> 1f
             GroupStateManager.GroupComponent.Mode.OUT -> 0f
         }
+        score = Random.nextInt(98484)
     }
 
-    inline fun onCancel(crossinline callback: () -> Unit) = bg_duration_cancel.setOnClickListener { callback() }
-    inline fun onConfirm(crossinline callback: () -> Unit) = bg_duration_confirm.setOnClickListener { callback() }
+    var score = 0
+        set(value) {
+            if (value != field) {
+                field = value
+                tg_score_tv.text = value.toString()
+            }
+        }
 
 }

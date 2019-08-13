@@ -32,14 +32,14 @@ class BottomGroupController(val group: BottomGroup) {
         }
 
     private fun updateState() {
-        group.mode = when (state) {
+        group.state = when (state) {
             State.PICKING_DESTINATION, State.LOCATING, State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED,
-            State.ROUTING, State.OFFLINE, State.OUTSIDE_AREA, State.ROUTING_FAILED -> BottomGroup.Mode.INFO
-            State.HIDDEN -> BottomGroup.Mode.HIDDEN
-            State.IDLE, State.ROUTED -> BottomGroup.Mode.ACTION
-            State.CONFIRMING_DESTINATION -> if (destinationName != null) BottomGroup.Mode.INFO else BottomGroup.Mode.ACTION
-            State.CHOOSING_DURATION -> BottomGroup.Mode.DURATION
-            State.CHOOSING_WALK_MODE -> BottomGroup.Mode.WALK
+            State.CONFIRMING_DESTINATION, State.ROUTING, State.OFFLINE, State.OUTSIDE_AREA,
+            State.ROUTING_FAILED -> BottomGroup.State.INFO
+            State.HIDDEN -> BottomGroup.State.HIDDEN
+            State.IDLE, State.ROUTED -> BottomGroup.State.ACTION
+            State.CHOOSING_DURATION -> BottomGroup.State.DURATION
+            State.CHOOSING_WALK_MODE -> BottomGroup.State.WALK
         }
         group.color = when (state) {
             State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED, State.OFFLINE,
@@ -59,7 +59,7 @@ class BottomGroupController(val group: BottomGroup) {
             State.OFFLINE -> getString(R.string.snackbar_offline)
             State.OUTSIDE_AREA -> getString(R.string.snackbar_outside_area)
             State.ROUTING_FAILED -> getString(R.string.snackbar_routing_failed)
-            State.CONFIRMING_DESTINATION -> destinationName ?: group.info.text
+            State.CONFIRMING_DESTINATION -> destinationName ?: getString(R.string.snackbar_unknown_place)
             else -> group.info.text
         }
         group.info.loading = when (state) {

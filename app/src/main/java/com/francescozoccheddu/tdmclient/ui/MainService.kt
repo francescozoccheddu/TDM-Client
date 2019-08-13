@@ -23,15 +23,20 @@ import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import com.francescozoccheddu.tdmclient.utils.data.latLng
+import com.francescozoccheddu.tdmclient.utils.data.latlngBounds
+import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineCallback
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
+import com.mapbox.geojson.Polygon
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.turf.TurfJoins
 import org.json.JSONObject
 import kotlin.math.roundToLong
 
@@ -197,6 +202,32 @@ class MainService : Service() {
                 coverageRetriever.periodicPoll = if (value && online) COVERAGE_INTERVAL_TIME else null
             }
         }
+    private val districts: FeatureCollection? by lazy {
+        try {
+            val json = assets.open("map.geojson").bufferedReader().use {
+                it.readText()
+            }
+            FeatureCollection.fromJson(json)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun getDistrictName(point: LatLng): String? {
+        val districts = this.districts
+        if (districts != null) {
+            val bbox = districts.bbox()
+            if (bbox == null || bbox.latlngBounds.contains(point)) {
+                val gpoint = point.point
+                val feature = districts.features()?.firstOrNull {
+                    val geometry = it.geometry()
+                    geometry is Polygon && TurfJoins.inside(gpoint, geometry)
+                }
+                return feature?.properties()?.get("name")?.asString
+            }
+        }
+        return null
+    }
 
     @SuppressLint("MissingPermission")
     override fun onCreate() {

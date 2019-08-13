@@ -25,7 +25,7 @@ private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, C
 
     override fun interpretRequest(request: CoverageRetrieveMode) = JSONObject().apply {
         put(
-            "mode", when (request) {
+            "constraintSetId", when (request) {
                 CoverageRetrieveMode.POINTS -> "points"
                 CoverageRetrieveMode.QUADS -> "quads"
             }

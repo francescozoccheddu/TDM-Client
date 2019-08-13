@@ -40,4 +40,5 @@
     <string name="snackbar_action_picking">Annulla</string>
     <string name="snackbar_action_destinated">Conferma</string>
     <string name="snackbar_action_routed">Termina</string>
+    <string name="snackbar_unknown_place">Luogo sconosciuto</string>
 </resources>
