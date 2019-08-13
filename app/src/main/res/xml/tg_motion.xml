@@ -15,6 +15,12 @@
             motion:motionInterpolator="easeOut"
     />
     <Transition
+            motion:constraintSetStart="@id/tg_cs_hidden"
+            motion:constraintSetEnd="@id/tg_cs_searching"
+            motion:duration="200"
+            motion:motionInterpolator="easeOut"
+    />
+    <Transition
             motion:constraintSetStart="@id/tg_cs_score"
             motion:constraintSetEnd="@id/tg_cs_hidden"
             motion:duration="200"
@@ -27,6 +33,12 @@
             motion:motionInterpolator="easeOut"
     />
     <Transition
+            motion:constraintSetStart="@id/tg_cs_score"
+            motion:constraintSetEnd="@id/tg_cs_searching"
+            motion:duration="200"
+            motion:motionInterpolator="easeOut"
+    />
+    <Transition
             motion:constraintSetStart="@id/tg_cs_search"
             motion:constraintSetEnd="@id/tg_cs_hidden"
             motion:duration="200"
@@ -34,6 +46,30 @@
     />
     <Transition
             motion:constraintSetStart="@id/tg_cs_search"
+            motion:constraintSetEnd="@id/tg_cs_score"
+            motion:duration="200"
+            motion:motionInterpolator="easeOut"
+    />
+    <Transition
+            motion:constraintSetStart="@id/tg_cs_search"
+            motion:constraintSetEnd="@id/tg_cs_searching"
+            motion:duration="200"
+            motion:motionInterpolator="easeOut"
+    />
+    <Transition
+            motion:constraintSetStart="@id/tg_cs_searching"
+            motion:constraintSetEnd="@id/tg_cs_search"
+            motion:duration="200"
+            motion:motionInterpolator="easeOut"
+    />
+    <Transition
+            motion:constraintSetStart="@id/tg_cs_searching"
+            motion:constraintSetEnd="@id/tg_cs_hidden"
+            motion:duration="200"
+            motion:motionInterpolator="linear"
+    />
+    <Transition
+            motion:constraintSetStart="@id/tg_cs_searching"
             motion:constraintSetEnd="@id/tg_cs_score"
             motion:duration="200"
             motion:motionInterpolator="easeOut"
@@ -57,6 +93,13 @@
                     motion:customDimension="20dp"/>
         
         </Constraint>
+        
+        <Constraint
+                android:id="@+id/tg_scrim"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0"
+        />
     
     </ConstraintSet>
     
@@ -65,7 +108,7 @@
         <Constraint
                 android:id="@+id/tg_root"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="15dp"
@@ -79,6 +122,13 @@
                     motion:customDimension="20dp"/>
         
         </Constraint>
+        
+        <Constraint
+                android:id="@+id/tg_scrim"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0"
+        />
     
     </ConstraintSet>
     
@@ -101,6 +151,13 @@
                     motion:customDimension="10dp"/>
         
         </Constraint>
+        
+        <Constraint
+                android:id="@+id/tg_scrim"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.5"
+        />
     
     </ConstraintSet>
     
@@ -122,6 +179,13 @@
                     motion:customDimension="20dp"/>
         
         </Constraint>
+        
+        <Constraint
+                android:id="@+id/tg_scrim"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0"
+        />
     
     </ConstraintSet>
 

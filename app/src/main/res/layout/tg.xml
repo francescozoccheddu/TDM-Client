@@ -3,6 +3,14 @@
        xmlns:app="http://schemas.android.com/apk/res-auto"
 >
     
+    <View
+            android:id="@+id/tg_scrim"
+            android:background="@android:color/black"
+            android:alpha="0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+    />
+    
     <Space
             android:id="@+id/tg_scorepadder"
             android:layout_width="20dp"
@@ -12,9 +20,9 @@
     
     <androidx.cardview.widget.CardView
             android:id="@+id/tg_root"
-            android:layout_width="96dp"
-            android:layout_height="42dp"
-            android:layout_marginTop="30dp"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="0dp"
             android:layout_marginStart="0dp"
             android:elevation="10dp"
@@ -22,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="parent"
             app:cardBackgroundColor="@color/background"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="20dp"
             android:padding="0px"
             app:cardUseCompatPadding="false"
             app:contentPadding="0px"
@@ -32,9 +40,7 @@
         <com.francescozoccheddu.tdmclient.ui.topgroup.ScoreComponent
                 android:id="@+id/tg_score"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                android:alpha="0"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:layout_marginEnd="26dp"
@@ -44,11 +50,11 @@
         <com.francescozoccheddu.tdmclient.ui.topgroup.SearchComponent
                 android:id="@+id/tg_search"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:alpha="0"
                 android:layout_margin="4dp"
+                android:alpha="0"
+                android:visibility="gone"
         />
     
     </androidx.cardview.widget.CardView>
