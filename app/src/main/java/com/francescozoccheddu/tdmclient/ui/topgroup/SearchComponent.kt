@@ -66,13 +66,17 @@ class SearchComponent @JvmOverloads constructor(
         })
 
         tg_search_text.setOnFocusChangeListener { _, focused ->
-            tg_search_results.visible = focused
             tg_search_close.isEnabled = focused
             if (!focused) {
                 val service = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 service.hideSoftInputFromWindow(tg_search_text.windowToken, 0)
             }
+            onFocusChanged?.invoke(focused)
         }
+    }
+
+    fun clearTextFocus() {
+        tg_search_text.clearFocus()
     }
 
     private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
@@ -88,6 +92,8 @@ class SearchComponent @JvmOverloads constructor(
     }
 
     private var animationCallback: (() -> Unit)? = null
+
+    var onFocusChanged: ((Boolean) -> Unit)? = null
 
     override fun animate(mode: GroupStateManager.GroupComponent.Mode, callback: (() -> Unit)?) {
         this.animationCallback = callback
