@@ -11,28 +11,20 @@
             android:layout_height="match_parent"
     />
     
-    <Space
-            android:id="@+id/bg_navbar"
-            android:layout_width="match_parent"
-            android:layout_height="0px"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-    />
-    
     <androidx.cardview.widget.CardView
             android:id="@+id/bg_root"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="0px"
+            android:layout_height="0px"
             android:layout_marginEnd="48dp"
             android:layout_marginBottom="48dp"
+            android:elevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:padding="0dp"
             app:contentPadding="0dp"
-            android:elevation="10dp"
             app:cardBackgroundColor="@color/background"
             android:clickable="true"
             app:cardUseCompatPadding="false"
-            app:layout_constraintBottom_toTopOf="@id/bg_navbar"
     >
         
         <com.francescozoccheddu.tdmclient.ui.bottomgroup.DurationComponent
@@ -40,6 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:alpha="0"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:layout_marginStart="18dp"
@@ -53,6 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"
+                android:alpha="0"
                 android:gravity="center"
                 android:layout_gravity="center"
         />
@@ -62,6 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:alpha="0"
                 android:gravity="center_vertical|start"
                 android:layout_gravity="start|center_vertical"
                 android:layout_margin="10dp"
@@ -72,6 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"
+                android:alpha="0"
                 android:gravity="center"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"

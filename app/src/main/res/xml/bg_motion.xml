@@ -136,7 +136,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:elevation="10dp"
-                motion:layout_constraintBottom_toTopOf="@id/bg_navbar"
+                motion:layout_constraintBottom_toBottomOf="parent"
                 motion:layout_constraintEnd_toEndOf="parent"
         >
             <CustomAttribute
@@ -163,7 +163,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:elevation="4dp"
-                motion:layout_constraintBottom_toTopOf="@id/bg_navbar"
+                motion:layout_constraintBottom_toBottomOf="parent"
                 motion:layout_constraintStart_toStartOf="parent"
                 motion:layout_constraintEnd_toEndOf="parent"
         >
@@ -191,7 +191,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:elevation="4dp"
-                motion:layout_constraintBottom_toTopOf="@id/bg_navbar"
+                motion:layout_constraintBottom_toBottomOf="parent"
                 motion:layout_constraintEnd_toEndOf="parent"
         >
             <CustomAttribute
@@ -218,7 +218,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:elevation="4dp"
-                motion:layout_constraintBottom_toTopOf="@id/bg_navbar"
+                motion:layout_constraintBottom_toBottomOf="parent"
                 motion:layout_constraintEnd_toEndOf="parent"
         >
             <CustomAttribute
@@ -244,7 +244,7 @@
                 android:layout_marginEnd="48dp"
                 android:layout_marginBottom="48dp"
                 android:elevation="0dp"
-                motion:layout_constraintBottom_toTopOf="@id/bg_navbar"
+                motion:layout_constraintBottom_toBottomOf="parent"
                 motion:layout_constraintEnd_toEndOf="parent"
         >
             <CustomAttribute

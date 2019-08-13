@@ -88,3 +88,9 @@ fun getNavigationBarHeight(context: Context): Int {
     )
     return if (id > 0) resources.getDimensionPixelSize(id) else 0
 }
+
+fun getStatusBarHeight(context: Context): Int {
+    val resources = context.resources
+    val id = resources.getIdentifier("status_bar_height", "dimen", "android")
+    return if (id > 0) resources.getDimensionPixelSize(id) else 0
+}
