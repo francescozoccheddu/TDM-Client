@@ -10,6 +10,7 @@ import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
 import com.francescozoccheddu.tdmclient.ui.topgroup.TopGroupController
 import com.francescozoccheddu.tdmclient.utils.data.point
+import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
@@ -72,11 +73,9 @@ class MainActivity : AppCompatActivity() {
         routingController = RoutingController(ma_bg)
         routingController.onDestinationChanged += {
             if (this::map.isInitialized) {
-                map.getStyle {
-                    val source = it.getSource(MB_SOURCE_DESTINATION) as GeoJsonSource
-                    val geometry = routingController.destination?.point
-                    //source.setGeoJson(Feature.fromGeometry(geometry))
-                }
+                val style = map.style
+                if (style != null)
+                    setDestinationMarker(style)
             }
         }
 
@@ -141,9 +140,7 @@ class MainActivity : AppCompatActivity() {
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
                         if (permissions.granted)
                             enableLocationComponent(it)
-                        val source = it.getSource(MB_SOURCE_DESTINATION) as GeoJsonSource
-                        val geometry = routingController.destination?.point
-                        //source.setGeoJson(Feature.fromGeometry(geometry))
+                        setDestinationMarker(it)
                     }
                     addOnMapClickListener { click ->
                         if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
@@ -169,6 +166,17 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    private fun setDestinationMarker(style: Style) {
+        val source = style.getSource(MB_SOURCE_DESTINATION)
+        if (source is GeoJsonSource) {
+            val destination = routingController.destination
+            if (destination == null)
+                source.setGeoJson(null as FeatureCollection?)
+            else
+                source.setGeoJson(destination.point)
+        }
     }
 
     private fun updateRouting() {
