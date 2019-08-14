@@ -22,6 +22,11 @@
             mapbox:mapbox_accuracyAnimationEnabled="true"
     />
     
+    <com.francescozoccheddu.tdmclient.ui.topgroup.TopGroup
+            android:id="@+id/ma_tg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    
     <com.francescozoccheddu.tdmclient.ui.bottomgroup.BottomGroup
             android:id="@+id/ma_bg"
             android:layout_width="match_parent"

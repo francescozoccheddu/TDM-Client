@@ -3,7 +3,7 @@ package com.francescozoccheddu.tdmclient.ui.bottomgroup
 import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
 
-class BottomGroupController(val group: BottomGroup) {
+class BottomGroupController(private val group: BottomGroup) {
 
     enum class State {
         LOCATING, UNLOCATABLE, PERMISSIONS_UNGRANTED, ROUTING, HIDDEN,

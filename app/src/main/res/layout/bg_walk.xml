@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-
+    
     <LinearLayout
             android:id="@+id/bg_walk_nearby"
             android:layout_width="match_parent"
@@ -12,24 +12,24 @@
             android:paddingEnd="12dp"
             android:gravity="start|center_vertical"
     >
-
+        
         <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:padding="12dp"
                 android:layout_marginRight="6dp"
-                android:src="@android:drawable/ic_dialog_map"
+                android:src="@drawable/ic_walk_nearby"
         />
-
+        
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vicinato"
                 style="@style/TextAppearance.MaterialComponents.Body2"
         />
-
+    
     </LinearLayout>
-
+    
     <LinearLayout
             android:id="@+id/bg_walk_destination"
             android:layout_width="match_parent"
@@ -41,22 +41,22 @@
             android:paddingEnd="12dp"
             android:gravity="start|center_vertical"
     >
-
+        
         <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:padding="12dp"
                 android:layout_marginRight="6dp"
-                android:src="@android:drawable/ic_dialog_map"
+                android:src="@drawable/ic_walk_destination"
         />
-
+        
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Destinazione"
                 style="@style/TextAppearance.MaterialComponents.Body2"
         />
-
+    
     </LinearLayout>
 
 </merge>

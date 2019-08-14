@@ -8,6 +8,24 @@
         <item name="colorPrimaryDark">@color/backgroundDark</item>
         <item name="colorAccent">@color/foreground</item>
         <item name="android:textColor">@color/foreground</item>
+        <item name="android:tint">@color/foreground</item>
+        <!--
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        -->
+    </style>
+    
+    <style name="AppTheme.Inverted"
+           parent="AppTheme">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/backgroundInv</item>
+        <item name="colorPrimaryDark">@color/backgroundInv</item>
+        <item name="colorAccent">@color/foregroundInv</item>
+        <item name="android:textColor">@color/foregroundInv</item>
+        <item name="android:tint">@color/foregroundInv</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="colorControlHighlight">@color/foregroundInvHighlight</item>
+        <item name="android:textColorHighlight">@color/foregroundInvHighlight</item>
         <!--
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>

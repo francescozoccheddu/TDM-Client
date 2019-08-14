@@ -4,11 +4,11 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
+import com.francescozoccheddu.tdmclient.ui.topgroup.TopGroupController
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
@@ -39,6 +39,7 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.ma.ma_bg
 import kotlinx.android.synthetic.main.ma.ma_map
+import kotlinx.android.synthetic.main.ma.ma_tg
 
 class MainActivity : AppCompatActivity() {
 
@@ -58,11 +59,16 @@ class MainActivity : AppCompatActivity() {
     //private lateinit var snackbar: ServiceSnackbar
     private val permissions = Permissions(this)
     private lateinit var routingController: RoutingController
+    private lateinit var topGroupController: TopGroupController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ma)
 
+        topGroupController = TopGroupController(ma_tg)
+        topGroupController.onDestinationChosen = {
+            routingController.setDestination(it.point, it.name, true)
+        }
         routingController = RoutingController(ma_bg)
         routingController.onDestinationChanged += {
             if (this::map.isInitialized) {
@@ -139,88 +145,28 @@ class MainActivity : AppCompatActivity() {
                         val geometry = routingController.destination?.point
                         //source.setGeoJson(Feature.fromGeometry(geometry))
                     }
-
                     addOnMapClickListener { click ->
-                        if (MainService.MAP_BOUNDS.contains(click)) {
-                            val name = service?.getDistrictName(click)
-                            Toast.makeText(this@MainActivity, name, Toast.LENGTH_SHORT).show()
+                        if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
+                            val screenPoint = map.projection.toScreenLocation(click)
+                            val features = map.queryRenderedFeatures(screenPoint, MB_LAYER_DESTINATION)
+                            if (features.isNotEmpty()) {
+                                routingController.removeDestination()
+                                true
+                            }
+                            else {
+                                val name = service?.getDistrictName(click)
+                                if (name != null) {
+                                    routingController.setDestination(click, name, false)
+                                    true
+                                }
+                                else false
+                            }
                         }
-                        routingController.pickingDestination
+                        else false
                     }
                 }
             }
         }
-        /*
-        // Search component
-        run {
-
-            searchProvider = LocationSearchProvider(MAP_BOUNDS)
-            searchProvider.onLocationClick += {
-                if (destinationPickEnabled)
-                    destination = it.point
-                et_search.clearFocus()
-            }
-
-            rv_search.apply {
-                layoutManager = LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
-                adapter = searchProvider.adapter
-            }
-
-            val ibSearchClose = findViewById<ImageButton>(R.id.ib_search_close)
-            val ibSearchClear = findViewById<ImageButton>(R.id.ib_search_clear)
-
-            ibSearchClose.setOnClickListener {
-                et_search.clearFocus()
-            }
-
-            ibSearchClear.setOnClickListener {
-                et_search.text.clear()
-            }
-
-            searchProvider.onLoadingChange += { pb_search.visible = it }
-
-            et_search.addTextChangedListener(object : TextWatcher {
-
-                override fun afterTextChanged(s: Editable) {
-                    pb_search.visible = false
-                    ibSearchClear.visibility = if (s.length > 0) View.VISIBLE else View.GONE
-                    searchProvider.query = s.toString()
-                }
-
-                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-            })
-
-            et_search.setOnFocusChangeListener { _, focused ->
-                rv_search.visibility = if (focused) View.VISIBLE else View.GONE
-                ibSearchClose.visibility = if (focused) View.VISIBLE else View.GONE
-                if (!focused) {
-                    val service = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    service.hideSoftInputFromWindow(et_search.windowToken, 0)
-                }
-            }
-        }
-
-        snackbar = ServiceSnackbar(cl_root).apply {
-
-            onLocationEnableRequest += {
-                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-            }
-            onPermissionAskRequest += {
-                if (permissions.canAsk)
-                    permissions.ask(this@MainActivity::onPermissionsChanged)
-                else
-                    permissions.openSettings()
-            }
-            onRoutingAbortRequest += {
-                routing = false
-            }
-
-        }
-
-        */
 
 
     }
@@ -242,6 +188,11 @@ class MainActivity : AppCompatActivity() {
                 RoutingController.Problem.OUTSIDE_AREA
             else null
         }
+        topGroupController.state = if (routingController.pickingDestination)
+            TopGroupController.State.SEARCHING
+        else if (routingController.problem == null)
+            TopGroupController.State.SCORE
+        else TopGroupController.State.HIDDEN
     }
 
     private fun onLocationChanged() {
@@ -257,6 +208,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onScoreChange() {
+        topGroupController.score = service?.score ?: topGroupController.score
     }
 
     private fun onCoverageDataChange() {
