@@ -10,6 +10,7 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.GroupStateManager
 import kotlinx.android.synthetic.main.tg.view.tg_root
+import kotlinx.android.synthetic.main.tg.view.tg_score
 import kotlinx.android.synthetic.main.tg.view.tg_scrim
 import kotlinx.android.synthetic.main.tg.view.tg_search
 
@@ -58,6 +59,9 @@ class TopGroup @JvmOverloads constructor(
                 tg_search.clearTextFocus()
         }
     }
+
+    val search = tg_search
+    val score = tg_score
 
     var state: State
         get() = stateManager.state

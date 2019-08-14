@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.data.Geocoder
 import com.francescozoccheddu.tdmclient.ui.GroupStateManager
 import com.francescozoccheddu.tdmclient.ui.LocationSearchProvider
 import com.francescozoccheddu.tdmclient.ui.MainService
@@ -35,6 +36,7 @@ class SearchComponent @JvmOverloads constructor(
         searchProvider.onLocationClick += {
             tg_search_text.text.clear()
             tg_search_text.clearFocus()
+            onDestinationChosen?.invoke(it)
         }
 
         tg_search_results.apply {
@@ -73,6 +75,7 @@ class SearchComponent @JvmOverloads constructor(
             }
             onFocusChanged?.invoke(focused)
         }
+
     }
 
     fun clearTextFocus() {
@@ -95,12 +98,16 @@ class SearchComponent @JvmOverloads constructor(
 
     var onFocusChanged: ((Boolean) -> Unit)? = null
 
+    var onDestinationChosen: ((Geocoder.Location) -> Unit)? = null
+
     override fun animate(mode: GroupStateManager.GroupComponent.Mode, callback: (() -> Unit)?) {
         this.animationCallback = callback
         animationAlpha = when (mode) {
             GroupStateManager.GroupComponent.Mode.IN -> 1f
             GroupStateManager.GroupComponent.Mode.OUT -> 0f
         }
+        if (mode == GroupStateManager.GroupComponent.Mode.OUT)
+            clearTextFocus()
     }
 
 }

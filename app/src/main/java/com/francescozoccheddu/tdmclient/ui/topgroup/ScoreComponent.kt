@@ -11,7 +11,6 @@ import com.francescozoccheddu.tdmclient.ui.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.robinhood.ticker.TickerUtils
 import kotlinx.android.synthetic.main.tg_score.view.tg_score_tv
-import kotlin.random.Random
 
 
 class ScoreComponent @JvmOverloads constructor(
@@ -48,7 +47,6 @@ class ScoreComponent @JvmOverloads constructor(
             GroupStateManager.GroupComponent.Mode.IN -> 1f
             GroupStateManager.GroupComponent.Mode.OUT -> 0f
         }
-        score = Random.nextInt(98484)
     }
 
     var score = 0

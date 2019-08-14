@@ -40,13 +40,22 @@ class RoutingController(group: BottomGroup) {
     private var pendingRoute: Any? = null
 
     var destination: LatLng? = null
-        set(value) {
-            if (value != field && pickingDestination) {
+        private set(value) {
+            if (value != field) {
                 field = value
                 updateState()
                 onDestinationChanged()
             }
         }
+
+    fun setDestination(destination: LatLng, name: String, exactName: Boolean) {
+        this.destination = destination
+        ui.destinationName = name
+    }
+
+    fun removeDestination() {
+        destination = null
+    }
 
     var pickingDestination = false
         private set(value) {
