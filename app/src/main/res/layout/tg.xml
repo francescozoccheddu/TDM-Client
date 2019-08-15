@@ -5,7 +5,7 @@
     
     <View
             android:id="@+id/tg_scrim"
-            android:background="@android:color/black"
+            android:background="@color/scrim"
             android:alpha="0"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -29,7 +29,6 @@
             android:minHeight="50dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="parent"
-            app:cardBackgroundColor="@color/backgroundInv"
             app:cardCornerRadius="20dp"
             android:padding="0px"
             app:cardUseCompatPadding="false"

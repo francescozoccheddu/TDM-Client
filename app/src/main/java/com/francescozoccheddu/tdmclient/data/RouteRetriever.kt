@@ -1,13 +1,11 @@
 package com.francescozoccheddu.tdmclient.data
 
-import android.location.Location
 import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import com.francescozoccheddu.tdmclient.utils.data.client.SimpleInterpreter
 import com.francescozoccheddu.tdmclient.utils.data.json
 import com.francescozoccheddu.tdmclient.utils.data.mapboxAccessToken
-import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.api.directions.v5.DirectionsCriteria
 import com.mapbox.api.directions.v5.MapboxDirections
 import com.mapbox.api.directions.v5.models.DirectionsResponse
@@ -32,24 +30,21 @@ private val INTERPRETER = object : SimpleInterpreter<RouteRequest, List<Point>>(
         JSONObject().apply {
             put("from", request.from.json)
             if (request.to != null)
-                put("to", request.from.json)
+                put("to", request.to.json)
             put("time", request.time)
         }
 
     override fun interpretResponse(request: RouteRequest, response: JSONObject): List<Point> {
         try {
             val jsonRoute = response.getJSONArray("routes").getJSONArray(0)
-            return List(
-                jsonRoute.length() + if (request.to == null) 1 else 0,
-                { i ->
-                    if (i == jsonRoute.length())
-                        request.from.point
-                    else {
-                        val point = jsonRoute.getJSONObject(i).getJSONArray("point")
-                        Point.fromLngLat(point.getDouble(0), point.getDouble(1))
-                    }
-                })
+            if (jsonRoute.length() < 2)
+                throw RuntimeException()
+            return List(jsonRoute.length(), {
+                val point = jsonRoute.getJSONObject(it).getJSONArray("point")
+                Point.fromLngLat(point.getDouble(0), point.getDouble(1))
+            })
         } catch (_: Exception) {
+            println("ROUTE ERROR:\n${response.toString(4)}")
             throw Interpreter.UninterpretableResponseException()
         }
     }
@@ -67,27 +62,31 @@ fun makeRouteRetriever(server: Server) =
     }
 
 private const val SPOT_SNAP_RADIUS = 200
-private const val ENDPOINT_SNAP_RADIUS = 50
+private const val START_SNAP_RADIUS = 50
+private const val END_SNAP_RADIUS = 50
 
-fun getDirections(origin: Point, path: List<Point>, callback: (DirectionsRoute?) -> Unit) {
-    if (path.isEmpty())
-        throw IllegalArgumentException("Empty path")
+fun getDirections(path: List<Point>, hasDestination: Boolean, callback: (DirectionsRoute?) -> Unit) {
+    if (path.size < 1)
+        throw IllegalArgumentException("Path size must be at least 2")
 
     MapboxDirections.builder().apply {
         accessToken(mapboxAccessToken)
-        origin(origin)
+        origin(path.first())
         destination(path.last())
         overview(DirectionsCriteria.OVERVIEW_FULL)
         profile(DirectionsCriteria.PROFILE_WALKING)
         language(Locale.getDefault())
-        radiuses(*DoubleArray(path.size + 1) {
-            if (it == 0 || it == path.size)
-                ENDPOINT_SNAP_RADIUS.toDouble()
+        radiuses(*DoubleArray(path.size) {
+            (if (it == 0)
+                START_SNAP_RADIUS
+            else if (hasDestination && it == path.lastIndex)
+                END_SNAP_RADIUS
             else
-                SPOT_SNAP_RADIUS.toDouble()
+                SPOT_SNAP_RADIUS)
+                .toDouble()
         })
 
-        for (i in 0 until path.lastIndex)
+        for (i in 1 until path.lastIndex)
             addWaypoint(path[i])
 
         build().enqueueCall(object : Callback<DirectionsResponse> {
@@ -95,11 +94,14 @@ fun getDirections(origin: Point, path: List<Point>, callback: (DirectionsRoute?)
                 val routes = response.body()?.routes()
                 if (routes != null && routes.size > 0)
                     callback(routes[0])
-                else
+                else {
+                    println("DIRECTIONS ERROR:\n${response.body()}")
                     callback(null)
+                }
             }
 
             override fun onFailure(call: Call<DirectionsResponse>, throwable: Throwable) {
+                println("DIRECTIONS ERROR:\n$throwable")
                 callback(null)
             }
         })

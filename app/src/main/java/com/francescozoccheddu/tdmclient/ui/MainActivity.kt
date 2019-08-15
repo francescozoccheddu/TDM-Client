@@ -2,6 +2,7 @@ package com.francescozoccheddu.tdmclient.ui
 
 import android.content.ComponentName
 import android.content.ServiceConnection
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
@@ -11,7 +12,9 @@ import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
 import com.francescozoccheddu.tdmclient.ui.topgroup.TopGroupController
 import com.francescozoccheddu.tdmclient.ui.utils.Permissions
 import com.francescozoccheddu.tdmclient.utils.data.point
+import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.LineString
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
@@ -27,6 +30,8 @@ import com.mapbox.mapboxsdk.style.expressions.Expression.stop
 import com.mapbox.mapboxsdk.style.expressions.Expression.subtract
 import com.mapbox.mapboxsdk.style.expressions.Expression.zoom
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
+import com.mapbox.mapboxsdk.style.layers.LineLayer
+import com.mapbox.mapboxsdk.style.layers.Property
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity
@@ -36,6 +41,10 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -53,6 +62,8 @@ class MainActivity : AppCompatActivity() {
         private const val MB_LAYER_DESTINATION = "source_destination"
         private const val MB_SOURCE_COVERAGE = "source_coverage"
         private const val MB_LAYER_COVERAGE = "layer_coverage"
+        private const val MB_SOURCE_DIRECTIONS = "source_directions"
+        private const val MB_LAYER_DIRECTIONS = "layer_directions"
 
     }
 
@@ -77,6 +88,13 @@ class MainActivity : AppCompatActivity() {
                 val style = map.style
                 if (style != null)
                     setDestinationMarker(style)
+            }
+        }
+        routingController.onRouteChanged += {
+            if (this::map.isInitialized) {
+                val style = map.style
+                if (style != null)
+                    setDirectionsLine(style)
             }
         }
 
@@ -136,12 +154,21 @@ class MainActivity : AppCompatActivity() {
                                             subtract(literal(1f), get("coverage"))
                                         )
                                     )
+                            ).withSource(GeoJsonSource(MB_SOURCE_DIRECTIONS))
+                            .withLayer(
+                                LineLayer(MB_LAYER_DIRECTIONS, MB_SOURCE_DIRECTIONS).withProperties(
+                                    lineCap(Property.LINE_CAP_ROUND),
+                                    lineJoin(Property.LINE_JOIN_ROUND),
+                                    lineWidth(5f),
+                                    lineColor(Color.BLACK)
+                                )
                             )
                     ) {
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
                         if (permissions.granted)
                             enableLocationComponent(it)
                         setDestinationMarker(it)
+                        setDirectionsLine(it)
                     }
                     addOnMapClickListener { click ->
                         if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
@@ -177,6 +204,19 @@ class MainActivity : AppCompatActivity() {
                 source.setGeoJson(null as FeatureCollection?)
             else
                 source.setGeoJson(destination.point)
+        }
+    }
+
+    private fun setDirectionsLine(style: Style) {
+        val source = style.getSource(MB_SOURCE_DIRECTIONS)
+        if (source is GeoJsonSource) {
+            val directions = routingController.route
+            if (directions == null)
+                source.setGeoJson(null as FeatureCollection?)
+            else
+                source.setGeoJson(
+                    LineString.fromPolyline(directions.geometry()!!, PRECISION_6)
+                )
         }
     }
 

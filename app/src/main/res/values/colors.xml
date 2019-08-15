@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="backgroundInv">#FFF</color>
+    <color name="backgroundLight">#26C6DA</color>
     <color name="background">#2196F3</color>
     <color name="backgroundDark">#0D47A1</color>
     <color name="foreground">#FFF</color>
-    <color name="foregroundInv">#000</color>
-    <color name="foregroundInvHint">#303030</color>
-    <color name="foregroundInvHighlight">#D8D8D8</color>
+    <color name="foregroundLight">#81D4FA</color>
     <color name="backgroundOk">#4CAF50</color>
     <color name="backgroundWarning">#FF9800</color>
     <color name="backgroundError">#F44336</color>
+    <color name="scrim">#000</color>
 </resources>

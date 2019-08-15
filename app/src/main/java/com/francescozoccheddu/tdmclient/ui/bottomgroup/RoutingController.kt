@@ -1,7 +1,7 @@
 package com.francescozoccheddu.tdmclient.ui.bottomgroup
 
 import com.francescozoccheddu.tdmclient.data.Geocoder
-import com.francescozoccheddu.tdmclient.ui.Router
+import com.francescozoccheddu.tdmclient.ui.utils.Router
 import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.data.latLng
@@ -38,9 +38,10 @@ class RoutingController(group: BottomGroup) {
             }
         }
         ui.onConfirmRouting = {
+            pickingDestination = false
             ui.state = BottomGroupController.State.ROUTING
             if (service != null)
-                router.request(destination, ui.time)
+                router.request(destination, ui.time * 60f)
             else
                 router.onResult?.invoke(null)
         }
