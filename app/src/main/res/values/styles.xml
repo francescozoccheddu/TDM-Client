@@ -15,21 +15,9 @@
         -->
     </style>
     
-    <style name="AppTheme.Inverted"
-           parent="AppTheme">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/backgroundInv</item>
-        <item name="colorPrimaryDark">@color/backgroundInv</item>
-        <item name="colorAccent">@color/foregroundInv</item>
-        <item name="android:textColor">@color/foregroundInv</item>
-        <item name="android:tint">@color/foregroundInv</item>
-        <item name="android:textCursorDrawable">@null</item>
-        <item name="colorControlHighlight">@color/foregroundInvHighlight</item>
-        <item name="android:textColorHighlight">@color/foregroundInvHighlight</item>
-        <!--
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        -->
+    <style name="AppTheme.materialCardStyle"
+           parent="@style/Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/background</item>
     </style>
 
 </resources>

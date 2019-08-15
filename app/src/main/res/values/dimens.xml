@@ -6,4 +6,15 @@
     <dimen name="bar_margin">10dp</dimen>
     <dimen name="snackbar_loading_size">20dp</dimen>
     <dimen name="snackbar_icon_size">20dp</dimen>
+    <dimen name="fab_size">64dp</dimen>
+    <dimen name="sheet_corner_radius">8dp</dimen>
+    <dimen name="fab_elevation">8dp</dimen>
+    <dimen name="sheet_elevation">4dp</dimen>
+    <dimen name="sheet_margin">4dp</dimen>
+    <dimen name="fab_margin">4dp</dimen>
+    <dimen name="search_margin">4dp</dimen>
+    <dimen name="score_elevation">6dp</dimen>
+    <dimen name="bg_duration_height">300dp</dimen>
+    <dimen name="bg_walk_height">100dp</dimen>
+    <dimen name="bg_walk_width">150dp</dimen>
 </resources>

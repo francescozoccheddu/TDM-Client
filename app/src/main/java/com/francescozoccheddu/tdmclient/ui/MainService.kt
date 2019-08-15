@@ -15,7 +15,6 @@ import com.francescozoccheddu.tdmclient.data.FakeSensor
 import com.francescozoccheddu.tdmclient.data.RouteRequest
 import com.francescozoccheddu.tdmclient.data.RouteRetriever
 import com.francescozoccheddu.tdmclient.data.SensorDriver
-import com.francescozoccheddu.tdmclient.data.getDirections
 import com.francescozoccheddu.tdmclient.data.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.data.makeRouteRetriever
 import com.francescozoccheddu.tdmclient.ui.utils.ServiceNotification
@@ -33,7 +32,6 @@ import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.geojson.Polygon
@@ -165,14 +163,6 @@ class MainService : Service() {
             return routeRetriever.Request(RouteRequest(from.latLng, to, time))
         else
             throw IllegalStateException("'${this::location.name}' is null")
-    }
-
-    fun getDirections(spots: List<Point>, callback: (DirectionsRoute?) -> Unit) {
-        val from = location
-        if (from == null)
-            callback(null)
-        else
-            getDirections(from.point, spots, callback)
     }
 
     private val locationCallback = object : LocationEngineCallback<LocationEngineResult> {

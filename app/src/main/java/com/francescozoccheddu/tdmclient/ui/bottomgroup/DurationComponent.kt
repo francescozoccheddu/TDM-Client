@@ -54,7 +54,6 @@ class DurationComponent @JvmOverloads constructor(
 
     var minTime = 0f
         set(value) {
-            println("MINTIME=$value")
             if (value < 0f)
                 throw IllegalArgumentException("'${this::minTime.name}' cannot be negative")
             bg_duration_time.apply {

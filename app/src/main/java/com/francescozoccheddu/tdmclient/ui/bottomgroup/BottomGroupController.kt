@@ -43,9 +43,9 @@ class BottomGroupController(private val group: BottomGroup) {
         group.state = when (state) {
             State.PICKING_DESTINATION, State.LOCATING, State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED,
             State.CONFIRMING_DESTINATION, State.ROUTING, State.OFFLINE, State.OUTSIDE_AREA,
-            State.ROUTING_FAILED -> BottomGroup.State.INFO
+            State.ROUTING_FAILED, State.ROUTED -> BottomGroup.State.INFO
             State.HIDDEN -> BottomGroup.State.HIDDEN
-            State.IDLE, State.ROUTED -> BottomGroup.State.ACTION
+            State.IDLE -> BottomGroup.State.ACTION
             State.CHOOSING_DURATION -> BottomGroup.State.DURATION
             State.CHOOSING_WALK_MODE -> BottomGroup.State.WALK
         }
@@ -53,9 +53,9 @@ class BottomGroupController(private val group: BottomGroup) {
             State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED, State.OFFLINE,
             State.ROUTING_FAILED -> getColor(R.color.backgroundError)
             State.LOCATING, State.ROUTING, State.IDLE, State.CHOOSING_WALK_MODE,
-            State.CHOOSING_DURATION, State.PICKING_DESTINATION -> getColor(R.color.background)
+            State.CHOOSING_DURATION, State.PICKING_DESTINATION, State.ROUTED -> getColor(R.color.background)
             State.HIDDEN -> group.color
-            State.OUTSIDE_AREA, State.ROUTED -> getColor(R.color.backgroundWarning)
+            State.OUTSIDE_AREA -> getColor(R.color.backgroundWarning)
             State.CONFIRMING_DESTINATION -> getColor(R.color.backgroundOk)
         }
         group.info.text = when (state) {
@@ -67,6 +67,7 @@ class BottomGroupController(private val group: BottomGroup) {
             State.OFFLINE -> getString(R.string.snackbar_offline)
             State.OUTSIDE_AREA -> getString(R.string.snackbar_outside_area)
             State.ROUTING_FAILED -> getString(R.string.snackbar_routing_failed)
+            State.ROUTED -> getString(R.string.snackbar_routed)
             State.CONFIRMING_DESTINATION -> destinationName ?: getString(R.string.snackbar_unknown_place)
             else -> group.info.text
         }
@@ -79,6 +80,7 @@ class BottomGroupController(private val group: BottomGroup) {
             State.OFFLINE -> R.drawable.ic_offline
             State.PERMISSIONS_UNGRANTED, State.ROUTING_FAILED -> R.drawable.ic_warning
             State.CONFIRMING_DESTINATION, State.PICKING_DESTINATION -> R.drawable.ic_place
+            State.ROUTED -> R.drawable.ic_directions
             else -> group.info.icon
         }
         group.modal = when (state) {
