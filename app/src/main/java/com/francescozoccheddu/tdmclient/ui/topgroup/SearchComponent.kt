@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.data.Geocoder
+import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import com.francescozoccheddu.tdmclient.ui.utils.LocationSearchProvider
 import com.francescozoccheddu.tdmclient.utils.android.visible
@@ -97,7 +97,7 @@ class SearchComponent @JvmOverloads constructor(
 
     var onFocusChanged: ((Boolean) -> Unit)? = null
 
-    var onDestinationChosen: ((Geocoder.Location) -> Unit)? = null
+    var onDestinationChosen: ((PlaceQuerier.Location) -> Unit)? = null
 
     override fun animate(mode: GroupStateManager.GroupComponent.Mode, callback: (() -> Unit)?) {
         this.animationCallback = callback

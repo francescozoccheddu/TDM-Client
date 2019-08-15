@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import org.json.JSONArray
+import java.util.*
 
 
 val Point.latlng get() = LatLng(latitude(), longitude())
@@ -44,3 +45,7 @@ fun isLocationEnabled(context: Context): Boolean {
         mode != Settings.Secure.LOCATION_MODE_OFF
     }
 }
+
+val countryLocale get() = Locale.ITALY
+
+val languageLocale get() = Locale.ITALIAN

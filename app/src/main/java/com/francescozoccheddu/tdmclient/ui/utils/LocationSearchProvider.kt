@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.data.Geocoder
+import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -42,14 +42,14 @@ class LocationSearchProvider {
             private val ivIcon = viewGroup.findViewById<ImageView>(R.id.iv_icon)
             private val tvDistance = viewGroup.findViewById<TextView>(R.id.tv_distance)
 
-            fun bind(location: Geocoder.Location) {
+            fun bind(location: PlaceQuerier.Location) {
                 tvName.text = location.name
                 ivIcon.setImageResource(
                     when (location.type) {
-                        Geocoder.Location.Type.ADDRESS -> R.drawable.ic_map
-                        Geocoder.Location.Type.PLACE -> R.drawable.ic_terrain
-                        Geocoder.Location.Type.POI -> R.drawable.ic_place
-                        Geocoder.Location.Type.UNKNOWN -> R.drawable.ic_place
+                        PlaceQuerier.Location.Type.ADDRESS -> R.drawable.ic_map
+                        PlaceQuerier.Location.Type.PLACE -> R.drawable.ic_terrain
+                        PlaceQuerier.Location.Type.POI -> R.drawable.ic_place
+                        PlaceQuerier.Location.Type.UNKNOWN -> R.drawable.ic_place
                     }
                 )
                 updateDistance()
@@ -68,9 +68,9 @@ class LocationSearchProvider {
             }
         }
 
-        private val list = mutableListOf<Geocoder.Location>()
+        private val list = mutableListOf<PlaceQuerier.Location>()
 
-        fun setList(list: Collection<Geocoder.Location>) {
+        fun setList(list: Collection<PlaceQuerier.Location>) {
             this.list.clear()
             this.list.addAll(list)
             notifyDataSetChanged()
@@ -110,7 +110,7 @@ class LocationSearchProvider {
             }
         }
 
-    private val geocoder = Geocoder().apply {
+    private val geocoder = PlaceQuerier().apply {
         onResult += { _adapter.setList(it.result!!) }
         onLoadingChange += { this@LocationSearchProvider.onLoadingChange(it.loading) }
     }
@@ -124,7 +124,7 @@ class LocationSearchProvider {
     private val _adapter = SearchListAdapter()
     val adapter: RecyclerView.Adapter<*> = _adapter
 
-    val onLocationClick = FuncEvent<Geocoder.Location>()
+    val onLocationClick = FuncEvent<PlaceQuerier.Location>()
 
     val onLoadingChange = FuncEvent<Boolean>()
 
