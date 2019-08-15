@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui
+package com.francescozoccheddu.tdmclient.ui.utils
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,11 +11,10 @@ import com.francescozoccheddu.tdmclient.data.Geocoder
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import kotlin.math.roundToInt
 
 
-class LocationSearchProvider(bounds: LatLngBounds) {
+class LocationSearchProvider {
 
     private inner class SearchListAdapter : RecyclerView.Adapter<SearchListAdapter.ViewHolder>() {
 
@@ -111,7 +110,7 @@ class LocationSearchProvider(bounds: LatLngBounds) {
             }
         }
 
-    private val geocoder = Geocoder(bounds).apply {
+    private val geocoder = Geocoder().apply {
         onResult += { _adapter.setList(it.result!!) }
         onLoadingChange += { this@LocationSearchProvider.onLoadingChange(it.loading) }
     }

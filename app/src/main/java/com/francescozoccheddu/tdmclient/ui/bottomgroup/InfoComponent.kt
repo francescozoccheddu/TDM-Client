@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.ui.GroupStateManager
+import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_bt
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_iv

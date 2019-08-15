@@ -7,7 +7,7 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.motion.widget.MotionLayout
 import com.francescozoccheddu.animatorhelpers.SpringColor
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.ui.GroupStateManager
+import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import kotlinx.android.synthetic.main.bg.view.bg_action
 import kotlinx.android.synthetic.main.bg.view.bg_duration
 import kotlinx.android.synthetic.main.bg.view.bg_info

@@ -9,6 +9,7 @@ import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
 import com.francescozoccheddu.tdmclient.ui.topgroup.TopGroupController
+import com.francescozoccheddu.tdmclient.ui.utils.Permissions
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -247,6 +248,7 @@ class MainActivity : AppCompatActivity() {
                     onScoreChange()
                     onCoverageDataChange()
                 }
+                routingController.service = value
                 updateRouting()
             }
         }

@@ -1,20 +1,54 @@
 package com.francescozoccheddu.tdmclient.data
 
+import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.data.boundingBox
 import com.francescozoccheddu.tdmclient.utils.data.latlng
 import com.francescozoccheddu.tdmclient.utils.data.mapboxAccessToken
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import retrofit2.Call
+import retrofit2.Response
 import java.util.*
 
-class Geocoder(val bounds: LatLngBounds?) {
+class Geocoder {
 
-    private companion object {
+    companion object {
         private const val MAX_RESULTS = 4
         private const val CACHE_SIZE = 100
+
+        private val FORWARD_BUILDER = MapboxGeocoding.builder()
+            .accessToken(mapboxAccessToken)
+            .autocomplete(true)
+            .limit(MAX_RESULTS)
+            .languages(Locale.ITALIAN)
+            .country(Locale.ITALY)
+            .geocodingTypes("district", "place", "locality", "neighborhood", "address", "poi")
+            .bbox(MainService.MAP_BOUNDS.boundingBox)
+
+        private val REVERSE_BUILDER = MapboxGeocoding.builder()
+            .accessToken(mapboxAccessToken)
+            .languages(Locale.ITALIAN)
+            .country(Locale.ITALY)
+
+        fun reverse(point: Point, callback: (String?) -> Unit) {
+            REVERSE_BUILDER.query(point).build().enqueueCall(object : retrofit2.Callback<GeocodingResponse> {
+                override fun onFailure(call: Call<GeocodingResponse>, t: Throwable) {
+                    callback(null)
+                }
+
+                override fun onResponse(call: Call<GeocodingResponse>, response: Response<GeocodingResponse>) {
+                    val features = response.body()?.features()
+                    if (features != null && features.isNotEmpty())
+                        callback(features[0].text())
+                    else callback(null)
+                }
+
+            })
+        }
+
     }
 
     data class Location(val name: String, val point: LatLng, val type: Type) {
@@ -24,15 +58,6 @@ class Geocoder(val bounds: LatLngBounds?) {
         }
     }
 
-    val builder = MapboxGeocoding.builder()
-        .accessToken(mapboxAccessToken)
-        .autocomplete(true)
-        .limit(MAX_RESULTS)
-        .languages(Locale.getDefault())
-        .geocodingTypes("district", "place", "locality", "neighborhood", "address", "poi").apply {
-            if (bounds != null)
-                bbox(bounds.boundingBox)
-        }
 
     private val cache = object : LinkedHashMap<String, List<Location>>() {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<Location>>?) =
@@ -65,7 +90,7 @@ class Geocoder(val bounds: LatLngBounds?) {
     private fun request(query: String) {
         loading = true
         result = null
-        builder.query(query).build().enqueueCall(object : retrofit2.Callback<GeocodingResponse> {
+        FORWARD_BUILDER.query(query).build().enqueueCall(object : retrofit2.Callback<GeocodingResponse> {
             override fun onResponse(
                 call: retrofit2.Call<GeocodingResponse>,
                 response: retrofit2.Response<GeocodingResponse>
@@ -100,6 +125,7 @@ class Geocoder(val bounds: LatLngBounds?) {
             }
         })
     }
+
 
     fun onCurrentQueryEnd(result: List<Location>?) {
         loading = false

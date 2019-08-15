@@ -15,8 +15,10 @@ import com.francescozoccheddu.tdmclient.data.FakeSensor
 import com.francescozoccheddu.tdmclient.data.RouteRequest
 import com.francescozoccheddu.tdmclient.data.RouteRetriever
 import com.francescozoccheddu.tdmclient.data.SensorDriver
+import com.francescozoccheddu.tdmclient.data.getDirections
 import com.francescozoccheddu.tdmclient.data.makeCoverageRetriever
 import com.francescozoccheddu.tdmclient.data.makeRouteRetriever
+import com.francescozoccheddu.tdmclient.ui.utils.ServiceNotification
 import com.francescozoccheddu.tdmclient.utils.android.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclient.utils.android.LocationStatusReceiver
 import com.francescozoccheddu.tdmclient.utils.android.Timer
@@ -31,6 +33,7 @@ import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.geojson.Polygon
@@ -156,21 +159,20 @@ class MainService : Service() {
         sensorDriver.requestScoreUpdate()
     }
 
-    fun requestRoute(to: Location?, time: Float, callback: (RouteRequest, List<Point>?) -> Unit) {
+    fun requestRoute(to: LatLng?, time: Float): Server.Service<RouteRequest, List<Point>>.Request {
         val from = location
-        if (from != null) {
-            routeRetriever.Request(RouteRequest(from, to, time)).apply {
-                onStatusChange += {
-                    if (it.status.succeeded)
-                        callback(it.request, it.response)
-                    else if (!it.status.pending)
-                        callback(it.request, null)
-                }
-                start()
-            }
-        }
+        if (from != null)
+            return routeRetriever.Request(RouteRequest(from.latLng, to, time))
         else
             throw IllegalStateException("'${this::location.name}' is null")
+    }
+
+    fun getDirections(spots: List<Point>, callback: (DirectionsRoute?) -> Unit) {
+        val from = location
+        if (from == null)
+            callback(null)
+        else
+            getDirections(from.point, spots, callback)
     }
 
     private val locationCallback = object : LocationEngineCallback<LocationEngineResult> {

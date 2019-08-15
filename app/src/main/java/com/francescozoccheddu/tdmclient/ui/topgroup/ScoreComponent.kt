@@ -7,7 +7,7 @@ import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.RelativeLayout
 import com.francescozoccheddu.animatorhelpers.ABFloat
-import com.francescozoccheddu.tdmclient.ui.GroupStateManager
+import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.robinhood.ticker.TickerUtils
 import kotlinx.android.synthetic.main.tg_score.view.tg_score_tv
