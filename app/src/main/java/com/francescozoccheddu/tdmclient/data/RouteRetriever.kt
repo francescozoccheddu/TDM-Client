@@ -13,6 +13,7 @@ import com.mapbox.api.directions.v5.MapboxDirections
 import com.mapbox.api.directions.v5.models.DirectionsResponse
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.geojson.Point
+import com.mapbox.mapboxsdk.geometry.LatLng
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,7 +24,7 @@ import java.util.*
 private const val SERVICE_ADDRESS = "getroute"
 private val DEFAULT_RETRY_POLICY = RetryPolicy(6f)
 
-data class RouteRequest(val from: Location, val to: Location?, val time: Float)
+data class RouteRequest(val from: LatLng, val to: LatLng?, val time: Float)
 
 private val INTERPRETER = object : SimpleInterpreter<RouteRequest, List<Point>>() {
 

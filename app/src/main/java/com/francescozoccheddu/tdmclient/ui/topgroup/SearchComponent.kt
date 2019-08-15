@@ -13,9 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.Geocoder
-import com.francescozoccheddu.tdmclient.ui.GroupStateManager
-import com.francescozoccheddu.tdmclient.ui.LocationSearchProvider
-import com.francescozoccheddu.tdmclient.ui.MainService
+import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
+import com.francescozoccheddu.tdmclient.ui.utils.LocationSearchProvider
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import kotlinx.android.synthetic.main.tg_search.view.tg_search_clear
 import kotlinx.android.synthetic.main.tg_search.view.tg_search_close
@@ -28,7 +27,7 @@ class SearchComponent @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr), GroupStateManager.GroupComponent {
 
 
-    private val searchProvider = LocationSearchProvider(MainService.MAP_BOUNDS)
+    private val searchProvider = LocationSearchProvider()
 
     init {
         orientation = VERTICAL

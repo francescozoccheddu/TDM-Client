@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.ui.GroupStateManager
+import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import kotlinx.android.synthetic.main.bg_walk.view.bg_walk_destination
 import kotlinx.android.synthetic.main.bg_walk.view.bg_walk_nearby

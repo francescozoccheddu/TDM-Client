@@ -31,6 +31,14 @@ class BottomGroupController(private val group: BottomGroup) {
             }
         }
 
+    val time get() = group.duration.time
+
+    var minTime
+        get() = group.duration.minTime
+        set(value) {
+            group.duration.minTime = value
+        }
+
     private fun updateState() {
         group.state = when (state) {
             State.PICKING_DESTINATION, State.LOCATING, State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED,

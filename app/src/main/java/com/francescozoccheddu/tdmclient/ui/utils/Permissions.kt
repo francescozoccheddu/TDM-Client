@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui
+package com.francescozoccheddu.tdmclient.ui.utils
 
 import android.Manifest
 import android.app.Activity

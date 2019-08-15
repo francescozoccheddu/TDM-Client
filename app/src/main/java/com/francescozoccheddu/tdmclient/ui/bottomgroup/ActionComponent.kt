@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import androidx.cardview.widget.CardView
 import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.ui.GroupStateManager
+import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
 
 class ActionComponent @JvmOverloads constructor(

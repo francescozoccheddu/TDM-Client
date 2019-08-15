@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto">
+    
     <TextView
             android:id="@+id/bg_duration_tv"
             android:layout_width="wrap_content"
@@ -10,7 +11,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
     />
-
+    
     <com.google.android.material.button.MaterialButton
             android:id="@+id/bg_duration_confirm"
             android:layout_height="wrap_content"
@@ -20,7 +21,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
     />
-
+    
     <com.google.android.material.button.MaterialButton
             android:id="@+id/bg_duration_cancel"
             android:layout_height="wrap_content"
@@ -30,7 +31,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
     />
-
+    
     <com.francescozoccheddu.knob.KnobView
             android:id="@+id/bg_duration_time"
             android:layout_width="wrap_content"
@@ -42,6 +43,13 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:layout_below="@+id/bg_duration_tv"
+            app:startValue="0"
+            app:minValue="0"
+            app:trackValue="60"
+            app:snap="5"
+            app:maxValue="240"
+            app:keyboardStep="5"
+            app:thicks="12"
     />
 
 </merge>

@@ -8,7 +8,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.motion.widget.MotionLayout
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.ui.GroupStateManager
+import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import kotlinx.android.synthetic.main.tg.view.tg_root
 import kotlinx.android.synthetic.main.tg.view.tg_score
 import kotlinx.android.synthetic.main.tg.view.tg_scrim

@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui
+package com.francescozoccheddu.tdmclient.ui.utils
 
 import android.view.View
 import androidx.constraintlayout.motion.widget.MotionLayout

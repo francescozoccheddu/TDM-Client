@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui
+package com.francescozoccheddu.tdmclient.ui.utils
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,6 +11,8 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.ui.MainActivity
+import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.android.addAction
 import com.francescozoccheddu.tdmclient.utils.android.makeActivityIntent
 import com.francescozoccheddu.tdmclient.utils.android.setContentText
@@ -41,14 +43,17 @@ class ServiceNotification(val service: MainService) {
             else this
 
         private fun makeBuilder(context: Context) =
-            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
+            NotificationCompat.Builder(context,
+                NOTIFICATION_CHANNEL
+            )
                 .setContentIntent(makeActivityIntent(context, MainActivity::class.java))
                 .setContentTitle(R.string.notification_title)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
 
         fun notifySensorConnectionLost(context: Context) {
             notify(
-                context, SENSOR_LOST_NOTIFICATION_ID,
+                context,
+                SENSOR_LOST_NOTIFICATION_ID,
                 makeBuilder(context)
                     .setContentText(R.string.notification_content_device_lost)
                     .build()
@@ -65,7 +70,9 @@ class ServiceNotification(val service: MainService) {
         update()
     }
 
-    private val builder get() = makeBuilder(service)
+    private val builder get() = makeBuilder(
+        service
+    )
 
     private val okNotification by lazy {
         builder
@@ -112,7 +119,8 @@ class ServiceNotification(val service: MainService) {
         OK, UNKNOWN_LOCATION, UNLOCATABLE, OFFLINE, UNREACHABLE
     }
 
-    private var notificationType: NotificationType = NotificationType.OK
+    private var notificationType: NotificationType =
+        NotificationType.OK
         set(value) {
             if (value != field) {
                 field = value
