@@ -2,11 +2,9 @@ package com.francescozoccheddu.tdmclient.ui
 
 import android.content.ComponentName
 import android.content.ServiceConnection
-import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
-import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
 import com.francescozoccheddu.tdmclient.ui.topgroup.TopGroupController
@@ -20,6 +18,7 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.localization.LocalizationPlugin
 import com.mapbox.mapboxsdk.style.expressions.Expression.get
 import com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity
 import com.mapbox.mapboxsdk.style.expressions.Expression.interpolate
@@ -42,7 +41,6 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
@@ -52,11 +50,15 @@ import kotlinx.android.synthetic.main.ma.ma_bg
 import kotlinx.android.synthetic.main.ma.ma_map
 import kotlinx.android.synthetic.main.ma.ma_tg
 
+
 class MainActivity : AppCompatActivity() {
 
     private companion object {
 
         private const val MAP_STYLE_URI = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
+        private const val MIN_ZOOM = 9.0
+        private const val MAX_ZOOM = 20.0
+
         private const val MB_IMAGE_DESTINATION = "image_destination"
         private const val MB_SOURCE_DESTINATION = "source_destination"
         private const val MB_LAYER_DESTINATION = "source_destination"
@@ -76,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.ma)
+        setContentView(com.francescozoccheddu.tdmclient.R.layout.ma)
 
         topGroupController = TopGroupController(ma_tg)
         topGroupController.onDestinationChosen = {
@@ -106,7 +108,10 @@ class MainActivity : AppCompatActivity() {
                     setStyle(
                         Style.Builder()
                             .fromUri(MAP_STYLE_URI)
-                            .withImage(MB_IMAGE_DESTINATION, resources.getDrawable(R.drawable.ic_somewhere, null))
+                            .withImage(
+                                MB_IMAGE_DESTINATION,
+                                resources.getDrawable(com.francescozoccheddu.tdmclient.R.drawable.ic_somewhere, null)
+                            )
                             .withSource(GeoJsonSource(MB_SOURCE_DESTINATION))
                             .withLayer(
                                 SymbolLayer(MB_LAYER_DESTINATION, MB_SOURCE_DESTINATION)
@@ -159,16 +164,20 @@ class MainActivity : AppCompatActivity() {
                                 LineLayer(MB_LAYER_DIRECTIONS, MB_SOURCE_DIRECTIONS).withProperties(
                                     lineCap(Property.LINE_CAP_ROUND),
                                     lineJoin(Property.LINE_JOIN_ROUND),
-                                    lineWidth(5f),
-                                    lineColor(Color.BLACK)
+                                    lineWidth(5f)
                                 )
                             )
-                    ) {
+                    ) { style ->
+                        LocalizationPlugin(ma_map, map, style).apply {
+                            matchMapLanguageWithDeviceDefault()
+                        }
+                        setMaxZoomPreference(MAX_ZOOM)
+                        setMinZoomPreference(MIN_ZOOM)
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
                         if (permissions.granted)
-                            enableLocationComponent(it)
-                        setDestinationMarker(it)
-                        setDirectionsLine(it)
+                            enableLocationComponent(style)
+                        setDestinationMarker(style)
+                        setDirectionsLine(style)
                     }
                     addOnMapClickListener { click ->
                         if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
@@ -213,10 +222,10 @@ class MainActivity : AppCompatActivity() {
             val directions = routingController.route
             if (directions == null)
                 source.setGeoJson(null as FeatureCollection?)
-            else
-                source.setGeoJson(
-                    LineString.fromPolyline(directions.geometry()!!, PRECISION_6)
-                )
+            else {
+                source.setGeoJson(LineString.fromPolyline(directions.geometry()!!, PRECISION_6))
+                //lineLayerAnimator.animate()
+            }
         }
     }
 

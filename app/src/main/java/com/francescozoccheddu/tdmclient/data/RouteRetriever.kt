@@ -61,9 +61,9 @@ fun makeRouteRetriever(server: Server) =
         customRetryPolicy = DEFAULT_RETRY_POLICY
     }
 
-private const val SPOT_SNAP_RADIUS = 200
-private const val START_SNAP_RADIUS = 50
-private const val END_SNAP_RADIUS = 50
+private const val SPOT_SNAP_RADIUS = 200.0
+private const val START_SNAP_RADIUS = 50.0
+private const val END_SNAP_RADIUS = 50.0
 
 fun getDirections(path: List<Point>, hasDestination: Boolean, callback: (DirectionsRoute?) -> Unit) {
     if (path.size < 1)
@@ -77,13 +77,12 @@ fun getDirections(path: List<Point>, hasDestination: Boolean, callback: (Directi
         profile(DirectionsCriteria.PROFILE_WALKING)
         language(Locale.getDefault())
         radiuses(*DoubleArray(path.size) {
-            (if (it == 0)
+            if (it == 0)
                 START_SNAP_RADIUS
             else if (hasDestination && it == path.lastIndex)
                 END_SNAP_RADIUS
             else
-                SPOT_SNAP_RADIUS)
-                .toDouble()
+                SPOT_SNAP_RADIUS
         })
 
         for (i in 1 until path.lastIndex)

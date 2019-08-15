@@ -21,6 +21,8 @@
     <string name="notification_action_unlocatable">Abilita</string>
     <string name="notification_content_device_lost">Connessione col sensore persa</string>
     <string name="notification_action_kill">Interrompi</string>
+    <string name="offline_cancel">Annulla</string>
+    <string name="offline_content">Scaricamento della mappa</string>
     <!--
     <string name="toast_permissions_settings_overlay">Concedi il permesso di accedere alla tua posizione</string>
     <string name="toast_location_settings_overlay">Abilita i servizi di localizzazione</string>
