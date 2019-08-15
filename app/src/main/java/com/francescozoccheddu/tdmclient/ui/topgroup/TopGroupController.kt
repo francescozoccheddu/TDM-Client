@@ -1,6 +1,6 @@
 package com.francescozoccheddu.tdmclient.ui.topgroup
 
-import com.francescozoccheddu.tdmclient.data.Geocoder
+import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 
 class TopGroupController(private val group: TopGroup) {
 
@@ -32,6 +32,6 @@ class TopGroupController(private val group: TopGroup) {
             group.score.score = value
         }
 
-    var onDestinationChosen: ((Geocoder.Location) -> Unit)? = null
+    var onDestinationChosen: ((PlaceQuerier.Location) -> Unit)? = null
 
 }

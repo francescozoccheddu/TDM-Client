@@ -3,6 +3,8 @@ package com.francescozoccheddu.tdmclient.data
 import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.data.boundingBox
+import com.francescozoccheddu.tdmclient.utils.data.countryLocale
+import com.francescozoccheddu.tdmclient.utils.data.languageLocale
 import com.francescozoccheddu.tdmclient.utils.data.latlng
 import com.francescozoccheddu.tdmclient.utils.data.mapboxAccessToken
 import com.mapbox.api.geocoding.v5.MapboxGeocoding
@@ -13,7 +15,7 @@ import retrofit2.Call
 import retrofit2.Response
 import java.util.*
 
-class Geocoder {
+class PlaceQuerier {
 
     companion object {
         private const val MAX_RESULTS = 4
@@ -23,15 +25,15 @@ class Geocoder {
             .accessToken(mapboxAccessToken)
             .autocomplete(true)
             .limit(MAX_RESULTS)
-            .languages(Locale.ITALIAN)
-            .country(Locale.ITALY)
+            .languages(languageLocale)
+            .country(countryLocale)
             .geocodingTypes("district", "place", "locality", "neighborhood", "address", "poi")
             .bbox(MainService.MAP_BOUNDS.boundingBox)
 
         private val REVERSE_BUILDER = MapboxGeocoding.builder()
             .accessToken(mapboxAccessToken)
-            .languages(Locale.ITALIAN)
-            .country(Locale.ITALY)
+            .languages(languageLocale)
+            .country(countryLocale)
 
         fun reverse(point: Point, callback: (String?) -> Unit) {
             REVERSE_BUILDER.query(point).build().enqueueCall(object : retrofit2.Callback<GeocodingResponse> {
@@ -115,12 +117,12 @@ class Geocoder {
                         )
                     }?.toList() ?: emptyList()
                 cache[query] = list
-                if (query == this@Geocoder.query)
+                if (query == this@PlaceQuerier.query)
                     onCurrentQueryEnd(list)
             }
 
             override fun onFailure(call: retrofit2.Call<GeocodingResponse>, throwable: Throwable) {
-                if (query == this@Geocoder.query)
+                if (query == this@PlaceQuerier.query)
                     onCurrentQueryEnd(null)
             }
         })
@@ -144,8 +146,8 @@ class Geocoder {
             request(query)
     }
 
-    val onResult = FuncEvent<Geocoder>()
-    val onFailure = FuncEvent<Geocoder>()
-    val onLoadingChange = FuncEvent<Geocoder>()
+    val onResult = FuncEvent<PlaceQuerier>()
+    val onFailure = FuncEvent<PlaceQuerier>()
+    val onLoadingChange = FuncEvent<PlaceQuerier>()
 
 }

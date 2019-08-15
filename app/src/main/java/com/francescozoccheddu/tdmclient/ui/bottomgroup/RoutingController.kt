@@ -1,6 +1,6 @@
 package com.francescozoccheddu.tdmclient.ui.bottomgroup
 
-import com.francescozoccheddu.tdmclient.data.Geocoder
+import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.ui.utils.Router
 import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
@@ -83,7 +83,7 @@ class RoutingController(group: BottomGroup) {
             this.destination = destination
             ui.destinationName = name
             if (!exactName) {
-                Geocoder.reverse(destination.point) {
+                PlaceQuerier.reverse(destination.point) {
                     if (it != null && destination == this.destination)
                         ui.destinationName = it
                 }
