@@ -1,9 +1,11 @@
 package com.francescozoccheddu.tdmclient.ui
 
 import android.content.ComponentName
+import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
@@ -28,11 +30,13 @@ import com.mapbox.mapboxsdk.style.expressions.Expression.rgba
 import com.mapbox.mapboxsdk.style.expressions.Expression.stop
 import com.mapbox.mapboxsdk.style.expressions.Expression.subtract
 import com.mapbox.mapboxsdk.style.expressions.Expression.zoom
+import com.mapbox.mapboxsdk.style.layers.FillLayer
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.mapboxsdk.style.layers.Property
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapWeight
@@ -46,8 +50,6 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute
-import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress
 import kotlinx.android.synthetic.main.ma.ma_bg
 import kotlinx.android.synthetic.main.ma.ma_map
 import kotlinx.android.synthetic.main.ma.ma_tg
@@ -64,16 +66,16 @@ class MainActivity : AppCompatActivity() {
         private const val MB_IMAGE_DESTINATION = "image_destination"
         private const val MB_SOURCE_DESTINATION = "source_destination"
         private const val MB_LAYER_DESTINATION = "source_destination"
-        private const val MB_SOURCE_COVERAGE = "source_coverage"
-        private const val MB_LAYER_COVERAGE = "layer_coverage"
+        private const val MB_SOURCE_COVERAGE_POINTS = "source_coverage_points"
+        private const val MB_SOURCE_COVERAGE_QUADS = "source_coverage_quads"
+        private const val MB_LAYER_COVERAGE_POINTS = "layer_coverage_points"
+        private const val MB_LAYER_COVERAGE_QUADS = "layer_coverage_quads"
         private const val MB_SOURCE_DIRECTIONS = "source_directions"
         private const val MB_LAYER_DIRECTIONS = "layer_directions"
 
     }
 
     private lateinit var map: MapboxMap
-    //private lateinit var searchProvider: LocationSearchProvider
-    //private lateinit var snackbar: ServiceSnackbar
     private val permissions = Permissions(this)
     private lateinit var routingController: RoutingController
     private lateinit var topGroupController: TopGroupController
@@ -82,23 +84,34 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(com.francescozoccheddu.tdmclient.R.layout.ma)
 
-        topGroupController = TopGroupController(ma_tg)
-        topGroupController.onDestinationChosen = {
-            routingController.setDestination(it.point, it.name, true)
-        }
-        routingController = RoutingController(ma_bg)
-        routingController.onDestinationChanged += {
-            if (this::map.isInitialized) {
-                val style = map.style
-                if (style != null)
-                    setDestinationMarker(style)
+        topGroupController = TopGroupController(ma_tg).apply {
+            onDestinationChosen = {
+                routingController.setDestination(it.point, it.name, true)
             }
         }
-        routingController.onRouteChanged += {
-            if (this::map.isInitialized) {
-                val style = map.style
-                if (style != null)
-                    setDirectionsLine(style)
+        routingController = RoutingController(ma_bg).apply {
+            onDestinationChanged += {
+                if (this@MainActivity::map.isInitialized) {
+                    val style = map.style
+                    if (style != null)
+                        setDestinationMarker(style)
+                }
+            }
+            onRouteChanged += {
+                if (this@MainActivity::map.isInitialized) {
+                    val style = map.style
+                    if (style != null)
+                        setDirectionsLine(style)
+                }
+            }
+            onLocationEnableIntent = {
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            onPermissionGrantIntent = {
+                if (permissions.canAsk)
+                    permissions.ask(this@MainActivity::onPermissionsChanged)
+                else
+                    permissions.openSettings()
             }
         }
 
@@ -124,29 +137,43 @@ class MainActivity : AppCompatActivity() {
                                         iconIgnorePlacement(true),
                                         iconOptional(false)
                                     )
-                            ).withSource(GeoJsonSource(MB_SOURCE_COVERAGE))
+                            )
+                            .withSource(GeoJsonSource(MB_SOURCE_COVERAGE_QUADS))
                             .withLayer(
-                                HeatmapLayer(MB_LAYER_COVERAGE, MB_SOURCE_COVERAGE)
+                                FillLayer(MB_LAYER_COVERAGE_QUADS, MB_SOURCE_COVERAGE_QUADS)
+                                    .withProperties(
+                                        fillColor(
+                                            interpolate(
+                                                linear(), subtract(literal(1f), get("coverage")),
+                                                literal(0.0), rgba(6, 50, 255, 0),
+                                                literal(1.0), rgba(48, 210, 255, 1.0)
+                                            )
+                                        ),
+                                        fillOpacity(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(12, 0),
+                                                stop(15, 0.5)
+                                            )
+                                        )
+                                    )
+                            )
+                            .withSource(GeoJsonSource(MB_SOURCE_COVERAGE_POINTS))
+                            .withLayer(
+                                HeatmapLayer(MB_LAYER_COVERAGE_POINTS, MB_SOURCE_COVERAGE_POINTS)
                                     .withProperties(
                                         heatmapColor(
                                             interpolate(
                                                 linear(), heatmapDensity(),
                                                 literal(0.0), rgba(6, 50, 255, 0),
-                                                literal(0.2), rgba(12, 105, 255, 0.5),
+                                                literal(0.2), rgba(12, 105, 255, 0.2),
                                                 literal(1.0), rgba(48, 210, 255, 1.0)
-                                            )
-                                        ),
-                                        heatmapIntensity(
-                                            interpolate(
-                                                linear(), zoom(),
-                                                stop(11, 1),
-                                                stop(15, 3)
                                             )
                                         ),
                                         heatmapRadius(
                                             interpolate(
                                                 linear(), zoom(),
-                                                stop(11, 30),
+                                                stop(MIN_ZOOM, 10),
                                                 stop(15, 100)
                                             )
                                         ),
@@ -161,7 +188,8 @@ class MainActivity : AppCompatActivity() {
                                             subtract(literal(1f), get("coverage"))
                                         )
                                     )
-                            ).withSource(GeoJsonSource(MB_SOURCE_DIRECTIONS))
+                            )
+                            .withSource(GeoJsonSource(MB_SOURCE_DIRECTIONS))
                             .withLayer(
                                 LineLayer(MB_LAYER_DIRECTIONS, MB_SOURCE_DIRECTIONS).withProperties(
                                     lineCap(Property.LINE_CAP_ROUND),
@@ -180,6 +208,8 @@ class MainActivity : AppCompatActivity() {
                             enableLocationComponent(style)
                         setDestinationMarker(style)
                         setDirectionsLine(style)
+                        setCoveragePointData(style)
+                        setCoverageQuadData(style)
                     }
                     addOnMapClickListener { click ->
                         if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
@@ -224,11 +254,22 @@ class MainActivity : AppCompatActivity() {
             val directions = routingController.route
             if (directions == null)
                 source.setGeoJson(null as FeatureCollection?)
-            else {
+            else
                 source.setGeoJson(LineString.fromPolyline(directions.geometry()!!, PRECISION_6))
-                //lineLayerAnimator.animate()
-            }
         }
+    }
+
+    private fun setCoveragePointData(style: Style) {
+        val source = style.getSource(MB_SOURCE_COVERAGE_POINTS)
+        if (source is GeoJsonSource)
+            source.setGeoJson(service?.coveragePointData)
+    }
+
+
+    private fun setCoverageQuadData(style: Style) {
+        val source = style.getSource(MB_SOURCE_COVERAGE_QUADS)
+        if (source is GeoJsonSource)
+            source.setGeoJson(service?.coverageQuadData)
     }
 
     private fun updateRouting() {
@@ -271,8 +312,20 @@ class MainActivity : AppCompatActivity() {
         topGroupController.score = service?.score ?: topGroupController.score
     }
 
-    private fun onCoverageDataChange() {
+    private fun onCoveragePointDataChange() {
+        if (this::map.isInitialized) {
+            val style = map.style
+            if (style != null)
+                setCoveragePointData(style)
+        }
+    }
 
+    private fun onCoverageQuadDataChange() {
+        if (this::map.isInitialized) {
+            val style = map.style
+            if (style != null)
+                setCoverageQuadData(style)
+        }
     }
 
     private var service: MainService? = null
@@ -285,19 +338,22 @@ class MainActivity : AppCompatActivity() {
                     old.onLocatableChange -= this::onLocatableChange
                     old.onOnlineChange -= this::onOnlineChange
                     old.onScoreChange -= this::onScoreChange
-                    old.onCoverageDataChange -= this::onCoverageDataChange
+                    old.onCoveragePointDataChange -= this::onCoveragePointDataChange
+                    old.onCoverageQuadDataChange -= this::onCoverageQuadDataChange
                 }
                 if (value != null) {
                     value.onLocationChange += this::onLocationChanged
                     value.onLocatableChange += this::onLocatableChange
                     value.onOnlineChange += this::onOnlineChange
                     value.onScoreChange += this::onScoreChange
-                    value.onCoverageDataChange += this::onCoverageDataChange
+                    value.onCoveragePointDataChange += this::onCoveragePointDataChange
+                    value.onCoverageQuadDataChange += this::onCoverageQuadDataChange
                     onLocationChanged()
                     onLocatableChange()
                     onOnlineChange()
                     onScoreChange()
-                    onCoverageDataChange()
+                    onCoveragePointDataChange()
+                    onCoverageQuadDataChange()
                 }
                 routingController.service = value
                 updateRouting()

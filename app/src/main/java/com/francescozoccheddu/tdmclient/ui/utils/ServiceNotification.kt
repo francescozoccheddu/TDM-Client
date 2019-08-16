@@ -37,7 +37,7 @@ class ServiceNotification(val service: MainService) {
                     R.drawable.ic_launcher_foreground, R.string.notification_action_kill,
                     PendingIntent.getService(
                         mContext, 0, MainService.makeStopIntent(mContext),
-                        PendingIntent.FLAG_CANCEL_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 )
             else this
