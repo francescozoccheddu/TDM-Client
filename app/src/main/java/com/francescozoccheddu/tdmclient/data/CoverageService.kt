@@ -5,6 +5,7 @@ import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import com.francescozoccheddu.tdmclient.utils.data.client.SimplePollInterpreter
+import com.mapbox.geojson.FeatureCollection
 import org.json.JSONObject
 import java.util.*
 
@@ -15,17 +16,15 @@ enum class CoverageRetrieveMode {
     POINTS, QUADS
 }
 
-data class CoverageData(val data: JSONObject, val time: Date)
+data class CoverageData(val data: FeatureCollection, val time: Date)
 
-private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, CoverageData, JSONObject>() {
+private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, CoverageData, FeatureCollection>() {
 
-    override fun interpretData(response: CoverageData): JSONObject {
-        return response.data
-    }
+    override fun interpretData(response: CoverageData) = response.data
 
     override fun interpretRequest(request: CoverageRetrieveMode) = JSONObject().apply {
         put(
-            "constraintSetId", when (request) {
+            "mode", when (request) {
                 CoverageRetrieveMode.POINTS -> "points"
                 CoverageRetrieveMode.QUADS -> "quads"
             }
@@ -34,7 +33,7 @@ private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, C
 
     override fun interpretResponse(request: CoverageRetrieveMode, response: JSONObject): CoverageData {
         try {
-            val data = response.getJSONObject("data")
+            val data = FeatureCollection.fromJson(response.getJSONObject("data").toString())
             val isotime = response.getString("time")
             return CoverageData(data, dateParseISO(isotime))
         } catch (_: Exception) {
@@ -42,13 +41,12 @@ private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, C
         }
     }
 
-    override fun interpretTime(request: Server.Service<CoverageRetrieveMode, CoverageData>.Request): Date {
-        return request.response.time
-    }
+    override fun interpretTime(request: Server.Service<CoverageRetrieveMode, CoverageData>.Request) =
+        request.response.time
 
 }
 
-typealias CoverageRetriever = Server.AutoPollService<CoverageRetrieveMode, CoverageData, JSONObject>
+typealias CoverageRetriever = Server.AutoPollService<CoverageRetrieveMode, CoverageData, FeatureCollection>
 
 fun makeCoverageRetriever(server: Server) =
     server.AutoPollService(

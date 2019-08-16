@@ -61,6 +61,18 @@ class RoutingController(group: BottomGroup) {
         }
     }
 
+    var onLocationEnableIntent
+        get() = ui.onLocationEnableIntent
+        set(value) {
+            ui.onLocationEnableIntent = value
+        }
+
+    var onPermissionGrantIntent
+        get() = ui.onPermissionGrantIntent
+        set(value) {
+            ui.onPermissionGrantIntent = value
+        }
+
     var route: DirectionsRoute? = null
         private set(value) {
             if (value != field) {

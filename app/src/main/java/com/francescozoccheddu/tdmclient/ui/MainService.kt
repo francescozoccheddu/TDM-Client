@@ -38,7 +38,6 @@ import com.mapbox.geojson.Polygon
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.turf.TurfJoins
-import org.json.JSONObject
 import kotlin.math.roundToLong
 
 
@@ -51,9 +50,8 @@ class MainService : Service() {
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
         private const val LOCATION_EXPIRATION_TIME = 15f
         private const val MEASURE_INTERVAL_TIME = 3f
-        private const val COVERAGE_INTERVAL_TIME = 10f
+        private const val COVERAGE_INTERVAL_TIME = 5f
         private const val COVERAGE_EXPIRATION_TIME = 60f
-        private val COVERAGE_RETRIEVE_MODE = CoverageRetrieveMode.POINTS
         private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
         private val USER = SensorDriver.User(0, "0")
         private val STOP_ACTION = "IntentActionStop"
@@ -96,10 +94,14 @@ class MainService : Service() {
     val onConnectedChange = ProcEvent()
     val onOnlineChange = ProcEvent()
     val onScoreChange = ProcEvent()
-    val onCoverageDataChange = ProcEvent()
+    val onCoveragePointDataChange = ProcEvent()
+    val onCoverageQuadDataChange = ProcEvent()
 
-    val coverageData: JSONObject?
-        get() = if (coverageRetriever.hasData && !coverageRetriever.expired) coverageRetriever.data else null
+    val coveragePointData: FeatureCollection?
+        get() = if (coveragePointRetriever.hasData && !coveragePointRetriever.expired) coveragePointRetriever.data else null
+
+    val coverageQuadData: FeatureCollection?
+        get() = if (coverageQuadRetriever.hasData && !coverageQuadRetriever.expired) coverageQuadRetriever.data else null
 
     val insideMeasurementArea
         get() = run {
@@ -139,7 +141,9 @@ class MainService : Service() {
             if (value != field) {
                 field = value
                 connected = sensorDriver.reachable && value
-                coverageRetriever.periodicPoll = if (value && bound) COVERAGE_INTERVAL_TIME else null
+                val coveragePollPeriod = if (value && bound) COVERAGE_INTERVAL_TIME else null
+                coveragePointRetriever.periodicPoll = coveragePollPeriod
+                coverageQuadRetriever.periodicPoll = coveragePollPeriod
                 sensorDriver.pushing = value
                 onOnlineChange()
             }
@@ -183,7 +187,8 @@ class MainService : Service() {
     private lateinit var locationEngine: LocationEngine
     private lateinit var server: Server
     private lateinit var sensorDriver: SensorDriver
-    private lateinit var coverageRetriever: CoverageRetriever
+    private lateinit var coveragePointRetriever: CoverageRetriever
+    private lateinit var coverageQuadRetriever: CoverageRetriever
     private lateinit var routeRetriever: RouteRetriever
     private lateinit var notification: ServiceNotification
     private var bound = false
@@ -191,7 +196,9 @@ class MainService : Service() {
             if (value != field) {
                 field = value
                 notification.foreground = !value
-                coverageRetriever.periodicPoll = if (value && online) COVERAGE_INTERVAL_TIME else null
+                val coveragePollPeriod = if (value && online) COVERAGE_INTERVAL_TIME else null
+                coveragePointRetriever.periodicPoll = coveragePollPeriod
+                coverageQuadRetriever.periodicPoll = coveragePollPeriod
             }
         }
     private val districts: FeatureCollection? by lazy {
@@ -247,11 +254,17 @@ class MainService : Service() {
 
         // Prepare retrievers
         run {
-            coverageRetriever = makeCoverageRetriever(server).apply {
-                pollRequest = COVERAGE_RETRIEVE_MODE
+            coveragePointRetriever = makeCoverageRetriever(server).apply {
+                pollRequest = CoverageRetrieveMode.POINTS
                 expiration = COVERAGE_EXPIRATION_TIME
-                onData += { onCoverageDataChange() }
-                onExpire += { onCoverageDataChange() }
+                onData += { onCoveragePointDataChange() }
+                onExpire += { onCoveragePointDataChange() }
+            }
+            coverageQuadRetriever = makeCoverageRetriever(server).apply {
+                pollRequest = CoverageRetrieveMode.QUADS
+                expiration = COVERAGE_EXPIRATION_TIME
+                onData += { onCoverageQuadDataChange() }
+                onExpire += { onCoverageQuadDataChange() }
             }
 
             routeRetriever = makeRouteRetriever(server)
@@ -341,7 +354,8 @@ class MainService : Service() {
         locationEngine.removeLocationUpdates(locationCallback)
         connectivityStatusReceiver.unregister(this)
         locationStatusReceiver.unregister(this)
-        coverageRetriever.periodicPoll = null
+        coveragePointRetriever.periodicPoll = null
+        coverageQuadRetriever.periodicPoll = null
         sensorDriver.measuring = false
         sensorDriver.pushing = false
         server.cancelAll()
