@@ -58,8 +58,8 @@ class MainService : Service() {
         private val START_ACTIVITY_ACTION = "IntentActionStartActivity"
 
         val MAP_BOUNDS = LatLngBounds.Builder()
-            .include(LatLng(39.267498, 9.181226))
-            .include(LatLng(39.176358, 9.054797))
+            .include(LatLng(39.1806426351715, 9.07530756367117))
+            .include(LatLng(39.2828121980494, 9.18185143891843))
             .build()
 
         fun makeStopIntent(context: Context) = Intent(context, MainService::class.java).apply {

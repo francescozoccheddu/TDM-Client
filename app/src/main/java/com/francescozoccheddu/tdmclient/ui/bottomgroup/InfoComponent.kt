@@ -4,10 +4,9 @@ package com.francescozoccheddu.tdmclient.ui.bottomgroup
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.RelativeLayout
-import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_bt
 import kotlinx.android.synthetic.main.bg_info.view.bg_info_iv
@@ -16,33 +15,12 @@ import kotlinx.android.synthetic.main.bg_info.view.bg_info_tv
 
 class InfoComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : RelativeLayout(context, attrs, defStyleAttr), GroupStateManager.GroupComponent {
+) : RelativeLayout(context, attrs, defStyleAttr) {
 
+    private val blinkAnimation = AnimationUtils.loadAnimation(context, R.anim.blink)
 
     init {
         View.inflate(context, R.layout.bg_info, this)
-    }
-
-    private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
-        onUpdate = {
-            alpha = it.value
-            visible = it.value != 0f
-            if (!it.running) {
-                animationCallback?.invoke()
-                animationCallback = null
-            }
-        }
-        speed = 6f
-    }
-
-    private var animationCallback: (() -> Unit)? = null
-
-    override fun animate(mode: GroupStateManager.GroupComponent.Mode, callback: (() -> Unit)?) {
-        this.animationCallback = callback
-        animationAlpha = when (mode) {
-            GroupStateManager.GroupComponent.Mode.IN -> 1f
-            GroupStateManager.GroupComponent.Mode.OUT -> 0f
-        }
     }
 
     var text = ""
@@ -50,6 +28,7 @@ class InfoComponent @JvmOverloads constructor(
             if (value != field) {
                 field = value
                 bg_info_tv.text = value
+                bg_info_tv.startAnimation(blinkAnimation)
             }
         }
 

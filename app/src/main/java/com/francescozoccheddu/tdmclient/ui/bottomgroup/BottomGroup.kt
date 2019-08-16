@@ -3,9 +3,12 @@ package com.francescozoccheddu.tdmclient.ui.bottomgroup
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
 import androidx.cardview.widget.CardView
-import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.view.setPadding
 import com.francescozoccheddu.animatorhelpers.SpringColor
+import com.francescozoccheddu.animatorhelpers.SpringFloat
+import com.francescozoccheddu.animatorhelpers.SpringInt
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import kotlinx.android.synthetic.main.bg.view.bg_action
@@ -17,15 +20,15 @@ import kotlinx.android.synthetic.main.bg.view.bg_walk
 
 class BottomGroup @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : MotionLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
 
-    enum class State(override val constraintSetId: Int, override val componentId: Int?) : GroupStateManager.GroupState {
-        ACTION(R.id.bg_cs_action, R.id.bg_action),
-        INFO(R.id.bg_cs_info, R.id.bg_info),
-        WALK(R.id.bg_cs_walk, R.id.bg_walk),
-        DURATION(R.id.bg_cs_duration, R.id.bg_duration),
-        HIDDEN(R.id.bg_cs_hidden, null)
+    enum class State(override val componentId: Int?) : GroupStateManager.GroupState {
+        ACTION(R.id.bg_action),
+        INFO(R.id.bg_info),
+        WALK(R.id.bg_walk),
+        DURATION(R.id.bg_duration),
+        HIDDEN(null)
     }
 
     private val root: CardView
@@ -34,18 +37,41 @@ class BottomGroup @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.bg, this)
         root = bg_root
-        loadLayoutDescription(R.xml.bg_motion)
-        stateManager = GroupStateManager(this, State.HIDDEN)
-        stateManager.onTransitionCompleted = {
-            if (stateManager.state == State.HIDDEN)
-                _color.reach()
+        stateManager = GroupStateManager(root, State.HIDDEN)
+    }
+
+    private var cornerRadius by SpringFloat(resources.getDimension(R.dimen.fab_size) / 2f).apply {
+        onUpdate = {
+            root.radius = it.value
         }
+        acceleration = 20f
+        maxVelocity = 200f
+    }
+
+    private var padding by SpringInt(0).apply {
+        onUpdate = {
+            setPadding(it.value)
+        }
+        acceleration = 20f
+        maxVelocity = 200f
     }
 
     var state: State
         get() = stateManager.state
         set(value) {
             stateManager.state = value
+            cornerRadius = when (value) {
+                State.ACTION, State.HIDDEN -> resources.getDimension(R.dimen.fab_size) / 2f
+                State.INFO -> resources.getDimension(R.dimen.snackbar_corner_radius)
+                State.WALK, State.DURATION -> resources.getDimension(R.dimen.sheet_corner_radius)
+            }
+            padding = when (state) {
+                State.ACTION, State.HIDDEN -> 100
+                State.INFO -> 50
+                State.WALK, State.DURATION -> 30
+            }
+
+            root.layoutParams = root.layoutParams
         }
 
     val action = bg_action
@@ -63,8 +89,6 @@ class BottomGroup @JvmOverloads constructor(
         get() = _color.target
         set(value) {
             _color.value = value
-            if (stateManager.state == State.HIDDEN && !stateManager.running)
-                _color.reach()
         }
 
     var modal

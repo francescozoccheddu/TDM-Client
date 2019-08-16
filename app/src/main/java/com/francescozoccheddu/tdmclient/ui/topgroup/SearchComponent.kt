@@ -1,6 +1,7 @@
 package com.francescozoccheddu.tdmclient.ui.topgroup
 
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,10 +11,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.francescozoccheddu.animatorhelpers.ABFloat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
-import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
 import com.francescozoccheddu.tdmclient.ui.utils.LocationSearchProvider
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import kotlinx.android.synthetic.main.tg_search.view.tg_search_clear
@@ -24,7 +23,7 @@ import kotlinx.android.synthetic.main.tg_search.view.tg_search_text
 
 class SearchComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), GroupStateManager.GroupComponent {
+) : LinearLayout(context, attrs, defStyleAttr) {
 
 
     private val searchProvider = LocationSearchProvider()
@@ -75,39 +74,20 @@ class SearchComponent @JvmOverloads constructor(
             onFocusChanged?.invoke(focused)
         }
 
+        layoutTransition = LayoutTransition().apply {
+            enableTransitionType(LayoutTransition.CHANGING)
+        }
+
     }
 
     fun clearTextFocus() {
         tg_search_text.clearFocus()
     }
 
-    private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
-        onUpdate = {
-            alpha = it.value
-            visible = it.value != 0f
-            if (!it.running) {
-                animationCallback?.invoke()
-                animationCallback = null
-            }
-        }
-        speed = 6f
-    }
-
-    private var animationCallback: (() -> Unit)? = null
-
     var onFocusChanged: ((Boolean) -> Unit)? = null
 
     var onDestinationChosen: ((PlaceQuerier.Location) -> Unit)? = null
 
-    override fun animate(mode: GroupStateManager.GroupComponent.Mode, callback: (() -> Unit)?) {
-        this.animationCallback = callback
-        animationAlpha = when (mode) {
-            GroupStateManager.GroupComponent.Mode.IN -> 1f
-            GroupStateManager.GroupComponent.Mode.OUT -> 0f
-        }
-        if (mode == GroupStateManager.GroupComponent.Mode.OUT)
-            clearTextFocus()
-    }
 
     var location
         get() = searchProvider.userLocation

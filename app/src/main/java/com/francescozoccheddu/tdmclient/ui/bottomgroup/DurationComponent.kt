@@ -5,10 +5,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.RelativeLayout
-import com.francescozoccheddu.animatorhelpers.ABFloat
+import com.francescozoccheddu.knob.KnobView
 import com.francescozoccheddu.tdmclient.R
-import com.francescozoccheddu.tdmclient.ui.utils.GroupStateManager
-import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.data.snapDown
 import com.francescozoccheddu.tdmclient.utils.data.snapUp
 import kotlinx.android.synthetic.main.bg_duration.view.bg_duration_cancel
@@ -17,7 +15,7 @@ import kotlinx.android.synthetic.main.bg_duration.view.bg_duration_time
 
 class DurationComponent @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : RelativeLayout(context, attrs, defStyleAttr), GroupStateManager.GroupComponent {
+) : RelativeLayout(context, attrs, defStyleAttr) {
 
     companion object {
 
@@ -28,27 +26,14 @@ class DurationComponent @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.bg_duration, this)
-    }
-
-    private var animationAlpha by ABFloat(if (visible) 1f else 0f).apply {
-        onUpdate = {
-            alpha = it.value
-            visible = it.value != 0f
-            if (!it.running) {
-                animationCallback?.invoke()
-                animationCallback = null
+        bg_duration_time.thickText = object : KnobView.ThickTextProvider {
+            override fun provide(view: KnobView, track: Int, thick: Int, value: Float): String {
+                val tm = value.toInt()
+                val m = tm % 60
+                val h = m / 60
+                return if (h > 0) "${h}h ${m}m" else "${m}m"
             }
-        }
-        speed = 6f
-    }
 
-    private var animationCallback: (() -> Unit)? = null
-
-    override fun animate(mode: GroupStateManager.GroupComponent.Mode, callback: (() -> Unit)?) {
-        this.animationCallback = callback
-        animationAlpha = when (mode) {
-            GroupStateManager.GroupComponent.Mode.IN -> 1f
-            GroupStateManager.GroupComponent.Mode.OUT -> 0f
         }
     }
 
