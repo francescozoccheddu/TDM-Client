@@ -34,4 +34,10 @@ class TopGroupController(private val group: TopGroup) {
 
     var onDestinationChosen: ((PlaceQuerier.Location) -> Unit)? = null
 
+    var location
+        get() = group.search.location
+        set(value) {
+            group.search.location = value
+        }
+
 }

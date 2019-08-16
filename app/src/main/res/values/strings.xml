@@ -1,16 +1,9 @@
 <resources>
     <string name="app_name">TDM-Client</string>
-    <string name="app_label">TDM</string>
     <string name="search_hint">Cerca una destinazione</string>
     <string name="mapbox_access_token">
         pk.eyJ1IjoiZnJhbmNlc2NvenoiLCJhIjoiY2pzYndrOTg5MGVrdzN5cGR2ZjdkY3ZnMiJ9.MCiDPh-MIjlWxN1IdzrYSg
     </string>
-    <string name="user_location_permission_explanation">TDM-Client ha bisogno di conoscere la tua posizione per poter
-        ottimizzare il tuo percorso
-    </string>
-    <string name="problem_offline">Nessuna connessione ad Internet</string>
-    <string name="problem_location_permission">Permesso di accededere alla posizione negato</string>
-    <string name="problem_location_permission_action">Concedi</string>
     <string name="service_notification_channel">Notifiche</string>
     <string name="notification_title">TDM Client</string>
     <string name="notification_content_ok">In esecuzione</string>
@@ -21,8 +14,6 @@
     <string name="notification_action_unlocatable">Abilita</string>
     <string name="notification_content_device_lost">Connessione col sensore persa</string>
     <string name="notification_action_kill">Interrompi</string>
-    <string name="offline_cancel">Annulla</string>
-    <string name="offline_content">Scaricamento della mappa</string>
     <!--
     <string name="toast_permissions_settings_overlay">Concedi il permesso di accedere alla tua posizione</string>
     <string name="toast_location_settings_overlay">Abilita i servizi di localizzazione</string>

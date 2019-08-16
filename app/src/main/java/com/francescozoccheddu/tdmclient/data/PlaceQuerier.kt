@@ -80,9 +80,10 @@ class PlaceQuerier {
         }
 
     var result: Collection<Location>? = null
+        private set
 
     var loading = false
-        set(value) {
+        private set(value) {
             if (value != field) {
                 field = value
                 onLoadingChange(this)
@@ -131,14 +132,11 @@ class PlaceQuerier {
 
     fun onCurrentQueryEnd(result: List<Location>?) {
         loading = false
-        if (result != null) {
-            this.result = result
+        this.result = result
+        if (result != null)
             onResult(this)
-        }
-        else {
-            this.result = null
+        else
             onFailure(this)
-        }
     }
 
     fun retry() {

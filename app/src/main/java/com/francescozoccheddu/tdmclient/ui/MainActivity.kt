@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
 import com.francescozoccheddu.tdmclient.ui.topgroup.TopGroupController
 import com.francescozoccheddu.tdmclient.ui.utils.Permissions
+import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
@@ -125,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                             .fromUri(MAP_STYLE_URI)
                             .withImage(
                                 MB_IMAGE_DESTINATION,
-                                resources.getDrawable(com.francescozoccheddu.tdmclient.R.drawable.ic_somewhere, null)
+                                resources.getDrawable(R.drawable.ic_place, null)
                             )
                             .withSource(GeoJsonSource(MB_SOURCE_DESTINATION))
                             .withLayer(
@@ -298,22 +300,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun onLocationChanged() {
         updateRouting()
-    }
+        topGroupController.location = service?.location?.latLng
+        }
 
-    private fun onLocatableChange() {
-        updateRouting()
-    }
+        private fun onLocatableChange() {
+            updateRouting()
+        }
 
-    private fun onOnlineChange() {
-        updateRouting()
-    }
+        private fun onOnlineChange() {
+            updateRouting()
+        }
 
-    private fun onScoreChange() {
-        topGroupController.score = service?.score ?: topGroupController.score
-    }
+        private fun onScoreChange() {
+            topGroupController.score = service?.score ?: topGroupController.score
+        }
 
-    private fun onCoveragePointDataChange() {
-        if (this::map.isInitialized) {
+        private fun onCoveragePointDataChange() {
+            if (this::map.isInitialized) {
             val style = map.style
             if (style != null)
                 setCoveragePointData(style)
