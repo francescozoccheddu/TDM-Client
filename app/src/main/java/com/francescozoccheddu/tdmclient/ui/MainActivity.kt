@@ -17,6 +17,8 @@ import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.LineString
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
@@ -64,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         private const val MAP_STYLE_URI = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
         private const val MIN_ZOOM = 9.0
         private const val MAX_ZOOM = 20.0
+        private const val SEARCH_ZOOM = 11.0
 
         private const val MB_IMAGE_DESTINATION = "image_destination"
         private const val MB_SOURCE_DESTINATION = "source_destination"
@@ -84,10 +87,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.francescozoccheddu.tdmclient.R.layout.ma)
+        setContentView(R.layout.ma)
 
         topGroupController = TopGroupController(ma_tg).apply {
             onDestinationChosen = {
+                if (this@MainActivity::map.isInitialized)
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(it.point, SEARCH_ZOOM))
                 routingController.setDestination(it.point, it.name, true)
             }
         }
@@ -101,6 +106,22 @@ class MainActivity : AppCompatActivity() {
             }
             onRouteChanged += {
                 if (this@MainActivity::map.isInitialized) {
+                    val route = routingController.route
+                    if (route != null) {
+                        val a = service?.location
+                        val b = routingController.destination
+                        if (a != null && b != null)
+                            map.animateCamera(
+                                CameraUpdateFactory.newLatLngBounds(
+                                    LatLngBounds
+                                        .Builder()
+                                        .include(a.latLng)
+                                        .include(b)
+                                        .build(),
+                                    resources.getDimensionPixelSize(R.dimen.map_bounds_padding)
+                                )
+                            )
+                    }
                     val style = map.style
                     if (style != null)
                         setDirectionsLine(style)
@@ -114,6 +135,9 @@ class MainActivity : AppCompatActivity() {
                     permissions.ask(this@MainActivity::onPermissionsChanged)
                 else
                     permissions.openSettings()
+            }
+            onPickingDestinationChanged += {
+                updateTopGroup()
             }
         }
 
@@ -291,6 +315,10 @@ class MainActivity : AppCompatActivity() {
                 RoutingController.Problem.OUTSIDE_AREA
             else null
         }
+        updateTopGroup()
+    }
+
+    private fun updateTopGroup() {
         topGroupController.state = if (routingController.pickingDestination)
             TopGroupController.State.SEARCHING
         else if (routingController.problem == null)
@@ -301,22 +329,22 @@ class MainActivity : AppCompatActivity() {
     private fun onLocationChanged() {
         updateRouting()
         topGroupController.location = service?.location?.latLng
-        }
+    }
 
-        private fun onLocatableChange() {
-            updateRouting()
-        }
+    private fun onLocatableChange() {
+        updateRouting()
+    }
 
-        private fun onOnlineChange() {
-            updateRouting()
-        }
+    private fun onOnlineChange() {
+        updateRouting()
+    }
 
-        private fun onScoreChange() {
-            topGroupController.score = service?.score ?: topGroupController.score
-        }
+    private fun onScoreChange() {
+        topGroupController.score = service?.score ?: topGroupController.score
+    }
 
-        private fun onCoveragePointDataChange() {
-            if (this::map.isInitialized) {
+    private fun onCoveragePointDataChange() {
+        if (this::map.isInitialized) {
             val style = map.style
             if (style != null)
                 setCoveragePointData(style)

@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="fab_size">64dp</dimen>
+    <dimen name="sheet_corner_radius">4dp</dimen>
+    <dimen name="snackbar_corner_radius">8dp</dimen>
+    <dimen name="map_bounds_padding">20dp</dimen>
 </resources>
