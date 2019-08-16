@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.data.snap
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.mapboxsdk.geometry.LatLng
-import kotlin.math.roundToInt
 
 
 class LocationSearchProvider {
@@ -59,8 +59,14 @@ class LocationSearchProvider {
                 val a = list[adapterPosition].point
                 val b = userLocation
                 if (b != null) {
-                    val minutes = (travelDuration(a.distanceTo(b).toFloat()) / 60f).roundToInt()
-                    tvDistance.text = if (minutes < 1) "<1m" else "${minutes}m"
+                    tvDistance.text = run {
+                        val tm = (travelDuration(a.distanceTo(b).toFloat()) / 60f)
+                        val m = tm.snap(if (tm < 3) 1f else if (tm < 30f) 5f else 15f).toInt()
+                        val h = m / 60
+                        if (h > 0) "${h}h ${m % 60}m"
+                        else if (m > 0) "${m}m"
+                        else "<1m"
+                    }
                     tvDistance.visibility = View.VISIBLE
                 }
                 else

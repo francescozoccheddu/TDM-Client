@@ -11,9 +11,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-private const val SPOT_SNAP_RADIUS = 200.0
-private const val START_SNAP_RADIUS = 10.0
-private const val END_SNAP_RADIUS = 10.0
+private const val SPOT_SNAP_RADIUS = 500.0
+private const val START_SNAP_RADIUS = 50.0
+private const val END_SNAP_RADIUS = 50.0
 
 fun getDirections(path: List<Point>, hasDestination: Boolean, callback: (DirectionsRoute?) -> Unit) {
     if (path.size < 1)
@@ -24,7 +24,10 @@ fun getDirections(path: List<Point>, hasDestination: Boolean, callback: (Directi
 
         origin(path.first())
         destination(path.last())
+        alternatives(false)
+        overview(DirectionsCriteria.OVERVIEW_FULL)
         profile(DirectionsCriteria.PROFILE_WALKING)
+        steps(false)
         language(languageLocale)
         radiuses(*DoubleArray(path.size) {
             if (it == 0)

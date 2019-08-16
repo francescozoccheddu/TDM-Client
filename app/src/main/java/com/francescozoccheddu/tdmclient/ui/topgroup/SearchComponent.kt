@@ -109,4 +109,10 @@ class SearchComponent @JvmOverloads constructor(
             clearTextFocus()
     }
 
+    var location
+        get() = searchProvider.userLocation
+        set(value) {
+            searchProvider.userLocation = value
+        }
+
 }
