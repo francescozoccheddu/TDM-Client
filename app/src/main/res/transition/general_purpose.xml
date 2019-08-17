@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
                android:transitionOrdering="sequential">
-    <fade android:fadingMode="fade_out"/>
+    <fade android:fadingMode="fade_out">
+        <targets>
+            <target android:excludeId="@id/sb_clear"/>
+            <target android:excludeId="@id/sb_loading"/>
+        </targets>
+    </fade>
     <transitionSet android:transitionOrdering="together">
         <transition class="com.francescozoccheddu.tdmclient.ui.transitions.ElevationTransition"/>
         <transition class="com.francescozoccheddu.tdmclient.ui.transitions.CardRadiusTransition"/>
@@ -17,10 +22,18 @@
             </targets>
         </changeBounds>
     </transitionSet>
-    <fade android:fadingMode="fade_in"/>
+    <fade android:fadingMode="fade_in">
+        <targets>
+            <target android:excludeId="@id/sb_clear"/>
+            <target android:excludeId="@id/sb_loading"/>
+        </targets>
+    </fade>
     <targets>
-        <target android:excludeId="@id/sb_bar_end"/>
-        <target android:excludeId="@id/sb_clear"/>
-        <target android:excludeId="@id/sb_loading"/>
+        <target android:excludeId="@id/bg_info_bt"/>
+        <target android:excludeId="@id/bg_info_tv"/>
+        <target android:excludeId="@id/bg_info_rl"/>
+        <target android:excludeId="@id/bg_info_rl"/>
+        <target android:excludeId="@id/bg_info_iv"/>
+        <target android:excludeId="@id/bg_info_pb"/>
     </targets>
 </transitionSet>
