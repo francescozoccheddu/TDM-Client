@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:text="Inizia!"
             style="@style/Widget.MaterialComponents.Button"
+            android:backgroundTint="@color/backgroundLight"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
     />
@@ -28,7 +29,6 @@
             android:layout_width="wrap_content"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:text="Annulla"
-            android:background="@color/button"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
     />
@@ -44,6 +44,9 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:layout_below="@+id/bg_duration_tv"
+            app:thickSize="12dp"
+            app:labelSize="18dp"
+            app:labelColor="@color/foreground"
             app:trackThickness="56dp"
             app:trackThicknessFactor="0.9"
             app:bedColor="@color/knobBed"

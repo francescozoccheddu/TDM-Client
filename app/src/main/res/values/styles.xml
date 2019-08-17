@@ -9,17 +9,11 @@
         <item name="colorAccent">@color/foreground</item>
         <item name="android:textColor">@color/foreground</item>
         <item name="android:tint">@color/foreground</item>
-        <item name="materialCardViewStyle">@style/AppTheme.CardStyle</item>
         <item name="colorControlHighlight">@color/ripple</item>
         <!--
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         -->
     </style>
-    
-    <style name="AppTheme.CardStyle"
-           parent="@style/Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/background</item>
-    </style>
-    
+
 </resources>
