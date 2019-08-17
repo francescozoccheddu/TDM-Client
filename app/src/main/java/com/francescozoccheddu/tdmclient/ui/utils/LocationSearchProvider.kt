@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.data.snap
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -80,11 +81,12 @@ class LocationSearchProvider {
             this.list.clear()
             this.list.addAll(list)
             notifyDataSetChanged()
+            onResultsChanged()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(
-                R.layout.search_item,
+                R.layout.sb_item,
                 parent, false
             ) as ViewGroup
             return ViewHolder(view)
@@ -130,10 +132,14 @@ class LocationSearchProvider {
     private val _adapter = SearchListAdapter()
     val adapter: RecyclerView.Adapter<*> = _adapter
 
+    val hasResults get() = _adapter.itemCount > 0
+
     val onLocationClick = FuncEvent<PlaceQuerier.Location>()
 
     val onLoadingChange = FuncEvent<Boolean>()
 
     val loading = geocoder.loading
+
+    val onResultsChanged = ProcEvent()
 
 }

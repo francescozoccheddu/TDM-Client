@@ -22,6 +22,9 @@ import kotlin.math.roundToInt
 
 class BottomGroupLayoutManager(private val parent: ViewGroup) {
 
+    private val transition = TransitionInflater
+        .from(parent.context)
+        .inflateTransition(R.transition.general_purpose)
 
     interface ScrimComponent {
         var onDismiss: Event
@@ -105,6 +108,14 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
         private val progressBar = parent.findViewById<ProgressBar>(R.id.bg_info_pb)
         private val button = parent.findViewById<Button>(R.id.bg_info_bt).apply {
             setOnClickListener { onAction() }
+        }
+
+        init {
+            transition.removeTarget(textView)
+            transition.removeTarget(imageView)
+            transition.removeTarget(progressBar)
+            transition.removeTarget(button)
+            transition.removeTarget(R.id.bg_info_rl)
         }
 
         override var text = ""
@@ -233,9 +244,6 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
         ACTION, INFO, WALK, DURATION, HIDDEN
     }
 
-    private val transition = TransitionInflater
-        .from(parent.context)
-        .inflateTransition(R.transition.general_purpose)
 
     var state = State.HIDDEN
         set(value) {
@@ -269,13 +277,15 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
         }
         cardView.setCardBackgroundColor(color)
         cardView.radius = when (state) {
-            State.ACTION, State.HIDDEN -> parent.resources.getDimension(R.dimen.fab_size) / 2f
-            State.DURATION, State.WALK -> parent.resources.getDimension(R.dimen.sheet_corner_radius)
-            State.INFO -> parent.resources.getDimension(R.dimen.snackbar_corner_radius)
+            State.ACTION -> parent.resources.getDimension(R.dimen.bg_action_size) / 2f
+            State.DURATION, State.WALK -> parent.resources.getDimension(R.dimen.bg_walk_duration_radius)
+            State.INFO -> parent.resources.getDimension(R.dimen.bg_info_radius)
+            State.HIDDEN -> 0f
         }
         val margins = when (state) {
-            State.ACTION, State.HIDDEN, State.INFO -> parent.resources.getDimensionPixelOffset(R.dimen.fab_margin)
-            State.DURATION, State.WALK -> parent.resources.getDimensionPixelOffset(R.dimen.sheet_margin)
+            State.ACTION, State.INFO -> parent.resources.getDimensionPixelOffset(R.dimen.bg_action_margin)
+            State.DURATION, State.WALK -> parent.resources.getDimensionPixelOffset(R.dimen.bg_walk_duration_margin)
+            State.HIDDEN -> (parent.resources.getDimension(R.dimen.bg_action_margin) + parent.resources.getDimension(R.dimen.bg_action_size) / 2f).roundToInt()
         }
         (cardView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(margins, margins, margins, margins)
     }

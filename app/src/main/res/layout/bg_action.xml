@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="@dimen/fab_size"
-             android:layout_height="@dimen/fab_size"
+             android:layout_width="@dimen/bg_action_size"
+             android:layout_height="@dimen/bg_action_size"
              android:background="?selectableItemBackground"
              android:clickable="true"
 >

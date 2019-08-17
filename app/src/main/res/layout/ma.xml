@@ -22,19 +22,7 @@
             mapbox:mapbox_accuracyAnimationEnabled="true"
     />
     
-    <com.francescozoccheddu.tdmclient.ui.topgroup.TopGroup
-            android:id="@+id/ma_tg"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    
-    <FrameLayout android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_gravity="end|bottom"
-                 android:id="@+id/ma_bg"
-    >
-        
-        <include layout="@layout/bg"/>
-    
-    </FrameLayout>
+    <include layout="@layout/sb"/>
+    <include layout="@layout/bg"/>
 
 </FrameLayout>
