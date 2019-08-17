@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.setMargins
 import androidx.core.view.setPadding
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
@@ -93,4 +94,12 @@ fun getStatusBarHeight(context: Context): Int {
     val resources = context.resources
     val id = resources.getIdentifier("status_bar_height", "dimen", "android")
     return if (id > 0) resources.getDimensionPixelSize(id) else 0
+}
+
+fun View.setMargins(margins: Int) {
+    (layoutParams as ViewGroup.MarginLayoutParams).setMargins(margins)
+}
+
+fun View.setMargins(left: Int, top: Int, right: Int, bottom: Int) {
+    (layoutParams as ViewGroup.MarginLayoutParams).setMargins(left, top, right, bottom)
 }

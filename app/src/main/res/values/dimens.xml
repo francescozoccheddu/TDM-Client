@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="fab_size">64dp</dimen>
-    <dimen name="fab_margin">20dp</dimen>
-    <dimen name="sheet_margin">10dp</dimen>
-    <dimen name="walk_item_height">120dp</dimen>
-    <dimen name="knob_size">256dp</dimen>
-    <dimen name="sheet_corner_radius">4dp</dimen>
-    <dimen name="snackbar_corner_radius">8dp</dimen>
+    <dimen name="bg_action_size">64dp</dimen>
+    <dimen name="bg_action_margin">20dp</dimen>
+    <dimen name="bg_walk_duration_margin">10dp</dimen>
+    <dimen name="bg_walk_item_height">120dp</dimen>
+    <dimen name="bg_duration_knob_size">256dp</dimen>
+    <dimen name="bg_walk_duration_radius">4dp</dimen>
+    <dimen name="bg_info_radius">8dp</dimen>
     <dimen name="map_bounds_padding">20dp</dimen>
+    <dimen name="sb_margin">16dp</dimen>
+    <dimen name="sb_focused_margin">10dp</dimen>
+    <dimen name="sb_padding">4dp</dimen>
+    <dimen name="sb_radius">6dp</dimen>
+    <dimen name="sb_focused_radius">4dp</dimen>
 </resources>

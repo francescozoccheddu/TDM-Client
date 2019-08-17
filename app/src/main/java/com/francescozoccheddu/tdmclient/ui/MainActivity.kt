@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
-import com.francescozoccheddu.tdmclient.ui.topgroup.TopGroupController
+import com.francescozoccheddu.tdmclient.ui.topgroup.SearchBarComponent
 import com.francescozoccheddu.tdmclient.ui.utils.Permissions
 import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.data.point
@@ -54,9 +54,11 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import kotlinx.android.synthetic.main.ma.ma_bg
+import kotlinx.android.synthetic.main.bg.bg_root
 import kotlinx.android.synthetic.main.ma.ma_map
-import kotlinx.android.synthetic.main.ma.ma_tg
+import kotlinx.android.synthetic.main.sb.sb_root
+
+//import kotlinx.android.synthetic.main.ma.ma_tg
 
 
 class MainActivity : AppCompatActivity() {
@@ -83,20 +85,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map: MapboxMap
     private val permissions = Permissions(this)
     private lateinit var routingController: RoutingController
-    private lateinit var topGroupController: TopGroupController
+    private lateinit var searchBarComponent: SearchBarComponent
+    //private lateinit var topGroupController: TopGroupController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ma)
 
-        topGroupController = TopGroupController(ma_tg).apply {
+        /*topGroupController = TopGroupController(ma_tg).apply {
             onDestinationChosen = {
                 if (this@MainActivity::map.isInitialized)
                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(it.point, SEARCH_ZOOM))
                 routingController.setDestination(it.point, it.name, true)
             }
-        }
-        routingController = RoutingController(ma_bg).apply {
+        }*/
+
+        searchBarComponent = SearchBarComponent(sb_root)
+
+        routingController = RoutingController(bg_root).apply {
             onDestinationChanged += {
                 if (this@MainActivity::map.isInitialized) {
                     val style = map.style
@@ -319,28 +325,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateTopGroup() {
-        topGroupController.state = if (routingController.pickingDestination)
+        /*topGroupController.state = if (routingController.pickingDestination)
             TopGroupController.State.SEARCHING
         else if (routingController.problem == null)
             TopGroupController.State.SCORE
-        else TopGroupController.State.HIDDEN
+        else TopGroupController.State.HIDDEN*/
     }
 
     private fun onLocationChanged() {
         updateRouting()
-        topGroupController.location = service?.location?.latLng
+        //topGroupController.location = service?.location?.latLng
     }
 
     private fun onLocatableChange() {
         updateRouting()
+        searchBarComponent.enabled = service?.locatable == true
     }
 
     private fun onOnlineChange() {
         updateRouting()
+
     }
 
     private fun onScoreChange() {
-        topGroupController.score = service?.score ?: topGroupController.score
+        //topGroupController.sl = service?.sl ?: topGroupController.sl
     }
 
     private fun onCoveragePointDataChange() {

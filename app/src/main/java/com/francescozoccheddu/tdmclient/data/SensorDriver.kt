@@ -25,7 +25,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
 
     companion object {
         const val DEFAULT_PREFS_NAME = "tdmclient:SensorDriver:SharedPreferences"
-        const val DEFAULT_SCORE_PREF_KEY = "$DEFAULT_PREFS_NAME.score"
+        const val DEFAULT_SCORE_PREF_KEY = "$DEFAULT_PREFS_NAME.sl"
 
         private const val MAX_SCORE_REQUESTS = 4
         private const val SCORE_SERVICE_ADDRESS = "getuser"
@@ -71,7 +71,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
 
             override fun interpretResponse(request: User, response: JSONObject): Int {
                 try {
-                    return response["score"] as Int
+                    return response["sl"] as Int
                 } catch (_: Exception) {
                     throw Interpreter.UninterpretableResponseException()
                 }
@@ -102,7 +102,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
 
             override fun interpretResponse(request: MeasurementPutRequest, response: JSONObject): Int {
                 try {
-                    return response.getInt("score")
+                    return response.getInt("sl")
                 } catch (_: Exception) {
                     throw Interpreter.UninterpretableResponseException()
                 }

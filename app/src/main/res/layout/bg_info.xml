@@ -2,11 +2,11 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/fab_size">
+        android:layout_height="@dimen/bg_action_size">
     
     <ProgressBar
-            android:layout_height="@dimen/fab_size"
-            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/bg_action_size"
+            android:layout_width="@dimen/bg_action_size"
             android:id="@+id/bg_info_pb"
             android:indeterminateOnly="true"
             android:indeterminate="true"
@@ -17,16 +17,18 @@
     
     <ImageView
             android:id="@+id/bg_info_iv"
-            android:layout_width="@dimen/fab_size"
-            android:layout_height="@dimen/fab_size"
+            android:layout_width="@dimen/bg_action_size"
+            android:layout_height="@dimen/bg_action_size"
             android:layout_gravity="start|center_vertical"
             android:src="@drawable/ic_place"
-            android:padding="10dp"
+            android:padding="16dp"
             android:visibility="gone"
     />
     
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/bg_info_rl"
     >
         
         <TextView
