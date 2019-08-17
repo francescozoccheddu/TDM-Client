@@ -63,7 +63,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/tg_search_close"
-                        android:layout_toStartOf="@id/sb_bar_end"
+                        android:layout_toStartOf="@id/sb_loading"
                         android:layout_alignWithParentIfMissing="true"
                         android:layout_centerVertical="true"
                         android:hint="@string/search_hint"
@@ -75,34 +75,28 @@
                         android:textCursorDrawable="@null"
                 />
                 
-                <LinearLayout android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:layout_alignParentEnd="true"
-                              android:layout_centerVertical="true"
-                              android:gravity="center"
-                              android:id="@+id/sb_bar_end"
-                >
-                    
-                    <ProgressBar
-                            android:id="@+id/sb_loading"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:indeterminateOnly="true"
-                            android:visibility="gone"
-                            android:layout_margin="2dp"
-                    />
-                    
-                    <ImageButton
-                            android:id="@+id/sb_clear"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_cancel"
-                            android:background="?selectableItemBackgroundBorderless"
-                            android:visibility="gone"
-                            android:layout_margin="2dp"
-                    />
+                <ProgressBar
+                        android:id="@+id/sb_loading"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:indeterminateOnly="true"
+                        android:visibility="gone"
+                        android:layout_alignWithParentIfMissing="true"
+                        android:layout_toStartOf="@id/sb_clear"
+                        android:layout_margin="2dp"
+                />
                 
-                </LinearLayout>
+                <ImageButton
+                        android:id="@+id/sb_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_cancel"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:visibility="gone"
+                        android:layout_margin="2dp"
+                />
             
             </RelativeLayout>
             
