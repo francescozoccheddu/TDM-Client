@@ -38,19 +38,19 @@ class SearchBarComponent(private val parent: ViewGroup) {
 
     init {
 
-        scrim.setOnClickListener { clearTextFocus() }
+        scrim.setOnClickListener { clearFocus() }
 
         searchProvider.onLocationClick += {
             editText.text.clear()
-            editText.clearFocus()
+            clearFocus()
             onDestinationChosen?.invoke(it)
         }
 
         searchProvider.onResultsChanged += { update() }
 
         val closeButton = parent.findViewById<ImageButton>(R.id.tg_search_close)
-        val clearButton = parent.findViewById<ImageButton>(R.id.tg_search_clear)
-        val progressBar = parent.findViewById<ProgressBar>(R.id.tg_search_loading)
+        val clearButton = parent.findViewById<ImageButton>(R.id.sb_clear)
+        val progressBar = parent.findViewById<ProgressBar>(R.id.sb_loading)
 
         resultList.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -58,7 +58,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
         }
 
         closeButton.setOnClickListener {
-            clearTextFocus()
+            clearFocus()
         }
 
         clearButton.setOnClickListener {
@@ -82,7 +82,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
 
         editText.setOnFocusChangeListener { _, nowFocused ->
             if (nowFocused && !enabled)
-                clearTextFocus()
+                clearFocus()
             closeButton.isEnabled = focused
             if (!focused) {
                 val service = parent.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -118,9 +118,10 @@ class SearchBarComponent(private val parent: ViewGroup) {
                 else R.dimen.sb_margin
             )
             val targetPadding = parent.resources.getDimension(R.dimen.sb_padding)
-            val extraMargins = max(margins - targetMargins, 0)
+            val extraMargins = max(targetMargins - margins, 0) * 0.75f
+            val padding = (targetPadding + extraMargins).roundToInt()
             card.setMargins(margins)
-            content.setMargins((targetPadding + extraMargins).roundToInt())
+            content.setMargins(padding)
         }
         card.alpha = if (focused) 1f else if (enabled) 0.75f else 0f
     }
@@ -131,12 +132,12 @@ class SearchBarComponent(private val parent: ViewGroup) {
                 field = value
                 editText.isFocusable = value
                 if (!value)
-                    clearTextFocus()
+                    clearFocus()
                 update()
             }
         }
 
-    fun clearTextFocus() {
+    fun clearFocus() {
         editText.clearFocus()
     }
 

@@ -18,4 +18,9 @@
         </changeBounds>
     </transitionSet>
     <fade android:fadingMode="fade_in"/>
+    <targets>
+        <target android:excludeId="@id/sb_bar_end"/>
+        <target android:excludeId="@id/sb_clear"/>
+        <target android:excludeId="@id/sb_loading"/>
+    </targets>
 </transitionSet>

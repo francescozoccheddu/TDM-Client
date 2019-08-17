@@ -63,7 +63,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/tg_search_close"
-                        android:layout_toStartOf="@id/tg_search_clear"
+                        android:layout_toStartOf="@id/sb_bar_end"
                         android:layout_alignWithParentIfMissing="true"
                         android:layout_centerVertical="true"
                         android:hint="@string/search_hint"
@@ -75,31 +75,34 @@
                         android:textCursorDrawable="@null"
                 />
                 
-                <ImageButton
-                        android:id="@+id/tg_search_clear"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_cancel"
-                        android:background="?selectableItemBackgroundBorderless"
-                        android:layout_toStartOf="@id/tg_search_loading"
-                        android:layout_alignWithParentIfMissing="true"
-                        android:layout_centerVertical="true"
-                        android:visibility="gone"
-                        android:layout_margin="2dp"
-                        android:foregroundGravity="center"
-                />
+                <LinearLayout android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_alignParentEnd="true"
+                              android:layout_centerVertical="true"
+                              android:gravity="center"
+                              android:id="@+id/sb_bar_end"
+                >
+                    
+                    <ProgressBar
+                            android:id="@+id/sb_loading"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:indeterminateOnly="true"
+                            android:visibility="gone"
+                            android:layout_margin="2dp"
+                    />
+                    
+                    <ImageButton
+                            android:id="@+id/sb_clear"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_cancel"
+                            android:background="?selectableItemBackgroundBorderless"
+                            android:visibility="gone"
+                            android:layout_margin="2dp"
+                    />
                 
-                <ProgressBar
-                        android:layout_alignParentEnd="true"
-                        android:id="@+id/tg_search_loading"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:indeterminateOnly="true"
-                        android:layout_centerVertical="true"
-                        android:visibility="gone"
-                        android:layout_margin="2dp"
-                        android:foregroundGravity="center"
-                />
+                </LinearLayout>
             
             </RelativeLayout>
             
@@ -110,6 +113,7 @@
                     android:scrollbars="vertical"
                     android:layout_gravity="center"
                     android:visibility="gone"
+                    android:overScrollMode="ifContentScrolls"
             />
         
         </LinearLayout>
