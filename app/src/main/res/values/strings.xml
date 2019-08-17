@@ -35,4 +35,7 @@
     <string name="snackbar_action_routed">Termina</string>
     <string name="snackbar_unknown_place">Luogo sconosciuto</string>
     <string name="snackbar_routed">Percorso calcolato</string>
+    <string name="duration_hint">Quanto tempo vuoi dedicarmi?</string>
+    <string name="duration_cancel">Annulla</string>
+    <string name="duration_start">Inizia</string>
 </resources>

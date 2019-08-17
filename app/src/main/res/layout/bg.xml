@@ -13,7 +13,7 @@
     />
     
     <androidx.cardview.widget.CardView
-            android:id="@+id/bg_root"
+            android:id="@+id/bg_card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -26,48 +26,18 @@
             app:cardUseCompatPadding="false"
     >
         
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.DurationComponent
-                android:id="@+id/bg_duration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="18dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-        />
-        
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.WalkComponent
-                android:id="@+id/bg_walk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:layoutAnimation="@anim/layout_rise"
-        />
-        
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.InfoComponent
-                android:id="@+id/bg_info"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/fab_size"
-                android:visibility="gone"
-                android:gravity="center_vertical|start"
-                android:layout_gravity="start|center_vertical"
-                android:layout_margin="10dp"
-        />
-        
-        <com.francescozoccheddu.tdmclient.ui.bottomgroup.ActionComponent
-                android:id="@+id/bg_action"
-                android:layout_width="@dimen/fab_size"
-                android:layout_height="@dimen/fab_size"
-                android:visibility="gone"
-                android:gravity="center"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-        />
+        <include layout="@layout/bg_action"
+                 android:visibility="gone"
+                 android:id="@+id/bg_action"/>
+        <include layout="@layout/bg_walk"
+                 android:visibility="gone"
+                 android:id="@+id/bg_walk"/>
+        <include layout="@layout/bg_duration"
+                 android:visibility="gone"
+                 android:id="@+id/bg_duration"/>
+        <include layout="@layout/bg_info"
+                 android:visibility="gone"
+                 android:id="@+id/bg_info"/>
     
     </androidx.cardview.widget.CardView>
 

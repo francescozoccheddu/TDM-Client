@@ -1,5 +1,6 @@
 package com.francescozoccheddu.tdmclient.ui.bottomgroup
 
+import android.view.ViewGroup
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.ui.utils.Router
 import com.francescozoccheddu.tdmclient.utils.android.Timer
@@ -10,9 +11,9 @@ import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-class RoutingController(group: BottomGroup) {
+class RoutingController(parent: ViewGroup) {
 
-    private val ui = BottomGroupController(group)
+    private val ui = BottomGroupController(parent)
     private val router = Router()
 
     init {
@@ -28,13 +29,13 @@ class RoutingController(group: BottomGroup) {
             ui.state = BottomGroupController.State.CHOOSING_WALK_MODE
         }
         ui.onSelectRoutingMode = {
-            if (it == WalkComponent.RoutingMode.DESTINATION)
+            if (it == BottomGroupLayoutManager.WalkComponent.RoutingMode.DESTINATION)
                 pickingDestination = true
             else
                 ui.minTime = 10f
             ui.state = when (it) {
-                WalkComponent.RoutingMode.NEARBY -> BottomGroupController.State.CHOOSING_DURATION
-                WalkComponent.RoutingMode.DESTINATION -> BottomGroupController.State.PICKING_DESTINATION
+                BottomGroupLayoutManager.WalkComponent.RoutingMode.NEARBY -> BottomGroupController.State.CHOOSING_DURATION
+                BottomGroupLayoutManager.WalkComponent.RoutingMode.DESTINATION -> BottomGroupController.State.PICKING_DESTINATION
             }
         }
         ui.onConfirmRouting = {

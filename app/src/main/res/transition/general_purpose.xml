@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+               android:transitionOrdering="sequential">
+    <fade android:fadingMode="fade_out"/>
+    <transitionSet android:transitionOrdering="together">
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.ElevationTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.CardRadiusTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.PaddingTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.MarginTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.AlphaTransition"/>
+        <changeBounds/>
+    </transitionSet>
+    <fade android:fadingMode="fade_in"/>
+</transitionSet>

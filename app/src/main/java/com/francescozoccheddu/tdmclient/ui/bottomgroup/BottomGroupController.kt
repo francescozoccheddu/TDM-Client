@@ -1,9 +1,12 @@
 package com.francescozoccheddu.tdmclient.ui.bottomgroup
 
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
 
-class BottomGroupController(private val group: BottomGroup) {
+class BottomGroupController(private val parent: ViewGroup) {
+
+    private val layout = BottomGroupLayoutManager(parent)
 
     enum class State {
         LOCATING, UNLOCATABLE, PERMISSIONS_UNGRANTED, ROUTING, HIDDEN,
@@ -20,8 +23,8 @@ class BottomGroupController(private val group: BottomGroup) {
             }
         }
 
-    private fun getString(resId: Int) = group.resources.getString(resId)
-    private fun getColor(resId: Int) = ContextCompat.getColor(group.context, resId)
+    private fun getString(resId: Int) = parent.resources.getString(resId)
+    private fun getColor(resId: Int) = ContextCompat.getColor(parent.context, resId)
 
     var state: State = State.HIDDEN
         set(value) {
@@ -31,34 +34,34 @@ class BottomGroupController(private val group: BottomGroup) {
             }
         }
 
-    val time get() = group.duration.time
+    val time get() = layout.duration.time
 
     var minTime
-        get() = group.duration.minTime
+        get() = layout.duration.minTime
         set(value) {
-            group.duration.minTime = value
+            layout.duration.minTime = value
         }
 
     private fun updateState() {
-        group.state = when (state) {
+        layout.state = when (state) {
             State.PICKING_DESTINATION, State.LOCATING, State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED,
             State.CONFIRMING_DESTINATION, State.ROUTING, State.OFFLINE, State.OUTSIDE_AREA,
-            State.ROUTING_FAILED, State.ROUTED -> BottomGroup.State.INFO
-            State.HIDDEN -> BottomGroup.State.HIDDEN
-            State.IDLE -> BottomGroup.State.ACTION
-            State.CHOOSING_DURATION -> BottomGroup.State.DURATION
-            State.CHOOSING_WALK_MODE -> BottomGroup.State.WALK
+            State.ROUTING_FAILED, State.ROUTED -> BottomGroupLayoutManager.State.INFO
+            State.HIDDEN -> BottomGroupLayoutManager.State.HIDDEN
+            State.IDLE -> BottomGroupLayoutManager.State.ACTION
+            State.CHOOSING_DURATION -> BottomGroupLayoutManager.State.DURATION
+            State.CHOOSING_WALK_MODE -> BottomGroupLayoutManager.State.WALK
         }
-        group.color = when (state) {
+        layout.color = when (state) {
             State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED, State.OFFLINE,
             State.ROUTING_FAILED -> getColor(R.color.backgroundError)
             State.LOCATING, State.ROUTING, State.IDLE, State.CHOOSING_WALK_MODE,
             State.CHOOSING_DURATION, State.PICKING_DESTINATION, State.ROUTED -> getColor(R.color.background)
-            State.HIDDEN -> group.color
+            State.HIDDEN -> layout.color
             State.OUTSIDE_AREA -> getColor(R.color.backgroundWarning)
             State.CONFIRMING_DESTINATION -> getColor(R.color.backgroundOk)
         }
-        group.info.text = when (state) {
+        layout.info.text = when (state) {
             State.PICKING_DESTINATION -> getString(R.string.snackbar_picking)
             State.LOCATING -> getString(R.string.snackbar_locating)
             State.UNLOCATABLE -> getString(R.string.snackbar_unlocatable)
@@ -69,25 +72,21 @@ class BottomGroupController(private val group: BottomGroup) {
             State.ROUTING_FAILED -> getString(R.string.snackbar_routing_failed)
             State.ROUTED -> getString(R.string.snackbar_routed)
             State.CONFIRMING_DESTINATION -> destinationName ?: getString(R.string.snackbar_unknown_place)
-            else -> group.info.text
+            else -> layout.info.text
         }
-        group.info.loading = when (state) {
+        layout.info.loading = when (state) {
             State.LOCATING, State.ROUTING -> true
             else -> false
         }
-        group.info.icon = when (state) {
+        layout.info.icon = when (state) {
             State.UNLOCATABLE, State.OUTSIDE_AREA -> R.drawable.ic_unlocatable
             State.OFFLINE -> R.drawable.ic_offline
             State.PERMISSIONS_UNGRANTED, State.ROUTING_FAILED -> R.drawable.ic_warning
             State.CONFIRMING_DESTINATION, State.PICKING_DESTINATION -> R.drawable.ic_place
             State.ROUTED -> R.drawable.ic_directions
-            else -> group.info.icon
+            else -> layout.info.icon
         }
-        group.modal = when (state) {
-            State.CHOOSING_DURATION, State.CHOOSING_WALK_MODE -> true
-            else -> false
-        }
-        group.info.action = when (state) {
+        layout.info.action = when (state) {
             State.UNLOCATABLE -> getString(R.string.snackbar_action_unlocatable)
             State.PERMISSIONS_UNGRANTED -> getString(R.string.snackbar_action_permissions_ungranted)
             State.ROUTING -> getString(R.string.snackbar_action_routing)
@@ -102,18 +101,22 @@ class BottomGroupController(private val group: BottomGroup) {
     var onRetryRouting: (() -> Unit)? = null
     var onConfirmRouting: (() -> Unit)? = null
     var onCancelRouting: (() -> Unit)? = null
-    var onSelectRoutingMode: ((WalkComponent.RoutingMode) -> Unit)? = null
+    var onSelectRoutingMode: ((BottomGroupLayoutManager.WalkComponent.RoutingMode) -> Unit)? = null
     var onWalkIntent: (() -> Unit)? = null
     var onLocationEnableIntent: (() -> Unit)? = null
     var onPermissionGrantIntent: (() -> Unit)? = null
     var onDestinationConfirmed: (() -> Unit)? = null
 
     init {
-        group.action.onClick { if (state == State.IDLE) onWalkIntent?.invoke() }
-        group.onDismiss { if (state == State.CHOOSING_DURATION || state == State.CHOOSING_WALK_MODE) onCancelRouting?.invoke() }
-        group.duration.onCancel { if (state == State.CHOOSING_DURATION) onCancelRouting?.invoke() }
-        group.duration.onConfirm { if (state == State.CHOOSING_DURATION) onConfirmRouting?.invoke() }
-        group.info.onAction {
+        layout.action.onAction =
+            { if (state == State.IDLE) onWalkIntent?.invoke() }
+        layout.scrim.onDismiss =
+            { if (state == State.CHOOSING_DURATION || state == State.CHOOSING_WALK_MODE) onCancelRouting?.invoke() }
+        layout.duration.onCancel =
+            { if (state == State.CHOOSING_DURATION) onCancelRouting?.invoke() }
+        layout.duration.onConfirm =
+            { if (state == State.CHOOSING_DURATION) onConfirmRouting?.invoke() }
+        layout.info.onAction = {
             when (state) {
                 State.UNLOCATABLE -> onLocationEnableIntent?.invoke()
                 State.PERMISSIONS_UNGRANTED -> onPermissionGrantIntent?.invoke()
@@ -124,7 +127,8 @@ class BottomGroupController(private val group: BottomGroup) {
                 State.ROUTING_FAILED -> onRetryRouting?.invoke()
             }
         }
-        group.walk.onChoose { if (state == State.CHOOSING_WALK_MODE) onSelectRoutingMode?.invoke(it) }
+        layout.walk.onChoose =
+            { if (state == State.CHOOSING_WALK_MODE) onSelectRoutingMode?.invoke(it) }
         updateState()
     }
 

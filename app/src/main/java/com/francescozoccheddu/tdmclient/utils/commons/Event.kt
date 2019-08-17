@@ -80,3 +80,11 @@ open class FuncEvent2<ArgumentType1, ArgumentType2> : WellSet<(ArgumentType1, Ar
     }
 
 }
+
+typealias Event = (() -> Unit)?
+
+fun event(): Event = null
+
+operator fun Event.invoke() {
+    this?.invoke()
+}
