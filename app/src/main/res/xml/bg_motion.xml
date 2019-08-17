@@ -130,7 +130,7 @@
     <ConstraintSet android:id="@+id/bg_cs_action">
         
         <Constraint
-                android:id="@+id/bg_root"
+                android:id="@+id/bg_card"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_marginEnd="16dp"
@@ -156,7 +156,7 @@
     <ConstraintSet android:id="@+id/bg_cs_info">
         
         <Constraint
-                android:id="@+id/bg_root"
+                android:id="@+id/bg_card"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_marginStart="16dp"
@@ -184,7 +184,7 @@
     <ConstraintSet android:id="@+id/bg_cs_walk">
         
         <Constraint
-                android:id="@+id/bg_root"
+                android:id="@+id/bg_card"
                 android:layout_width="200dp"
                 android:layout_height="140dp"
                 android:layout_marginStart="10dp"
@@ -211,7 +211,7 @@
     <ConstraintSet android:id="@+id/bg_cs_duration">
         
         <Constraint
-                android:id="@+id/bg_root"
+                android:id="@+id/bg_card"
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
                 android:layout_marginStart="10dp"
@@ -238,7 +238,7 @@
     <ConstraintSet android:id="@+id/bg_cs_hidden">
         
         <Constraint
-                android:id="@+id/bg_root"
+                android:id="@+id/bg_card"
                 android:layout_width="0px"
                 android:layout_height="0px"
                 android:layout_marginEnd="48dp"

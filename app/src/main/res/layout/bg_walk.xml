@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="@dimen/walk_item_height"
+              android:weightSum="2"
+              android:orientation="vertical"
+>
     
     <LinearLayout
             android:id="@+id/bg_walk_nearby"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="?selectableItemBackground"
             android:clickable="true"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
             android:gravity="start|center_vertical"
     >
         
         <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:padding="12dp"
-                android:layout_marginRight="6dp"
                 android:src="@drawable/ic_walk_nearby"
         />
         
@@ -26,27 +29,30 @@
                 android:layout_height="wrap_content"
                 android:text="Vicinato"
                 style="@style/TextAppearance.MaterialComponents.Body2"
+                android:lines="1"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_marginEnd="10dp"
         />
     
     </LinearLayout>
     
     <LinearLayout
             android:id="@+id/bg_walk_destination"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="?selectableItemBackground"
             android:clickable="true"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
             android:gravity="start|center_vertical"
     >
         
         <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:padding="12dp"
-                android:layout_marginRight="6dp"
                 android:src="@drawable/ic_walk_destination"
         />
         
@@ -55,8 +61,13 @@
                 android:layout_height="wrap_content"
                 android:text="Destinazione"
                 style="@style/TextAppearance.MaterialComponents.Body2"
+                android:lines="1"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_marginEnd="10dp"
         />
     
     </LinearLayout>
 
-</merge>
+</LinearLayout>
