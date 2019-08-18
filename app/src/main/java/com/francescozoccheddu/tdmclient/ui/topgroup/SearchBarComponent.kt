@@ -123,7 +123,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
             card.setMargins(margins)
             content.setMargins(padding)
         }
-        card.alpha = if (focused) 1f else if (enabled) 0.75f else 0f
+        card.alpha = if (focused) 1f else 0.75f
         card.elevation = if (enabled) parent.resources.getDimension(R.dimen.sb_elevation) else 0f
     }
 
@@ -132,6 +132,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
             if (value != field) {
                 field = value
                 editText.isFocusable = value
+                editText.isFocusableInTouchMode = value
                 if (!value)
                     clearFocus()
                 update()

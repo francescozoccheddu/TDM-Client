@@ -20,8 +20,10 @@
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:padding="12dp"
+                android:padding="10dp"
                 android:src="@drawable/ic_walk_nearby"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
         />
         
         <TextView
@@ -33,7 +35,7 @@
                 android:maxLines="1"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="26dp"
         />
     
     </LinearLayout>
@@ -52,8 +54,10 @@
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:padding="12dp"
+                android:padding="10dp"
                 android:src="@drawable/ic_walk_destination"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
         />
         
         <TextView
@@ -65,7 +69,7 @@
                 android:maxLines="1"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="26dp"
         />
     
     </LinearLayout>
