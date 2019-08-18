@@ -92,11 +92,10 @@
                         android:id="@+id/sb_clear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_cancel"
+                        android:src="@drawable/asl_clear"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:background="?selectableItemBackgroundBorderless"
-                        android:visibility="gone"
                         android:layout_margin="2dp"
                 />
             
