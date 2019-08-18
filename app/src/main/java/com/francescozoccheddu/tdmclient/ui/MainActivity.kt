@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
-import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
-import com.francescozoccheddu.tdmclient.ui.topgroup.SearchBarComponent
+import com.francescozoccheddu.tdmclient.ui.components.RoutingController
+import com.francescozoccheddu.tdmclient.ui.components.SearchBarComponent
 import com.francescozoccheddu.tdmclient.ui.utils.Permissions
 import com.francescozoccheddu.tdmclient.utils.android.dp
 import com.francescozoccheddu.tdmclient.utils.android.hsv

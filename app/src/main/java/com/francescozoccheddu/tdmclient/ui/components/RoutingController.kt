@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.bottomgroup
+package com.francescozoccheddu.tdmclient.ui.components
 
 import android.view.ViewGroup
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
@@ -199,7 +199,8 @@ class RoutingController(parent: ViewGroup) {
         else false
 
 
-    var problem: Problem? = Problem.UNBOUND
+    var problem: Problem? =
+        Problem.UNBOUND
         set(value) {
             if (value != field) {
                 field = value

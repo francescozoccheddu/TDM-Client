@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.bottomgroup
+package com.francescozoccheddu.tdmclient.ui.components
 
 import android.view.View
 import android.view.ViewGroup
@@ -207,7 +207,9 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
                 field = value
                 knob.apply {
                     minValue = value.snapUp(MIN_DURATION_STEP)
-                    maxValue = (minValue + MIN_DURATION_RANGE).snapUp(MIN_DURATION_STEP)
+                    maxValue = (minValue + MIN_DURATION_RANGE).snapUp(
+                        MIN_DURATION_STEP
+                    )
                     startValue = minValue.snapDown(60f)
                 }
             }
