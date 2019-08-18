@@ -46,7 +46,14 @@ class RoutingController(parent: ViewGroup) {
             else
                 router.onResult?.invoke(null)
         }
-        ui.onRetryRouting = ui.onConfirmRouting
+        ui.onRetryRouting = {
+            failureNotificationCountdown.cancel()
+            if (destination != null)
+                ui.onConfirmRouting?.invoke()
+            else
+                updateState()
+        }
+
         ui.onCancelRouting = {
             cancelRouting(true)
             ui.state = BottomGroupController.State.IDLE
@@ -147,29 +154,33 @@ class RoutingController(parent: ViewGroup) {
     }
 
     private fun updateState() {
-        if (failureNotificationCountdown.running) {
-            destination = null
-            failureNotificationCountdown.cancel()
-        }
         val problem = this.problem
-        ui.state = if (problem != null)
-            when (problem) {
-                Problem.OFFLINE -> BottomGroupController.State.OFFLINE
-                Problem.UNLOCATABLE -> BottomGroupController.State.UNLOCATABLE
-                Problem.LOCATING -> BottomGroupController.State.LOCATING
-                Problem.PERMISSIONS_UNGRANTED -> BottomGroupController.State.PERMISSIONS_UNGRANTED
-                Problem.OUTSIDE_AREA -> BottomGroupController.State.OUTSIDE_AREA
-                Problem.UNBOUND -> BottomGroupController.State.HIDDEN
+        ui.state =
+            if (!enabled)
+                BottomGroupController.State.HIDDEN
+            else if (failureNotificationCountdown.running)
+                BottomGroupController.State.ROUTING_FAILED
+            else if (problem != null)
+                when (problem) {
+                    Problem.OFFLINE -> BottomGroupController.State.OFFLINE
+                    Problem.UNLOCATABLE -> BottomGroupController.State.UNLOCATABLE
+                    Problem.LOCATING -> BottomGroupController.State.LOCATING
+                    Problem.PERMISSIONS_UNGRANTED -> BottomGroupController.State.PERMISSIONS_UNGRANTED
+                    Problem.OUTSIDE_AREA -> BottomGroupController.State.OUTSIDE_AREA
+                    Problem.UNBOUND -> BottomGroupController.State.HIDDEN
+                }
+            else if (pickingDestination) {
+                if (destination != null)
+                    BottomGroupController.State.CONFIRMING_DESTINATION
+                else
+                    BottomGroupController.State.PICKING_DESTINATION
             }
-        else if (pickingDestination) {
-            if (destination != null)
-                BottomGroupController.State.CONFIRMING_DESTINATION
-            else
-                BottomGroupController.State.PICKING_DESTINATION
-        }
-        else if (route != null) BottomGroupController.State.ROUTED
-        else if (router.running) BottomGroupController.State.ROUTING
-        else BottomGroupController.State.IDLE
+            else if (route != null) BottomGroupController.State.ROUTED
+            else if (router.running) BottomGroupController.State.ROUTING
+            else when (ui.state) {
+                BottomGroupController.State.CHOOSING_DURATION, BottomGroupController.State.CHOOSING_WALK_MODE -> ui.state
+                else -> BottomGroupController.State.IDLE
+            }
     }
 
     fun onBack(): Boolean {
@@ -180,8 +191,21 @@ class RoutingController(parent: ViewGroup) {
         set(value) {
             if (value != field) {
                 field = value
-                if (value != null)
+                if (value != null) {
+                    if (failureNotificationCountdown.running) {
+                        failureNotificationCountdown.cancel()
+                        destination = null
+                    }
                     cancelRouting(false)
+                }
+                updateState()
+            }
+        }
+
+    var enabled = true
+        set(value) {
+            if (field != value) {
+                field = value
                 updateState()
             }
         }

@@ -143,7 +143,7 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
                 }
             }
 
-        override var icon: Int = R.drawable.ic_back
+        override var icon: Int = 0
             set(value) {
                 if (field != value) {
                     field = value

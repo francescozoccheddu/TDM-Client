@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 routingController.setDestination(it.point, it.name, true)
             }
+            onFocusChanged = { routingController.enabled = !searchBarComponent.focused }
         }
 
         routingController = RoutingController(bg_root).apply {
@@ -474,9 +475,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (routingController.onBack())
+        if (searchBarComponent.focused)
+            searchBarComponent.clearFocus()
+        else if (routingController.onBack())
             return
-        super.onBackPressed()
+        else super.onBackPressed()
     }
 
     override fun onRequestPermissionsResult(
