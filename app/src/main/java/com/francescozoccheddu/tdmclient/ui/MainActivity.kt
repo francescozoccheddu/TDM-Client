@@ -60,6 +60,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.bg.bg_root
 import kotlinx.android.synthetic.main.ma.ma_map
 import kotlinx.android.synthetic.main.sb.sb_root
+import kotlin.math.roundToInt
 
 //import kotlinx.android.synthetic.main.ma.ma_tg
 
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         private const val MIN_ZOOM = 9.0
         private const val MAX_ZOOM = 20.0
         private const val SEARCH_ZOOM = 11.0
+        private const val CAMERA_ANIMATION_DURATION = 1f
 
         private const val MB_IMAGE_DESTINATION = "image_destination"
         private const val MB_SOURCE_DESTINATION = "source_destination"
@@ -87,7 +89,6 @@ class MainActivity : AppCompatActivity() {
         private const val MB_LAYER_POIS_RADIUS = "layer_pois_radius"
         private const val MB_LAYER_POIS_POINT = "layer_pois_point"
         private const val MB_LAYER_LOWEST = "admin-0-boundary-disputed"
-        private const val MB_LAYER_HIGHEST = "admin-0-boundary-disputed"
 
     }
 
@@ -101,15 +102,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ma)
 
-        /*topGroupController = TopGroupController(ma_tg).apply {
+        searchBarComponent = SearchBarComponent(sb_root).apply {
             onDestinationChosen = {
                 if (this@MainActivity::map.isInitialized)
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(it.point, SEARCH_ZOOM))
+                    map.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(it.point, SEARCH_ZOOM),
+                        (CAMERA_ANIMATION_DURATION * 1000).roundToInt()
+                    )
                 routingController.setDestination(it.point, it.name, true)
             }
-        }*/
-
-        searchBarComponent = SearchBarComponent(sb_root)
+        }
 
         routingController = RoutingController(bg_root).apply {
             onDestinationChanged += {
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                                         .include(b)
                                         .build(),
                                     resources.getDimensionPixelSize(R.dimen.map_bounds_padding)
-                                )
+                                ), (CAMERA_ANIMATION_DURATION * 1000).roundToInt()
                             )
                     }
                     val style = map.style
@@ -364,11 +366,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateTopGroup() {
-        /*topGroupController.state = if (routingController.pickingDestination)
-            TopGroupController.State.SEARCHING
-        else if (routingController.problem == null)
-            TopGroupController.State.SCORE
-        else TopGroupController.State.HIDDEN*/
+        searchBarComponent.enabled = routingController.pickingDestination
     }
 
     private fun onLocationChanged() {
