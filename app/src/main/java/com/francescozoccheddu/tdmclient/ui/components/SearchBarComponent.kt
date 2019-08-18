@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.topgroup
+package com.francescozoccheddu.tdmclient.ui.components
 
 
 import android.content.Context
@@ -80,14 +80,18 @@ class SearchBarComponent(private val parent: ViewGroup) {
 
         })
 
+        val closeAvd = SearchToBackAVD(closeButton)
+
         editText.setOnFocusChangeListener { _, nowFocused ->
             if (nowFocused && !enabled)
                 clearFocus()
-            closeButton.isEnabled = focused
             if (!focused) {
                 val service = parent.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 service.hideSoftInputFromWindow(editText.windowToken, 0)
             }
+            closeButton.isEnabled = focused
+            closeAvd.state = if (focused) SearchToBackAVD.State.BACK else SearchToBackAVD.State.SEARCH
+            scrim.isClickable = focused
             update()
             onFocusChanged?.invoke(focused)
         }
@@ -100,7 +104,6 @@ class SearchBarComponent(private val parent: ViewGroup) {
         TransitionManager.beginDelayedTransition(parent, transition)
         resultList.visible = focused
         scrim.alpha = if (focused) 0.4f else 0f
-        scrim.isClickable = focused
         card.radius =
             if (enabled)
                 parent.resources.getDimension(

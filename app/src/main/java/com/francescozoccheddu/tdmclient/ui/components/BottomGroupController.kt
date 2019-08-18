@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.bottomgroup
+package com.francescozoccheddu.tdmclient.ui.components
 
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -26,7 +26,8 @@ class BottomGroupController(private val parent: ViewGroup) {
     private fun getString(resId: Int) = parent.resources.getString(resId)
     private fun getColor(resId: Int) = ContextCompat.getColor(parent.context, resId)
 
-    var state: State = State.HIDDEN
+    var state: State =
+        State.HIDDEN
         set(value) {
             if (value != field) {
                 field = value
