@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         private const val MAP_STYLE_URI = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
         private const val MIN_ZOOM = 9.0
         private const val MAX_ZOOM = 20.0
-        private const val SEARCH_ZOOM = 11.0
+        private const val SEARCH_ZOOM = 13.0
         private const val CAMERA_ANIMATION_DURATION = 1f
 
         private const val MB_IMAGE_DESTINATION = "image_destination"
@@ -371,7 +371,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onLocationChanged() {
         updateRouting()
-        //topGroupController.location = service?.location?.latLng
+        searchBarComponent.location = service?.location?.latLng
     }
 
     private fun onLocatableChange() {
