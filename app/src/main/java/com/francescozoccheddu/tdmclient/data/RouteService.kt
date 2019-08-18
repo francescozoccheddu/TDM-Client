@@ -42,9 +42,9 @@ private val INTERPRETER = object : SimpleInterpreter<RouteRequest, List<Point>>(
 
 }
 
-typealias RouteRetriever = Server.Service<RouteRequest, List<Point>>
+typealias RouteService = Server.Service<RouteRequest, List<Point>>
 
-fun makeRouteRetriever(server: Server) =
+fun makeRouteService(server: Server) : RouteService =
     server.Service(
         SERVICE_ADDRESS,
         INTERPRETER

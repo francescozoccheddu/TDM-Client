@@ -1,8 +1,8 @@
 package com.francescozoccheddu.tdmclient.data
 
-class FakeSensor(val measurement: SensorDriver.Measurement) :
+class FakeSensor(val measurement: Measurement) :
     SensorDriver.Sensor {
-    override fun measure(): SensorDriver.Measurement {
+    override fun measure(): Measurement {
         return measurement
     }
 }

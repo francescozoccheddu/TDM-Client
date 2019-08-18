@@ -6,33 +6,20 @@ import android.location.Location
 import android.os.Looper
 import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.FixedSizeSortedQueue
-import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
+import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
-import com.francescozoccheddu.tdmclient.utils.commons.iso
-import com.francescozoccheddu.tdmclient.utils.data.client.Interpreter
-import com.francescozoccheddu.tdmclient.utils.data.client.PollInterpreter
-import com.francescozoccheddu.tdmclient.utils.data.client.RetryPolicy
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
-import com.francescozoccheddu.tdmclient.utils.data.client.SimpleInterpreter
 import com.francescozoccheddu.tdmclient.utils.data.client.error
-import com.francescozoccheddu.tdmclient.utils.data.json
-import org.json.JSONArray
-import org.json.JSONObject
 import java.util.*
 import kotlin.math.max
 
 class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: Looper = Looper.myLooper()!!) {
 
     companion object {
-        const val DEFAULT_PREFS_NAME = "tdmclient:SensorDriver:SharedPreferences"
-        const val DEFAULT_SCORE_PREF_KEY = "$DEFAULT_PREFS_NAME.sl"
+        val DEFAULT_PREFS_NAME = "${this::class.java.canonicalName}:score"
+        val DEFAULT_SCORE_PREF_KEY = "${this::class.java.canonicalName}:score"
 
         private const val MAX_SCORE_REQUESTS = 4
-        private const val SCORE_SERVICE_ADDRESS = "getuser"
-        private val SCORE_SERVICE_RETRY_POLICY = RetryPolicy(2f)
-
-        private const val MEASUREMENT_SERVICE_ADDRESS = "putmeasurements"
-        private val MEASUREMENT_SERVICE_RETRY_POLICY = RetryPolicy(4f)
 
         private const val MAX_MEASUREMENTS_REQUESTS = 4
         private const val MAX_UNREACHABLE_ATTEMPTS = 3
@@ -49,87 +36,33 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
         fun measure(): Measurement
     }
 
-    data class User(val id: Int, val passkey: String)
-    data class Measurement(
-        val altitude: Float, val humidity: Float,
-        val pressure: Float, val temperature: Float,
-        val fineDust150: Float, val fineDust200: Float
-    )
-
-    private data class LocalizedMeasurement(val time: Date, val location: Location, val measurement: Measurement)
-    private data class MeasurementPutRequest(val user: User, val measurements: Collection<LocalizedMeasurement>)
-
     private val queue = FixedSizeSortedQueue.by(MAX_QUEUE_SIZE, true) { value: LocalizedMeasurement -> value.time }
 
-    private val scoreService =
-        server.PollService(SCORE_SERVICE_ADDRESS, user, PollInterpreter.from(object : SimpleInterpreter<User, Int>() {
-            override fun interpretRequest(request: User): JSONObject? =
-                JSONObject().apply {
-                    put("id", request.id)
-                    put("passkey", request.passkey)
-                }
-
-            override fun interpretResponse(request: User, response: JSONObject): Int {
-                try {
-                    return response["sl"] as Int
-                } catch (_: Exception) {
-                    throw Interpreter.UninterpretableResponseException()
-                }
+    private val userService = makeUserService(server, user).apply {
+        onData += { score = it }
+    }
+    private val measurementService = makeMeasurementService(server).apply {
+        onRequestStatusChanged += {
+            if (it.status.succeeded) {
+                userService.submit(it.startTime, it.response)
+                reachable = true
+                failureCount = 0
             }
-        })).apply {
-            onData += { score = it }
-            customRetryPolicy = SCORE_SERVICE_RETRY_POLICY
+            else if (it.status.error) {
+                failureCount++
+                if (failureCount > MAX_UNREACHABLE_ATTEMPTS)
+                    reachable = false
+            }
+
+            if (!it.status.pending) {
+                if (!it.status.succeeded)
+                    queue.addLocalized(it.request.measurements.filter {
+                        dateElapsed(it.time) < MAX_QUEUE_HOLD_TIME
+                    })
+                updateBatch()
+            }
         }
-    private val measurementService =
-        server.Service(MEASUREMENT_SERVICE_ADDRESS, object : SimpleInterpreter<MeasurementPutRequest, Int>() {
-            override fun interpretRequest(request: MeasurementPutRequest): JSONObject? =
-                JSONObject().apply {
-                    put("id", request.user.id)
-                    put("passkey", request.user.passkey)
-                    put("measurements", JSONArray(request.measurements.map {
-                        JSONObject().apply {
-                            put("time", it.time.iso)
-                            put("location", it.location.json)
-                            put("altitude", it.measurement.altitude)
-                            put("humidity", it.measurement.humidity)
-                            put("pressure", it.measurement.pressure)
-                            put("temperature", it.measurement.temperature)
-                            put("fineDust150", it.measurement.fineDust150)
-                            put("fineDust200", it.measurement.fineDust200)
-                        }
-                    }))
-                }
-
-            override fun interpretResponse(request: MeasurementPutRequest, response: JSONObject): Int {
-                try {
-                    return response.getInt("sl")
-                } catch (_: Exception) {
-                    throw Interpreter.UninterpretableResponseException()
-                }
-            }
-        }).apply {
-            onRequestStatusChanged += {
-                if (it.status.succeeded) {
-                    scoreService.submit(it.startTime, it.response)
-                    reachable = true
-                    failureCount = 0
-                }
-                else if (it.status.error) {
-                    failureCount++
-                    if (failureCount > MAX_UNREACHABLE_ATTEMPTS)
-                        reachable = false
-                }
-
-                if (!it.status.pending) {
-                    if (!it.status.succeeded)
-                        queue.addLocalized(it.request.measurements.filter {
-                            dateElapsed(it.time) < MAX_QUEUE_HOLD_TIME
-                        })
-                    updateBatch()
-                }
-            }
-            customRetryPolicy = MEASUREMENT_SERVICE_RETRY_POLICY
-        }
+    }
 
     private var failureCount = 0
 
@@ -237,12 +170,25 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             ticker.tickInterval = value
         }
 
-    var score = 0
-        private set(value) {
-            if (value != field || !hasScore) {
-                hasScore = true
+    val hasScore get() = this::_score.isInitialized
+
+    lateinit private var _score: Score
+
+    var notifyLevel = 0
+        set(value) {
+            if (value != field) {
                 field = value
-                onScoreChange(this)
+                userService.pollRequest = UserGetRequest(user, value)
+                requestScoreUpdate()
+            }
+        }
+
+    var score
+        get() = _score
+        private set(value) {
+            if (!hasScore || value != _score) {
+                _score = value
+                onScoreChange()
             }
         }
 
@@ -250,25 +196,25 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
         private set(value) {
             if (value != field) {
                 field = value
-                onReachableChange(this)
+                onReachableChange()
             }
         }
 
-    private var hasScore = false
+    val onScoreChange = ProcEvent()
 
-    val onScoreChange = FuncEvent<SensorDriver>()
-
-    val onReachableChange = FuncEvent<SensorDriver>()
+    val onReachableChange = ProcEvent()
 
     fun loadScore(prefs: SharedPreferences, key: String = DEFAULT_SCORE_PREF_KEY) {
-        if (!hasScore && prefs.contains(key))
-            score = prefs.getInt(key, score)
+        if (!hasScore) {
+            val score = loadScoreFromPrefs(prefs, key)
+            if (score != null)
+                this.score = score
+        }
     }
 
     fun saveScore(prefs: SharedPreferences.Editor, key: String = DEFAULT_SCORE_PREF_KEY) {
-        if (hasScore) {
-            prefs.putInt(key, score)
-        }
+        if (hasScore)
+            saveScoreToPrefs(prefs, score, key)
     }
 
     fun loadScore(context: Context, prefsName: String = DEFAULT_PREFS_NAME, key: String = DEFAULT_SCORE_PREF_KEY) {
@@ -287,13 +233,13 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
     }
 
     fun requestScoreUpdate() {
-        if (scoreService.pendingRequests.size >= MAX_SCORE_REQUESTS)
-            scoreService.pendingRequests.minBy { it.startTime }?.cancel()
-        scoreService.poll()
+        if (userService.pendingRequests.size >= MAX_SCORE_REQUESTS)
+            userService.pendingRequests.minBy { it.startTime }?.cancel()
+        userService.poll()
     }
 
     fun cancelAll() {
-        scoreService.cancelAll()
+        userService.cancelAll()
         measurementService.cancelAll()
     }
 
