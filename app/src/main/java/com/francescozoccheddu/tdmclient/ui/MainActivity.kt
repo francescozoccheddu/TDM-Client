@@ -16,6 +16,7 @@ import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.LineString
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
@@ -34,10 +35,12 @@ import com.mapbox.mapboxsdk.style.expressions.Expression.rgba
 import com.mapbox.mapboxsdk.style.expressions.Expression.stop
 import com.mapbox.mapboxsdk.style.expressions.Expression.subtract
 import com.mapbox.mapboxsdk.style.expressions.Expression.zoom
+import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.FillLayer
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.mapboxsdk.style.layers.Property
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor
@@ -79,6 +82,12 @@ class MainActivity : AppCompatActivity() {
         private const val MB_LAYER_COVERAGE_QUADS = "layer_coverage_quads"
         private const val MB_SOURCE_DIRECTIONS = "source_directions"
         private const val MB_LAYER_DIRECTIONS = "layer_directions"
+        private const val MB_IMAGE_POI = "image_poi"
+        private const val MB_SOURCE_POIS = "source_pois"
+        private const val MB_LAYER_POIS_RADIUS = "layer_pois_radius"
+        private const val MB_LAYER_POIS_POINT = "layer_pois_point"
+        private const val MB_LAYER_LOWEST = "admin-0-boundary-disputed"
+        private const val MB_LAYER_HIGHEST = "admin-0-boundary-disputed"
 
     }
 
@@ -104,11 +113,7 @@ class MainActivity : AppCompatActivity() {
 
         routingController = RoutingController(bg_root).apply {
             onDestinationChanged += {
-                if (this@MainActivity::map.isInitialized) {
-                    val style = map.style
-                    if (style != null)
-                        setDestinationMarker(style)
-                }
+                setSource(MB_SOURCE_DESTINATION, routingController.destination?.point)
             }
             onRouteChanged += {
                 if (this@MainActivity::map.isInitialized) {
@@ -159,19 +164,16 @@ class MainActivity : AppCompatActivity() {
                                 MB_IMAGE_DESTINATION,
                                 resources.getDrawable(R.drawable.ic_place, null)
                             )
-                            .withSource(GeoJsonSource(MB_SOURCE_DESTINATION))
-                            .withLayer(
-                                SymbolLayer(MB_LAYER_DESTINATION, MB_SOURCE_DESTINATION)
-                                    .withProperties(
-                                        iconAllowOverlap(true),
-                                        textAllowOverlap(true),
-                                        iconImage(MB_IMAGE_DESTINATION),
-                                        iconIgnorePlacement(true),
-                                        iconOptional(false)
-                                    )
+                            .withImage(
+                                MB_IMAGE_POI,
+                                resources.getDrawable(R.drawable.ic_poi, null)
                             )
+                            .withSource(GeoJsonSource(MB_SOURCE_POIS))
+                            .withSource(GeoJsonSource(MB_SOURCE_COVERAGE_POINTS))
                             .withSource(GeoJsonSource(MB_SOURCE_COVERAGE_QUADS))
-                            .withLayer(
+                            .withSource(GeoJsonSource(MB_SOURCE_DESTINATION))
+                            .withSource(GeoJsonSource(MB_SOURCE_DIRECTIONS))
+                            .withLayerAbove(
                                 FillLayer(MB_LAYER_COVERAGE_QUADS, MB_SOURCE_COVERAGE_QUADS)
                                     .withProperties(
                                         fillColor(
@@ -188,10 +190,21 @@ class MainActivity : AppCompatActivity() {
                                                 stop(15, 0.5)
                                             )
                                         )
-                                    )
+                                    ),
+                                MB_LAYER_LOWEST
                             )
-                            .withSource(GeoJsonSource(MB_SOURCE_COVERAGE_POINTS))
-                            .withLayer(
+                            .withLayerAbove(
+                                CircleLayer(MB_LAYER_POIS_RADIUS, MB_SOURCE_POIS).withProperties(
+                                    fillColor(
+                                        rgba(48, 210, 255, 1.0)
+                                    ),
+                                    circleRadius(
+                                        get("radius")
+                                    )
+                                ),
+                                MB_LAYER_COVERAGE_QUADS
+                            )
+                            .withLayerAbove(
                                 HeatmapLayer(MB_LAYER_COVERAGE_POINTS, MB_SOURCE_COVERAGE_POINTS)
                                     .withProperties(
                                         heatmapColor(
@@ -219,15 +232,35 @@ class MainActivity : AppCompatActivity() {
                                         heatmapWeight(
                                             subtract(literal(1f), get("coverage"))
                                         )
-                                    )
+                                    ),
+                                MB_LAYER_POIS_RADIUS
                             )
-                            .withSource(GeoJsonSource(MB_SOURCE_DIRECTIONS))
                             .withLayer(
                                 LineLayer(MB_LAYER_DIRECTIONS, MB_SOURCE_DIRECTIONS).withProperties(
                                     lineCap(Property.LINE_CAP_ROUND),
                                     lineJoin(Property.LINE_JOIN_ROUND),
                                     lineWidth(5f)
                                 )
+                            )
+                            .withLayer(
+                                SymbolLayer(MB_LAYER_POIS_POINT, MB_SOURCE_POIS)
+                                    .withProperties(
+                                        iconAllowOverlap(true),
+                                        textAllowOverlap(true),
+                                        iconImage(MB_IMAGE_POI),
+                                        iconIgnorePlacement(true),
+                                        iconOptional(false)
+                                    )
+                            )
+                            .withLayer(
+                                SymbolLayer(MB_LAYER_DESTINATION, MB_SOURCE_DESTINATION)
+                                    .withProperties(
+                                        iconAllowOverlap(true),
+                                        textAllowOverlap(true),
+                                        iconImage(MB_IMAGE_DESTINATION),
+                                        iconIgnorePlacement(true),
+                                        iconOptional(false)
+                                    )
                             )
                     ) { style ->
                         LocalizationPlugin(ma_map, map, style).apply {
@@ -238,70 +271,76 @@ class MainActivity : AppCompatActivity() {
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
                         if (permissions.granted)
                             enableLocationComponent(style)
-                        setDestinationMarker(style)
+                        setSource(style, MB_SOURCE_DESTINATION, routingController.destination?.point)
                         setDirectionsLine(style)
-                        setCoveragePointData(style)
-                        setCoverageQuadData(style)
-                    }
-                    addOnMapClickListener { click ->
-                        if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
-                            val screenPoint = map.projection.toScreenLocation(click)
-                            val features = map.queryRenderedFeatures(screenPoint, MB_LAYER_DESTINATION)
-                            if (features.isNotEmpty()) {
-                                routingController.removeDestination()
-                                true
-                            }
-                            else {
-                                val name = service?.getDistrictName(click)
-                                if (name != null) {
-                                    routingController.setDestination(click, name, false)
+                        setSource(style, MB_SOURCE_COVERAGE_POINTS, service?.coveragePointData)
+                        setSource(style, MB_SOURCE_COVERAGE_QUADS, service?.coverageQuadData)
+                        setSource(style, MB_SOURCE_POIS, service?.poiData)
+                        addOnMapClickListener { click ->
+                            if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
+                                val screenPoint = map.projection.toScreenLocation(click)
+                                val features = map.queryRenderedFeatures(screenPoint, MB_LAYER_DESTINATION)
+                                if (features.isNotEmpty()) {
+                                    routingController.removeDestination()
                                     true
                                 }
-                                else false
+                                else {
+                                    val name = service?.getDistrictName(click)
+                                    if (name != null) {
+                                        routingController.setDestination(click, name, false)
+                                        true
+                                    }
+                                    else false
+                                }
                             }
+                            else false
                         }
-                        else false
                     }
                 }
             }
         }
-
-
     }
 
-    private fun setDestinationMarker(style: Style) {
-        val source = style.getSource(MB_SOURCE_DESTINATION)
-        if (source is GeoJsonSource) {
-            val destination = routingController.destination
-            if (destination == null)
-                source.setGeoJson(null as FeatureCollection?)
-            else
-                source.setGeoJson(destination.point)
-        }
-    }
 
     private fun setDirectionsLine(style: Style) {
-        val source = style.getSource(MB_SOURCE_DIRECTIONS)
-        if (source is GeoJsonSource) {
-            val directions = routingController.route
-            if (directions == null)
-                source.setGeoJson(null as FeatureCollection?)
-            else
-                source.setGeoJson(LineString.fromPolyline(directions.geometry()!!, PRECISION_6))
+        val directions = routingController.route
+        val geometry = if (directions != null) LineString.fromPolyline(directions.geometry()!!, PRECISION_6) else null
+        setSource(style, MB_SOURCE_DIRECTIONS, geometry)
+    }
+
+    private fun GeoJsonSource.clear() {
+        setGeoJson(null as FeatureCollection?)
+    }
+
+    private fun setSource(style: Style, sourceId: String, data: FeatureCollection?) {
+        val source = style.getSource(sourceId)
+        if (source is GeoJsonSource)
+            source.setGeoJson(data)
+    }
+
+    private fun setSource(sourceId: String, data: FeatureCollection?) {
+        if (this@MainActivity::map.isInitialized) {
+            val style = map.style
+            if (style != null)
+                setSource(style, sourceId, data)
         }
     }
 
-    private fun setCoveragePointData(style: Style) {
-        val source = style.getSource(MB_SOURCE_COVERAGE_POINTS)
+    private fun setSource(style: Style, sourceId: String, data: Geometry?) {
+        val source = style.getSource(sourceId)
         if (source is GeoJsonSource)
-            source.setGeoJson(service?.coveragePointData)
+            if (data == null)
+                source.clear()
+            else
+                source.setGeoJson(data)
     }
 
-
-    private fun setCoverageQuadData(style: Style) {
-        val source = style.getSource(MB_SOURCE_COVERAGE_QUADS)
-        if (source is GeoJsonSource)
-            source.setGeoJson(service?.coverageQuadData)
+    private fun setSource(sourceId: String, data: Geometry?) {
+        if (this@MainActivity::map.isInitialized) {
+            val style = map.style
+            if (style != null)
+                setSource(style, sourceId, data)
+        }
     }
 
     private fun updateRouting() {
@@ -344,7 +383,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun onOnlineChange() {
         updateRouting()
-
     }
 
     private fun onScoreChange() {
@@ -353,19 +391,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onCoveragePointDataChange() {
-        if (this::map.isInitialized) {
-            val style = map.style
-            if (style != null)
-                setCoveragePointData(style)
-        }
+        setSource(MB_SOURCE_COVERAGE_POINTS, service?.coveragePointData)
     }
 
     private fun onCoverageQuadDataChange() {
-        if (this::map.isInitialized) {
-            val style = map.style
-            if (style != null)
-                setCoverageQuadData(style)
-        }
+        setSource(MB_SOURCE_COVERAGE_QUADS, service?.coverageQuadData)
+    }
+
+    private fun onPoiDataChange() {
+        setSource(MB_SOURCE_POIS, service?.poiData)
     }
 
     private var service: MainService? = null
@@ -380,6 +414,7 @@ class MainActivity : AppCompatActivity() {
                     old.onScoreChange -= this::onScoreChange
                     old.onCoveragePointDataChange -= this::onCoveragePointDataChange
                     old.onCoverageQuadDataChange -= this::onCoverageQuadDataChange
+                    old.onPoiDataChange -= this::onPoiDataChange
                 }
                 if (value != null) {
                     value.onLocationChange += this::onLocationChanged
@@ -388,12 +423,14 @@ class MainActivity : AppCompatActivity() {
                     value.onScoreChange += this::onScoreChange
                     value.onCoveragePointDataChange += this::onCoveragePointDataChange
                     value.onCoverageQuadDataChange += this::onCoverageQuadDataChange
+                    value.onPoiDataChange += this::onPoiDataChange
                     onLocationChanged()
                     onLocatableChange()
                     onOnlineChange()
                     onScoreChange()
                     onCoveragePointDataChange()
                     onCoverageQuadDataChange()
+                    onPoiDataChange()
                 }
                 routingController.service = value
                 updateRouting()

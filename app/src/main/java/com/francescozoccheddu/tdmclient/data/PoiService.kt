@@ -19,7 +19,7 @@ private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<User, 
             put("mode", "points")
         }
 
-    override fun interpretResponse(request: User, response: JSONObject) =
+    override fun interpretResponse(request: User, response: JSONObject): FeatureCollection =
         try {
             FeatureCollection.fromJson(response.getJSONObject("pois").toString())
         } catch (_: Exception) {
