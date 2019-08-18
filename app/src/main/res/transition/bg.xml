@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+               android:transitionOrdering="sequential">
+    <fade android:fadingMode="fade_out"/>
+    <transitionSet android:transitionOrdering="together">
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.ElevationTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.CardRadiusTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.MarginTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.AlphaTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.CardColorTransition"/>
+        <changeBounds>
+            <targets>
+                <target android:excludeId="@id/bg_scrim"/>
+                <target android:excludeId="@id/bg_root"/>
+            </targets>
+        </changeBounds>
+    </transitionSet>
+    <fade android:fadingMode="fade_in"/>
+    <targets>
+        <target android:excludeId="@id/bg_info_bt"/>
+        <target android:excludeId="@id/bg_info_tv"/>
+        <target android:excludeId="@id/bg_info_rl"/>
+        <target android:excludeId="@id/bg_info_rl"/>
+        <target android:excludeId="@id/bg_info_iv"/>
+        <target android:excludeId="@id/bg_info_pb"/>
+    </targets>
+</transitionSet>

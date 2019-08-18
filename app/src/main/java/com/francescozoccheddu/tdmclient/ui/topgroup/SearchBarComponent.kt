@@ -27,7 +27,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
 
     private val transition = TransitionInflater
         .from(parent.context)
-        .inflateTransition(R.transition.general_purpose)
+        .inflateTransition(R.transition.sb)
 
     private val searchProvider = LocationSearchProvider()
     private val editText = parent.findViewById<EditText>(R.id.tg_search_text)
@@ -124,6 +124,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
             content.setMargins(padding)
         }
         card.alpha = if (focused) 1f else if (enabled) 0.75f else 0f
+        card.elevation = if (enabled) parent.resources.getDimension(R.dimen.sb_elevation) else 0f
     }
 
     var enabled = false
