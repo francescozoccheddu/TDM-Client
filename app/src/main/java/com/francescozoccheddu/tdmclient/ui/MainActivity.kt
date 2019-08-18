@@ -205,8 +205,8 @@ class MainActivity : AppCompatActivity() {
                                         heatmapRadius(
                                             interpolate(
                                                 linear(), zoom(),
-                                                stop(MIN_ZOOM, 10),
-                                                stop(15, 100)
+                                                stop(MIN_ZOOM, 5),
+                                                stop(15, 150)
                                             )
                                         ),
                                         heatmapOpacity(
@@ -349,6 +349,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onScoreChange() {
         //topGroupController.sl = service?.sl ?: topGroupController.sl
+        println("Score=${service?.score?.score}")
     }
 
     private fun onCoveragePointDataChange() {

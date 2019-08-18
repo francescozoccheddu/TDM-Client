@@ -46,9 +46,9 @@ private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, C
 
 }
 
-typealias CoverageRetriever = Server.AutoPollService<CoverageRetrieveMode, CoverageData, FeatureCollection>
+typealias CoverageService = Server.AutoPollService<CoverageRetrieveMode, CoverageData, FeatureCollection>
 
-fun makeCoverageRetriever(server: Server) =
+fun makeCoverageService(server: Server) : CoverageService =
     server.AutoPollService(
         SERVICE_ADDRESS,
         CoverageRetrieveMode.POINTS,

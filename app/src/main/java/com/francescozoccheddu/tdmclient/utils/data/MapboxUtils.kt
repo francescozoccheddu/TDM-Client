@@ -30,6 +30,8 @@ val Location.json get() = JSONArray(arrayOf(longitude, latitude))
 
 val LatLng.json get() = JSONArray(arrayOf(longitude, latitude))
 
+fun pointFromJson(json: JSONArray) = Point.fromLngLat(json.getDouble(0), json.getDouble(1))
+
 val mapboxAccessToken get() = Mapbox.getAccessToken() ?: throw IllegalStateException("No access token registered")
 
 fun isLocationEnabled(context: Context): Boolean {
