@@ -124,11 +124,13 @@ class RoutingController(parent: ViewGroup) {
         }
 
     private fun cancelRouting(evenIfCompleted: Boolean) {
+        failureNotificationCountdown.cancel()
         pickingDestination = false
         destination = null
         router.cancel()
         if (evenIfCompleted)
             route = null
+        updateState()
     }
 
     val onPickingDestinationChanged = ProcEvent()
@@ -183,9 +185,19 @@ class RoutingController(parent: ViewGroup) {
             }
     }
 
-    fun onBack(): Boolean {
-        return false
-    }
+    fun onBack() =
+        if (router.running
+            || pickingDestination
+            || failureNotificationCountdown.running
+            || ui.state == BottomGroupController.State.CHOOSING_WALK_MODE
+            || ui.state == BottomGroupController.State.CHOOSING_DURATION
+        ) {
+            ui.state = BottomGroupController.State.IDLE
+            cancelRouting(false)
+            true
+        }
+        else false
+
 
     var problem: Problem? = Problem.UNBOUND
         set(value) {

@@ -5,6 +5,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.content.res.Resources
+import android.graphics.Color
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -103,3 +106,17 @@ fun View.setMargins(margins: Int) {
 fun View.setMargins(left: Int, top: Int, right: Int, bottom: Int) {
     (layoutParams as ViewGroup.MarginLayoutParams).setMargins(left, top, right, bottom)
 }
+
+private val tempHsvArray by lazy { FloatArray(3) }
+
+fun hsv(
+    hue: Float, saturation: Float,
+    value: Float, alpha: Float = 1f
+) =
+    Color.HSVToColor((alpha * 255).roundToInt(), tempHsvArray.apply {
+        this[0] = hue
+        this[1] = saturation
+        this[2] = value
+    })
+
+val Float.dp get() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, Resources.getSystem().displayMetrics)

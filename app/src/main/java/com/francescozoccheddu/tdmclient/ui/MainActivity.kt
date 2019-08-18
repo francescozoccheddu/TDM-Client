@@ -7,11 +7,14 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.bottomgroup.RoutingController
 import com.francescozoccheddu.tdmclient.ui.topgroup.SearchBarComponent
 import com.francescozoccheddu.tdmclient.ui.utils.Permissions
+import com.francescozoccheddu.tdmclient.utils.android.dp
+import com.francescozoccheddu.tdmclient.utils.android.hsv
 import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.core.constants.Constants.PRECISION_6
@@ -26,21 +29,20 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.localization.LocalizationPlugin
+import com.mapbox.mapboxsdk.style.expressions.Expression.color
+import com.mapbox.mapboxsdk.style.expressions.Expression.exponential
 import com.mapbox.mapboxsdk.style.expressions.Expression.get
 import com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity
 import com.mapbox.mapboxsdk.style.expressions.Expression.interpolate
 import com.mapbox.mapboxsdk.style.expressions.Expression.linear
 import com.mapbox.mapboxsdk.style.expressions.Expression.literal
-import com.mapbox.mapboxsdk.style.expressions.Expression.rgba
 import com.mapbox.mapboxsdk.style.expressions.Expression.stop
 import com.mapbox.mapboxsdk.style.expressions.Expression.subtract
 import com.mapbox.mapboxsdk.style.expressions.Expression.zoom
-import com.mapbox.mapboxsdk.style.layers.CircleLayer
 import com.mapbox.mapboxsdk.style.layers.FillLayer
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer
 import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.mapboxsdk.style.layers.Property
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor
@@ -48,13 +50,24 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapWeight
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOptional
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOpacity
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOpacity
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textOptional
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textRadialOffset
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.bg.bg_root
@@ -70,8 +83,10 @@ class MainActivity : AppCompatActivity() {
     private companion object {
 
         private const val MAP_STYLE_URI = "mapbox://styles/francescozz/cjx1wlf2l080f1cqmmhh4jbgi"
-        private const val MIN_ZOOM = 9.0
+        private const val MIN_ZOOM = 11.0
         private const val MAX_ZOOM = 20.0
+        private const val MIN_HEATMAP_RADIUS_WIDTH_FACTOR = 0.03f
+        private const val MAX_HEATMAP_RADIUS_WIDTH_FACTOR = 0.25f
         private const val SEARCH_ZOOM = 13.0
         private const val CAMERA_ANIMATION_DURATION = 1f
 
@@ -86,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         private const val MB_LAYER_DIRECTIONS = "layer_directions"
         private const val MB_IMAGE_POI = "image_poi"
         private const val MB_SOURCE_POIS = "source_pois"
-        private const val MB_LAYER_POIS_RADIUS = "layer_pois_radius"
+        //private const val MB_LAYER_POIS_RADIUS = "layer_pois_radius"
         private const val MB_LAYER_POIS_POINT = "layer_pois_point"
         private const val MB_LAYER_LOWEST = "admin-0-boundary-disputed"
 
@@ -160,16 +175,20 @@ class MainActivity : AppCompatActivity() {
             onCreate(savedInstanceState)
             getMapAsync { map ->
                 this@MainActivity.map = map.apply {
+                    val iconColor = ContextCompat.getColor(this@MainActivity, R.color.backgroundDark)
+                    val routeColor = ContextCompat.getColor(this@MainActivity, R.color.background)
+                    val heatmapMinRadius = width * MIN_HEATMAP_RADIUS_WIDTH_FACTOR
+                    val heatmapMaxRadius = width * MAX_HEATMAP_RADIUS_WIDTH_FACTOR
                     setStyle(
                         Style.Builder()
                             .fromUri(MAP_STYLE_URI)
                             .withImage(
                                 MB_IMAGE_DESTINATION,
-                                resources.getDrawable(R.drawable.ic_place, null)
+                                resources.getDrawable(R.drawable.ic_place, null), true
                             )
                             .withImage(
                                 MB_IMAGE_POI,
-                                resources.getDrawable(R.drawable.ic_poi, null)
+                                resources.getDrawable(R.drawable.ic_poi, null), true
                             )
                             .withSource(GeoJsonSource(MB_SOURCE_POIS))
                             .withSource(GeoJsonSource(MB_SOURCE_COVERAGE_POINTS))
@@ -182,8 +201,8 @@ class MainActivity : AppCompatActivity() {
                                         fillColor(
                                             interpolate(
                                                 linear(), subtract(literal(1f), get("coverage")),
-                                                literal(0.0), rgba(6, 50, 255, 0),
-                                                literal(1.0), rgba(48, 210, 255, 1.0)
+                                                stop(0.0, color(hsv(210f, 1f, 1f, 0f))),
+                                                stop(1.0, color(hsv(190f, 1f, 1f, 1f)))
                                             )
                                         ),
                                         fillOpacity(
@@ -196,13 +215,35 @@ class MainActivity : AppCompatActivity() {
                                     ),
                                 MB_LAYER_LOWEST
                             )
-                            .withLayerAbove(
+                            /*.withLayerAbove(
                                 CircleLayer(MB_LAYER_POIS_RADIUS, MB_SOURCE_POIS).withProperties(
                                     fillColor(
                                         rgba(48, 210, 255, 1.0)
                                     ),
                                     circleRadius(
                                         get("radius")
+                                    )
+                                ),
+                                MB_LAYER_COVERAGE_QUADS
+                            )*/
+                            .withLayerAbove(
+                                LineLayer(MB_LAYER_DIRECTIONS, MB_SOURCE_DIRECTIONS).withProperties(
+                                    lineCap(Property.LINE_CAP_ROUND),
+                                    lineJoin(Property.LINE_JOIN_ROUND),
+                                    lineColor(routeColor),
+                                    lineWidth(
+                                        interpolate(
+                                            linear(), zoom(),
+                                            stop(MIN_ZOOM, 0.5f.dp),
+                                            stop(MAX_ZOOM, 4f.dp)
+                                        )
+                                    ),
+                                    lineOpacity(
+                                        interpolate(
+                                            linear(), zoom(),
+                                            stop(MIN_ZOOM, 0.75f),
+                                            stop(MAX_ZOOM, 0.85f)
+                                        )
                                     )
                                 ),
                                 MB_LAYER_COVERAGE_QUADS
@@ -213,16 +254,19 @@ class MainActivity : AppCompatActivity() {
                                         heatmapColor(
                                             interpolate(
                                                 linear(), heatmapDensity(),
-                                                literal(0.0), rgba(6, 50, 255, 0),
-                                                literal(0.2), rgba(12, 105, 255, 0.2),
-                                                literal(1.0), rgba(48, 210, 255, 1.0)
+                                                stop(0.0, color(hsv(230f, 1f, 1f, 0f))),
+                                                stop(0.2, color(hsv(220f, 1f, 1f, 0.7f))),
+                                                stop(0.4, color(hsv(210f, 1f, 1f, 0.8f))),
+                                                stop(0.6, color(hsv(200f, 1f, 1f, 0.9f))),
+                                                stop(0.8, color(hsv(190f, 1f, 1f, 1f))),
+                                                stop(1.0, color(hsv(180f, 1f, 1f, 1f)))
                                             )
                                         ),
                                         heatmapRadius(
                                             interpolate(
-                                                linear(), zoom(),
-                                                stop(MIN_ZOOM, 5),
-                                                stop(15, 150)
+                                                exponential(1.5), zoom(),
+                                                stop(MIN_ZOOM, heatmapMinRadius),
+                                                stop(15, heatmapMaxRadius)
                                             )
                                         ),
                                         heatmapOpacity(
@@ -236,33 +280,72 @@ class MainActivity : AppCompatActivity() {
                                             subtract(literal(1f), get("coverage"))
                                         )
                                     ),
-                                MB_LAYER_POIS_RADIUS
-                            )
-                            .withLayer(
-                                LineLayer(MB_LAYER_DIRECTIONS, MB_SOURCE_DIRECTIONS).withProperties(
-                                    lineCap(Property.LINE_CAP_ROUND),
-                                    lineJoin(Property.LINE_JOIN_ROUND),
-                                    lineWidth(5f)
-                                )
+                                //MB_LAYER_POIS_RADIUS
+                                MB_LAYER_DIRECTIONS
                             )
                             .withLayer(
                                 SymbolLayer(MB_LAYER_POIS_POINT, MB_SOURCE_POIS)
                                     .withProperties(
-                                        iconAllowOverlap(true),
-                                        textAllowOverlap(true),
+                                        iconAllowOverlap(false),
+                                        textAllowOverlap(false),
                                         iconImage(MB_IMAGE_POI),
-                                        iconIgnorePlacement(true),
-                                        iconOptional(false)
+                                        iconColor(iconColor),
+                                        iconOpacity(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(MIN_ZOOM, 0.65f),
+                                                stop(MAX_ZOOM, 0.85f)
+                                            )
+                                        ),
+                                        iconSize(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(MIN_ZOOM, 0.75f),
+                                                stop(MAX_ZOOM, 1f)
+                                            )
+                                        ),
+                                        iconOptional(false),
+                                        textOptional(true),
+                                        textField(get("score")),
+                                        textSize(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(MIN_ZOOM, 3f.dp),
+                                                stop(MAX_ZOOM, 6f.dp)
+                                            )
+                                        ),
+                                        textAnchor(Property.TEXT_ANCHOR_TOP),
+                                        textRadialOffset(0.5f.dp),
+                                        textOpacity(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(MIN_ZOOM, 0.5f),
+                                                stop(MAX_ZOOM, 0.7f)
+                                            )
+                                        ),
+                                        textColor(iconColor)
                                     )
                             )
                             .withLayer(
                                 SymbolLayer(MB_LAYER_DESTINATION, MB_SOURCE_DESTINATION)
                                     .withProperties(
-                                        iconAllowOverlap(true),
-                                        textAllowOverlap(true),
+                                        iconAllowOverlap(false),
                                         iconImage(MB_IMAGE_DESTINATION),
-                                        iconIgnorePlacement(true),
-                                        iconOptional(false)
+                                        iconColor(iconColor),
+                                        iconOpacity(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(MIN_ZOOM, 0.85f),
+                                                stop(MAX_ZOOM, 0.95f)
+                                            )
+                                        ),
+                                        iconSize(
+                                            interpolate(
+                                                linear(), zoom(),
+                                                stop(MIN_ZOOM, 0.75f),
+                                                stop(MAX_ZOOM, 1f)
+                                            )
+                                        )
                                     )
                             )
                     ) { style ->

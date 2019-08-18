@@ -57,7 +57,7 @@ class MainService : Service() {
         private const val MEASURE_INTERVAL_TIME = 3f
         private const val COVERAGE_INTERVAL_TIME = 5f
         private const val COVERAGE_EXPIRATION_TIME = 60f
-        private const val POI_INTERVAL_TIME = 30f
+        private const val POI_INTERVAL_TIME = 10f
         private const val POI_EXPIRATION_TIME = 120f
         private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
         private val USER = User(0, "0")
