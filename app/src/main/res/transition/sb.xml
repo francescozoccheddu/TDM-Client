@@ -10,15 +10,12 @@
     <transitionSet android:transitionOrdering="together">
         <transition class="com.francescozoccheddu.tdmclient.ui.transitions.ElevationTransition"/>
         <transition class="com.francescozoccheddu.tdmclient.ui.transitions.CardRadiusTransition"/>
-        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.PaddingTransition"/>
         <transition class="com.francescozoccheddu.tdmclient.ui.transitions.MarginTransition"/>
         <transition class="com.francescozoccheddu.tdmclient.ui.transitions.AlphaTransition"/>
         <changeBounds>
             <targets>
-                <target android:excludeId="@id/sb_scrim"/>
-                <target android:excludeId="@id/bg_scrim"/>
                 <target android:excludeId="@id/sb_root"/>
-                <target android:excludeId="@id/bg_root"/>
+                <target android:excludeId="@id/sb_scrim"/>
             </targets>
         </changeBounds>
     </transitionSet>
@@ -28,12 +25,4 @@
             <target android:excludeId="@id/sb_loading"/>
         </targets>
     </fade>
-    <targets>
-        <target android:excludeId="@id/bg_info_bt"/>
-        <target android:excludeId="@id/bg_info_tv"/>
-        <target android:excludeId="@id/bg_info_rl"/>
-        <target android:excludeId="@id/bg_info_rl"/>
-        <target android:excludeId="@id/bg_info_iv"/>
-        <target android:excludeId="@id/bg_info_pb"/>
-    </targets>
 </transitionSet>

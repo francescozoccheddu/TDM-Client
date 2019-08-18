@@ -12,6 +12,7 @@ import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
 import com.francescozoccheddu.knob.KnobView
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.utils.android.setMargins
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.commons.Event
 import com.francescozoccheddu.tdmclient.utils.commons.event
@@ -24,7 +25,7 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
 
     private val transition = TransitionInflater
         .from(parent.context)
-        .inflateTransition(R.transition.general_purpose)
+        .inflateTransition(R.transition.bg)
 
     interface ScrimComponent {
         var onDismiss: Event
@@ -108,14 +109,6 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
         private val progressBar = parent.findViewById<ProgressBar>(R.id.bg_info_pb)
         private val button = parent.findViewById<Button>(R.id.bg_info_bt).apply {
             setOnClickListener { onAction() }
-        }
-
-        init {
-            transition.removeTarget(textView)
-            transition.removeTarget(imageView)
-            transition.removeTarget(progressBar)
-            transition.removeTarget(button)
-            transition.removeTarget(R.id.bg_info_rl)
         }
 
         override var text = ""
@@ -282,12 +275,21 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
             State.INFO -> parent.resources.getDimension(R.dimen.bg_info_radius)
             State.HIDDEN -> 0f
         }
-        val margins = when (state) {
-            State.ACTION, State.INFO -> parent.resources.getDimensionPixelOffset(R.dimen.bg_action_margin)
-            State.DURATION, State.WALK -> parent.resources.getDimensionPixelOffset(R.dimen.bg_walk_duration_margin)
-            State.HIDDEN -> (parent.resources.getDimension(R.dimen.bg_action_margin) + parent.resources.getDimension(R.dimen.bg_action_size) / 2f).roundToInt()
+        cardView.setMargins(
+            when (state) {
+                State.ACTION, State.INFO -> parent.resources.getDimensionPixelOffset(R.dimen.bg_action_margin)
+                State.WALK -> parent.resources.getDimensionPixelOffset(R.dimen.bg_walk_margin)
+                State.DURATION -> parent.resources.getDimensionPixelOffset(R.dimen.bg_duration_margin)
+                State.HIDDEN ->
+                    (parent.resources.getDimension(R.dimen.bg_action_margin)
+                            + parent.resources.getDimension(R.dimen.bg_action_size) / 2f).roundToInt()
+            }
+        )
+        cardView.elevation = when (state) {
+            State.ACTION -> parent.resources.getDimension(R.dimen.bg_action_elevation)
+            State.HIDDEN -> 0f
+            else -> parent.resources.getDimension(R.dimen.bg_no_action_elevation)
         }
-        (cardView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(margins, margins, margins, margins)
     }
 
     fun reach() {
