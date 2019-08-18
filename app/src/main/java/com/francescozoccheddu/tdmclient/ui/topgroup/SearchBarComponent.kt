@@ -133,8 +133,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
                 field = value
                 editText.isFocusable = value
                 editText.isFocusableInTouchMode = value
-                if (!value)
-                    clearFocus()
+                clearFocus()
                 update()
             }
         }
