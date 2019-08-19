@@ -75,8 +75,6 @@ import kotlinx.android.synthetic.main.ma.ma_map
 import kotlinx.android.synthetic.main.sb.sb_root
 import kotlin.math.roundToInt
 
-//import kotlinx.android.synthetic.main.ma.ma_tg
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -111,7 +109,6 @@ class MainActivity : AppCompatActivity() {
     private val permissions = Permissions(this)
     private lateinit var routingController: RoutingController
     private lateinit var searchBarComponent: SearchBarComponent
-    //private lateinit var topGroupController: TopGroupController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
