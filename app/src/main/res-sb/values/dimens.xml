@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="sb_margin">16dp</dimen>
+    <dimen name="sb_elevation">4dp</dimen>
+    <dimen name="sb_focused_margin">10dp</dimen>
+    <dimen name="sb_padding">4dp</dimen>
+    <dimen name="sb_radius">6dp</dimen>
+    <dimen name="sb_focused_radius">4dp</dimen>
+</resources>

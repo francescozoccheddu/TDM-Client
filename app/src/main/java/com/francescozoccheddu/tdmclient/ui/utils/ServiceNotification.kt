@@ -34,7 +34,7 @@ class ServiceNotification(val service: MainService) {
         private fun NotificationCompat.Builder.addStopServiceAction() =
             if (ENABLE_KILL_BUTTON)
                 addAction(
-                    R.drawable.ic_launcher_foreground, R.string.notification_action_kill,
+                    R.drawable.sn_icon_flat, R.string.sn_action_kill,
                     PendingIntent.getService(
                         mContext, 0, MainService.makeStopIntent(mContext),
                         PendingIntent.FLAG_UPDATE_CURRENT
@@ -43,19 +43,20 @@ class ServiceNotification(val service: MainService) {
             else this
 
         private fun makeBuilder(context: Context) =
-            NotificationCompat.Builder(context,
+            NotificationCompat.Builder(
+                context,
                 NOTIFICATION_CHANNEL
             )
                 .setContentIntent(makeActivityIntent(context, MainActivity::class.java))
-                .setContentTitle(R.string.notification_title)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(R.string.sn_title)
+                .setSmallIcon(R.drawable.sn_icon_flat)
 
         fun notifySensorConnectionLost(context: Context) {
             notify(
                 context,
                 SENSOR_LOST_NOTIFICATION_ID,
                 makeBuilder(context)
-                    .setContentText(R.string.notification_content_device_lost)
+                    .setContentText(R.string.sn_content_device_lost)
                     .build()
             )
         }
@@ -70,31 +71,32 @@ class ServiceNotification(val service: MainService) {
         update()
     }
 
-    private val builder get() = makeBuilder(
-        service
-    )
+    private val builder
+        get() = makeBuilder(
+            service
+        )
 
     private val okNotification by lazy {
         builder
-            .setContentText(R.string.notification_content_ok)
+            .setContentText(R.string.sn_content_ok)
             .addStopServiceAction()
             .build()
     }
 
     private val unknownLocationNotification by lazy {
         builder
-            .setContentText(R.string.notification_content_unknown_location)
+            .setContentText(R.string.sn_content_unknown_location)
             .addStopServiceAction()
             .build()
     }
 
     private val unlocatableNotification by lazy {
         builder
-            .setContentText(R.string.notification_content_unlocatable)
+            .setContentText(R.string.sn_content_unlocatable)
             .addStopServiceAction()
             .addAction(
-                R.drawable.ic_launcher_foreground,
-                R.string.notification_action_unlocatable,
+                R.drawable.sn_icon_flat,
+                R.string.sn_action_unlocatable,
                 PendingIntent.getActivity(service, 0, Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0)
             )
             .build()
@@ -102,14 +104,14 @@ class ServiceNotification(val service: MainService) {
 
     private val offlineNotification by lazy {
         builder
-            .setContentText(R.string.notification_content_offline)
+            .setContentText(R.string.sn_content_offline)
             .addStopServiceAction()
             .build()
     }
 
     private val unreachableNotification by lazy {
         builder
-            .setContentText(R.string.notification_content_unreachable)
+            .setContentText(R.string.sn_content_unreachable)
             .addStopServiceAction()
             .build()
     }
@@ -144,7 +146,7 @@ class ServiceNotification(val service: MainService) {
                 .createNotificationChannel(
                     NotificationChannel(
                         NOTIFICATION_CHANNEL,
-                        service.resources.getString(R.string.service_notification_channel),
+                        service.resources.getString(R.string.sn_channel),
                         NotificationManager.IMPORTANCE_DEFAULT
                     )
                 )

@@ -1,0 +1,22 @@
+<resources>
+    <string name="bg_locating">Localizzazione in corso</string>
+    <string name="bg_offline">Nessuna connessiona ad Internet</string>
+    <string name="bg_unlocatable">Servizi di localizzazione disattivati</string>
+    <string name="bg_action_unlocatable">Abilita</string>
+    <string name="bg_routing">Direzionamento in corso</string>
+    <string name="bg_action_routing">Annulla</string>
+    <string name="bg_permissions_ungranted">Permesso negato</string>
+    <string name="bg_action_permissions_ungranted">Concedi</string>
+    <string name="bg_routing_failed">Direzionamento fallito</string>
+    <string name="bg_action_routing_failed">Riprova</string>
+    <string name="bg_outside_area">Sei fuori dall\'area di interesse</string>
+    <string name="bg_picking">Scegli la destinazione</string>
+    <string name="bg_action_picking">Annulla</string>
+    <string name="bg_action_destinated">Conferma</string>
+    <string name="bg_action_routed">Termina</string>
+    <string name="bg_unknown_place">Luogo sconosciuto</string>
+    <string name="bg_routed">Percorso calcolato</string>
+    <string name="bg_duration_hint">Quanto tempo vuoi dedicarmi?</string>
+    <string name="bg_duration_cancel">Annulla</string>
+    <string name="bg_duration_start">Inizia</string>
+</resources>

@@ -24,6 +24,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main.res.srcDirs += ['src/main/res-us', 'src/main/res-sb', 'src/main/res-bg', 'src/main/res-sn']
+    }
 }
 
 dependencies {

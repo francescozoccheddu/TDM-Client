@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="button">#00BCD4</color>
-    <color name="knobProgressFrom">#00BCD4</color>
-    <color name="knobProgressTo">#03A1EE</color>
-    <color name="knobBed">#026496</color>
-    <color name="knobBedThick">#498FB3</color>
     <color name="background">#039BE5</color>
     <color name="backgroundLight">#00BCD4</color>
     <color name="backgroundDark">#0D47A1</color>
     <color name="foreground">#FFF</color>
     <color name="foregroundHint">#81D4FA</color>
-    <color name="backgroundOk">#4CAF50</color>
-    <color name="backgroundWarning">#FF9800</color>
-    <color name="backgroundError">#F44336</color>
     <color name="scrim">#000</color>
     <color name="ripple">#80FFFFFF</color>
 </resources>

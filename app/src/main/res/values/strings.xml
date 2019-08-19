@@ -1,41 +1,6 @@
 <resources>
     <string name="app_name">TDM-Client</string>
-    <string name="search_hint">Cerca una destinazione</string>
     <string name="mapbox_access_token">
         pk.eyJ1IjoiZnJhbmNlc2NvenoiLCJhIjoiY2pzYndrOTg5MGVrdzN5cGR2ZjdkY3ZnMiJ9.MCiDPh-MIjlWxN1IdzrYSg
     </string>
-    <string name="service_notification_channel">Notifiche</string>
-    <string name="notification_title">TDM Client</string>
-    <string name="notification_content_ok">In esecuzione</string>
-    <string name="notification_content_unknown_location">Localizzazione in corso</string>
-    <string name="notification_content_unreachable">Servizio non disponibile</string>
-    <string name="notification_content_offline">Nessuna connessiona ad Internet</string>
-    <string name="notification_content_unlocatable">Servizi di localizzazione disattivati</string>
-    <string name="notification_action_unlocatable">Abilita</string>
-    <string name="notification_content_device_lost">Connessione col sensore persa</string>
-    <string name="notification_action_kill">Interrompi</string>
-    <!--
-    <string name="toast_permissions_settings_overlay">Concedi il permesso di accedere alla tua posizione</string>
-    <string name="toast_location_settings_overlay">Abilita i servizi di localizzazione</string>
-    -->
-    <string name="snackbar_locating">Localizzazione in corso</string>
-    <string name="snackbar_offline">Nessuna connessiona ad Internet</string>
-    <string name="snackbar_unlocatable">Servizi di localizzazione disattivati</string>
-    <string name="snackbar_action_unlocatable">Abilita</string>
-    <string name="snackbar_routing">Direzionamento in corso</string>
-    <string name="snackbar_action_routing">Annulla</string>
-    <string name="snackbar_permissions_ungranted">Permesso negato</string>
-    <string name="snackbar_action_permissions_ungranted">Concedi</string>
-    <string name="snackbar_routing_failed">Direzionamento fallito</string>
-    <string name="snackbar_action_routing_failed">Riprova</string>
-    <string name="snackbar_outside_area">Sei fuori dall\'area di interesse</string>
-    <string name="snackbar_picking">Scegli la destinazione</string>
-    <string name="snackbar_action_picking">Annulla</string>
-    <string name="snackbar_action_destinated">Conferma</string>
-    <string name="snackbar_action_routed">Termina</string>
-    <string name="snackbar_unknown_place">Luogo sconosciuto</string>
-    <string name="snackbar_routed">Percorso calcolato</string>
-    <string name="duration_hint">Quanto tempo vuoi dedicarmi?</string>
-    <string name="duration_cancel">Annulla</string>
-    <string name="duration_start">Inizia</string>
 </resources>

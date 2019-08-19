@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bg_action_size">64dp</dimen>
+    <dimen name="bg_action_elevation">8dp</dimen>
+    <dimen name="bg_no_action_elevation">4dp</dimen>
+    <dimen name="bg_action_margin">20dp</dimen>
+    <dimen name="bg_duration_margin">10dp</dimen>
+    <dimen name="bg_walk_margin">14dp</dimen>
+    <dimen name="bg_walk_item_height">120dp</dimen>
+    <dimen name="bg_duration_knob_size">256dp</dimen>
+    <dimen name="bg_walk_duration_radius">4dp</dimen>
+    <dimen name="bg_info_radius">8dp</dimen>
+</resources>
