@@ -6,26 +6,26 @@
     
     <item
             android:id="@+id/frame_gone"
-            android:drawable="@drawable/vd_clear_gone"
+            android:drawable="@drawable/cross_gone"
             app:state_visible="false"
     />
     
     <item
             android:id="@+id/frame_visible"
-            android:drawable="@drawable/vd_clear"
+            android:drawable="@drawable/cross"
             app:state_visible="true"
     />
     
     <transition
             android:fromId="@id/frame_gone"
             android:toId="@id/frame_visible"
-            android:drawable="@drawable/avd_clear_in"
+            android:drawable="@drawable/cross_in"
     />
     
     <transition
             android:fromId="@id/frame_visible"
             android:toId="@id/frame_gone"
-            android:drawable="@drawable/avd_clear_out"
+            android:drawable="@drawable/cross_out"
     />
 
 </animated-selector>

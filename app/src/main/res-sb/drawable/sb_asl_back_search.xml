@@ -6,26 +6,26 @@
     
     <item
             android:id="@+id/frame_search"
-            android:drawable="@drawable/vd_search"
-            app:state_back="false"
+            android:drawable="@drawable/sb_search"
+            app:sb_state_back="false"
     />
     
     <item
             android:id="@+id/frame_back"
-            android:drawable="@drawable/vd_back"
-            app:state_back="true"
+            android:drawable="@drawable/sb_back"
+            app:sb_state_back="true"
     />
     
     <transition
             android:fromId="@id/frame_search"
             android:toId="@id/frame_back"
-            android:drawable="@drawable/avd_search_to_back"
+            android:drawable="@drawable/sb_search_to_back"
     />
     
     <transition
             android:fromId="@id/frame_back"
             android:toId="@id/frame_search"
-            android:drawable="@drawable/avd_back_to_search"
+            android:drawable="@drawable/sb_back_to_search"
     />
 
 </animated-selector>

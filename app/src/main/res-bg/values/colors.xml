@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_knobProgressFrom">#00BCD4</color>
+    <color name="bg_knobProgressTo">#03A1EE</color>
+    <color name="bg_knobBed">#026496</color>
+    <color name="bg_knobBedThick">#498FB3</color>
+    <color name="bg_backgroundOk">#4CAF50</color>
+    <color name="bg_backgroundWarning">#FF9800</color>
+    <color name="bg_backgroundError">#F44336</color>
+</resources>

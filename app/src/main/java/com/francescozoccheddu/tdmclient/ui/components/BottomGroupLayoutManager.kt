@@ -102,7 +102,7 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
 
     val info = object : InfoComponent {
 
-        private val blinkAnimation = AnimationUtils.loadAnimation(parent.context, R.anim.blink)
+        private val blinkAnimation = AnimationUtils.loadAnimation(parent.context, R.anim.bg_blink)
 
         private val textView = parent.findViewById<TextView>(R.id.bg_info_tv)
         private val imageView = parent.findViewById<ImageView>(R.id.bg_info_iv)

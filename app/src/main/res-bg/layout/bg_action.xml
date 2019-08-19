@@ -10,7 +10,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="16dp"
-            android:src="@drawable/ic_directions"
+            android:src="@drawable/bg_directions"
             android:id="@+id/bg_action_ib"
             android:clickable="false"
             android:layout_gravity="center"

@@ -47,8 +47,8 @@ class LocationSearchProvider {
                 tvName.text = location.name
                 ivIcon.setImageResource(
                     when (location.type) {
-                        PlaceQuerier.Location.Type.ADDRESS -> R.drawable.ic_map
-                        PlaceQuerier.Location.Type.PLACE -> R.drawable.ic_terrain
+                        PlaceQuerier.Location.Type.ADDRESS -> R.drawable.sb_map
+                        PlaceQuerier.Location.Type.PLACE -> R.drawable.sb_terrain
                         PlaceQuerier.Location.Type.POI -> R.drawable.ic_place
                         PlaceQuerier.Location.Type.UNKNOWN -> R.drawable.ic_place
                     }

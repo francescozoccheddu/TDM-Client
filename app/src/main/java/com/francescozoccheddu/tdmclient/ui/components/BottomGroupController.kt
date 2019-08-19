@@ -55,24 +55,24 @@ class BottomGroupController(private val parent: ViewGroup) {
         }
         layout.color = when (state) {
             State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED, State.OFFLINE,
-            State.ROUTING_FAILED -> getColor(R.color.backgroundError)
+            State.ROUTING_FAILED -> getColor(R.color.bg_backgroundError)
             State.LOCATING, State.ROUTING, State.IDLE, State.CHOOSING_WALK_MODE,
             State.CHOOSING_DURATION, State.PICKING_DESTINATION, State.ROUTED -> getColor(R.color.background)
             State.HIDDEN -> layout.color
-            State.OUTSIDE_AREA -> getColor(R.color.backgroundWarning)
-            State.CONFIRMING_DESTINATION -> getColor(R.color.backgroundOk)
+            State.OUTSIDE_AREA -> getColor(R.color.bg_backgroundWarning)
+            State.CONFIRMING_DESTINATION -> getColor(R.color.bg_backgroundOk)
         }
         layout.info.text = when (state) {
-            State.PICKING_DESTINATION -> getString(R.string.snackbar_picking)
-            State.LOCATING -> getString(R.string.snackbar_locating)
-            State.UNLOCATABLE -> getString(R.string.snackbar_unlocatable)
-            State.PERMISSIONS_UNGRANTED -> getString(R.string.snackbar_permissions_ungranted)
-            State.ROUTING -> getString(R.string.snackbar_routing)
-            State.OFFLINE -> getString(R.string.snackbar_offline)
-            State.OUTSIDE_AREA -> getString(R.string.snackbar_outside_area)
-            State.ROUTING_FAILED -> getString(R.string.snackbar_routing_failed)
-            State.ROUTED -> getString(R.string.snackbar_routed)
-            State.CONFIRMING_DESTINATION -> destinationName ?: getString(R.string.snackbar_unknown_place)
+            State.PICKING_DESTINATION -> getString(R.string.bg_picking)
+            State.LOCATING -> getString(R.string.bg_locating)
+            State.UNLOCATABLE -> getString(R.string.bg_unlocatable)
+            State.PERMISSIONS_UNGRANTED -> getString(R.string.bg_permissions_ungranted)
+            State.ROUTING -> getString(R.string.bg_routing)
+            State.OFFLINE -> getString(R.string.bg_offline)
+            State.OUTSIDE_AREA -> getString(R.string.bg_outside_area)
+            State.ROUTING_FAILED -> getString(R.string.bg_routing_failed)
+            State.ROUTED -> getString(R.string.bg_routed)
+            State.CONFIRMING_DESTINATION -> destinationName ?: getString(R.string.bg_unknown_place)
             else -> layout.info.text
         }
         layout.info.loading = when (state) {
@@ -80,21 +80,21 @@ class BottomGroupController(private val parent: ViewGroup) {
             else -> false
         }
         layout.info.icon = when (state) {
-            State.UNLOCATABLE, State.OUTSIDE_AREA -> R.drawable.ic_unlocatable
-            State.OFFLINE -> R.drawable.ic_offline
-            State.PERMISSIONS_UNGRANTED, State.ROUTING_FAILED -> R.drawable.ic_warning
+            State.UNLOCATABLE, State.OUTSIDE_AREA -> R.drawable.bg_unlocatable
+            State.OFFLINE -> R.drawable.bg_offline
+            State.PERMISSIONS_UNGRANTED, State.ROUTING_FAILED -> R.drawable.bg_warning
             State.CONFIRMING_DESTINATION, State.PICKING_DESTINATION -> R.drawable.ic_place
-            State.ROUTED -> R.drawable.ic_directions
+            State.ROUTED -> R.drawable.bg_directions
             else -> layout.info.icon
         }
         layout.info.action = when (state) {
-            State.UNLOCATABLE -> getString(R.string.snackbar_action_unlocatable)
-            State.PERMISSIONS_UNGRANTED -> getString(R.string.snackbar_action_permissions_ungranted)
-            State.ROUTING -> getString(R.string.snackbar_action_routing)
-            State.PICKING_DESTINATION -> getString(R.string.snackbar_action_picking)
-            State.CONFIRMING_DESTINATION -> getString(R.string.snackbar_action_destinated)
-            State.ROUTED -> getString(R.string.snackbar_action_routed)
-            State.ROUTING_FAILED -> getString(R.string.snackbar_action_routing_failed)
+            State.UNLOCATABLE -> getString(R.string.bg_action_unlocatable)
+            State.PERMISSIONS_UNGRANTED -> getString(R.string.bg_action_permissions_ungranted)
+            State.ROUTING -> getString(R.string.bg_action_routing)
+            State.PICKING_DESTINATION -> getString(R.string.bg_action_picking)
+            State.CONFIRMING_DESTINATION -> getString(R.string.bg_action_destinated)
+            State.ROUTED -> getString(R.string.bg_action_routed)
+            State.ROUTING_FAILED -> getString(R.string.bg_action_routing_failed)
             else -> null
         }
     }
