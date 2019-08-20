@@ -43,16 +43,20 @@
                 app:touchAnchorId="@id/us_score_root"
                 app:touchRegionId="@id/us_score_root"
         />
+        
         <KeyFrameSet>
             
             <KeyTrigger
-                    app:motionTarget="@id/uss_close"
-                    app:onPositiveCross="show"
-                    app:onNegativeCross="hide"
-                    app:framePosition="80"
+                    app:motionTarget="@id/us_sheet_root"
+                    app:onPositiveCross="onOpened"
+                    app:onNegativeCross="onClosed"
+                    app:framePosition="90"
+                    app:triggerSlack="0.025"
+            
             />
         
         </KeyFrameSet>
+    
     </Transition>
     
     <Transition
@@ -67,6 +71,19 @@
                 app:touchAnchorId="@id/us_level_root"
                 app:touchRegionId="@id/us_level_root"
         />
+        
+        <KeyFrameSet>
+            
+            <KeyTrigger
+                    app:motionTarget="@id/us_sheet_root"
+                    app:onPositiveCross="onOpened"
+                    app:onNegativeCross="onClosed"
+                    app:framePosition="90"
+                    app:triggerSlack="0.025"
+            
+            />
+        
+        </KeyFrameSet>
     
     </Transition>
     
@@ -82,6 +99,18 @@
                 app:touchAnchorId="@id/us_gain_root"
                 app:touchRegionId="@id/us_gain_root"
         />
+        
+        <KeyFrameSet>
+            
+            <KeyTrigger
+                    app:motionTarget="@id/us_sheet_root"
+                    app:onPositiveCross="onOpened"
+                    app:onNegativeCross="onClosed"
+                    app:framePosition="90"
+                    app:triggerSlack="0.025"
+            />
+        
+        </KeyFrameSet>
     
     </Transition>
     
@@ -97,6 +126,18 @@
                 app:touchAnchorId="@id/us_sheet_root"
                 app:touchRegionId="@id/us_sheet_root"
         />
+        
+        <KeyFrameSet>
+            
+            <KeyTrigger
+                    app:motionTarget="@id/us_sheet_root"
+                    app:onPositiveCross="onOpened"
+                    app:onNegativeCross="onClosed"
+                    app:framePosition="90"
+                    app:triggerSlack="0.025"
+            />
+        
+        </KeyFrameSet>
     
     </Transition>
     
@@ -112,6 +153,19 @@
                 app:touchAnchorId="@id/us_sheet_root"
                 app:touchRegionId="@id/us_sheet_root"
         />
+        
+        <KeyFrameSet>
+            
+            <KeyTrigger
+                    app:motionTarget="@id/us_sheet_root"
+                    app:onPositiveCross="onOpened"
+                    app:onNegativeCross="onClosed"
+                    app:framePosition="90"
+                    app:triggerSlack="0.025"
+            
+            />
+        
+        </KeyFrameSet>
     
     </Transition>
     

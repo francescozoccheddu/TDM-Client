@@ -11,11 +11,17 @@ class InOutImageButton @JvmOverloads constructor(
     private val avd = InOutAVD(this)
 
     fun show() {
-        avd.state = InOutAVD.State.VISIBLE
+        shown = true
     }
 
     fun hide() {
-        avd.state = InOutAVD.State.GONE
+        shown = false
     }
+
+    var shown
+        get() = avd.state == InOutAVD.State.VISIBLE
+        set(value) {
+            avd.state = if (value) InOutAVD.State.VISIBLE else InOutAVD.State.GONE
+        }
 
 }

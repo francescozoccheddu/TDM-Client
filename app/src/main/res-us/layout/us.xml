@@ -16,17 +16,13 @@
             android:alpha="0"
     />
     
-    <FrameLayout
+    <com.francescozoccheddu.tdmclient.ui.components.UserStatsSheet
             android:id="@+id/us_sheet_root"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@color/backgroundStatsDark"
             android:elevation="@dimen/us_sheet_elevation"
-    >
-        
-        <include layout="@layout/uss"/>
-    
-    </FrameLayout>
+    />
     
     <FrameLayout
             android:id="@+id/us_gain_root"
