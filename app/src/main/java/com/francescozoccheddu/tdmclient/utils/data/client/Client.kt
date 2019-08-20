@@ -56,7 +56,7 @@ class Server(context: Context, val address: ServerAddress) {
 
     private val nativeQueue = Volley.newRequestQueue(context)
 
-    inner open class Service<RequestType, ResponseType>(
+    open inner class Service<RequestType, ResponseType>(
         val address: ServiceAddress,
         open val interpreter: Interpreter<RequestType, ResponseType>
     ) {
@@ -142,11 +142,11 @@ class Server(context: Context, val address: ServerAddress) {
                     {
                         endTime = Date()
                         response = it
-                        if (hasResponse) {
-                            status = Status.SUCCESS
+                        status = if (hasResponse) {
+                            Status.SUCCESS
                         }
                         else {
-                            status = Status.RESPONSE_ERROR
+                            Status.RESPONSE_ERROR
                         }
                     },
                     VolleyResponse.ErrorListener
@@ -213,7 +213,7 @@ class Server(context: Context, val address: ServerAddress) {
             interpreter: PollInterpreter<RequestType, ResponseType, DataType>
         ) : this(ServiceAddress(address), pollRequest, interpreter)
 
-        override final fun getBody(request: RequestType): String {
+        final override fun getBody(request: RequestType): String {
             return if (request == pollRequest) {
                 if (!this::cachedBody.isInitialized || cachedBodyRequest != pollRequest) {
                     cachedBody = super.getBody(pollRequest)

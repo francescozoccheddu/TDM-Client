@@ -20,9 +20,7 @@ class Router {
 
     fun request(to: LatLng?, time: Float) {
         cancel()
-        val service = this.service
-        if (service == null)
-            throw IllegalStateException("'${this::service.name}' is null")
+        val service = this.service ?: throw IllegalStateException("'${this::service.name}' is null")
         running = true
         spotRequest = service.requestRoute(to, time).apply {
             attachedRequest = this

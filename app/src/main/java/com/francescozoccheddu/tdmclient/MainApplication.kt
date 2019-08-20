@@ -7,7 +7,7 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token))
+        Mapbox.getInstance(applicationContext, getString(R.string.mapbox_access_token))
     }
 
 }

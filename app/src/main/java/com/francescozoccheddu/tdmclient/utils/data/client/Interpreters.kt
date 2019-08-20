@@ -24,7 +24,7 @@ interface Interpreter<RequestType, ResponseType> {
 
 abstract class SimpleInterpreter<RequestType, ResponseType> : Interpreter<RequestType, ResponseType> {
 
-    override final fun interpretResponse(request: RequestType, response: Any?): ResponseType {
+    final override fun interpretResponse(request: RequestType, response: Any?): ResponseType {
         return when (response) {
             is JSONObject -> interpretResponse(request, response)
             is JSONArray -> interpretResponse(request, response)

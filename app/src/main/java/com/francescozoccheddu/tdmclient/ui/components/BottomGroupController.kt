@@ -83,7 +83,7 @@ class BottomGroupController(private val parent: ViewGroup) {
             State.UNLOCATABLE, State.OUTSIDE_AREA -> R.drawable.bg_unlocatable
             State.OFFLINE -> R.drawable.bg_offline
             State.PERMISSIONS_UNGRANTED, State.ROUTING_FAILED -> R.drawable.bg_warning
-            State.CONFIRMING_DESTINATION, State.PICKING_DESTINATION -> R.drawable.ic_place
+            State.CONFIRMING_DESTINATION, State.PICKING_DESTINATION -> R.drawable.place
             State.ROUTED -> R.drawable.bg_directions
             else -> layout.info.icon
         }

@@ -34,7 +34,7 @@ class ServiceNotification(val service: MainService) {
         private fun NotificationCompat.Builder.addStopServiceAction() =
             if (ENABLE_KILL_BUTTON)
                 addAction(
-                    R.drawable.sn_icon_flat, R.string.sn_action_kill,
+                    R.drawable.ic_icon, R.string.sn_action_kill,
                     PendingIntent.getService(
                         mContext, 0, MainService.makeStopIntent(mContext),
                         PendingIntent.FLAG_UPDATE_CURRENT
@@ -49,7 +49,7 @@ class ServiceNotification(val service: MainService) {
             )
                 .setContentIntent(makeActivityIntent(context, MainActivity::class.java))
                 .setContentTitle(R.string.sn_title)
-                .setSmallIcon(R.drawable.sn_icon_flat)
+                .setSmallIcon(R.drawable.ic_icon)
 
         fun notifySensorConnectionLost(context: Context) {
             notify(
@@ -95,7 +95,7 @@ class ServiceNotification(val service: MainService) {
             .setContentText(R.string.sn_content_unlocatable)
             .addStopServiceAction()
             .addAction(
-                R.drawable.sn_icon_flat,
+                R.drawable.ic_icon,
                 R.string.sn_action_unlocatable,
                 PendingIntent.getActivity(service, 0, Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0)
             )

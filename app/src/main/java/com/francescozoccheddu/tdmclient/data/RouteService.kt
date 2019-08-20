@@ -30,10 +30,10 @@ private val INTERPRETER = object : SimpleInterpreter<RouteRequest, List<Point>>(
             val jsonRoute = response.getJSONArray("routes").getJSONArray(0)
             if (jsonRoute.length() < 2)
                 throw RuntimeException()
-            return List(jsonRoute.length(), {
+            return List(jsonRoute.length()) {
                 val point = jsonRoute.getJSONObject(it).getJSONArray("point")
                 Point.fromLngLat(point.getDouble(0), point.getDouble(1))
-            })
+            }
         } catch (_: Exception) {
             println("ROUTE ERROR:\n${response.toString(4)}")
             throw Interpreter.UninterpretableResponseException()

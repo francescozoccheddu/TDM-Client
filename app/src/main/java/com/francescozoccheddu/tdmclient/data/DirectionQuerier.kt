@@ -16,7 +16,7 @@ private const val START_SNAP_RADIUS = 50.0
 private const val END_SNAP_RADIUS = 50.0
 
 fun getDirections(path: List<Point>, hasDestination: Boolean, callback: (DirectionsRoute?) -> Unit) {
-    if (path.size < 1)
+    if (path.isEmpty())
         throw IllegalArgumentException("Path size must be at least 2")
 
     MapboxDirections.builder().apply {

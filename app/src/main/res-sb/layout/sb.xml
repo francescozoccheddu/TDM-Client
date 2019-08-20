@@ -31,8 +31,8 @@
             app:cardBackgroundColor="@color/backgroundDark"
     >
         
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:orientation="vertical"
+        <LinearLayout
+                android:orientation="vertical"
                       android:id="@+id/sb_content"
                       android:visibility="gone"
                       android:layout_margin="@dimen/sb_padding"

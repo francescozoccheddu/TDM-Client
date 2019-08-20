@@ -49,8 +49,8 @@ class LocationSearchProvider {
                     when (location.type) {
                         PlaceQuerier.Location.Type.ADDRESS -> R.drawable.sb_map
                         PlaceQuerier.Location.Type.PLACE -> R.drawable.sb_terrain
-                        PlaceQuerier.Location.Type.POI -> R.drawable.ic_place
-                        PlaceQuerier.Location.Type.UNKNOWN -> R.drawable.ic_place
+                        PlaceQuerier.Location.Type.POI -> R.drawable.place
+                        PlaceQuerier.Location.Type.UNKNOWN -> R.drawable.place
                     }
                 )
                 updateDistance()

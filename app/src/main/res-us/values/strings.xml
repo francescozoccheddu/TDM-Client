@@ -1,0 +1,13 @@
+<resources>
+    <string name="uss_score">punteggio</string>
+    <string name="uss_level">livello</string>
+    <string name="uss_multiplier">moltiplicatore</string>
+    <string name="uss_next_level">punti per il prossimo livello</string>
+    <string name="uss_link_rules">
+        <a href="https://www.example.com">Regolamento</a>
+    </string>
+    <string name="uss_link_privacy">
+        <a href="https://www.example.com">Informativa sulla privacy</a>
+    </string>
+    <string name="uss_url_site">https://www.example.com</string>
+</resources>
