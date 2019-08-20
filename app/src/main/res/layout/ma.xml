@@ -24,5 +24,6 @@
     
     <include layout="@layout/sb"/>
     <include layout="@layout/bg"/>
+    <include layout="@layout/us"/>
 
 </FrameLayout>

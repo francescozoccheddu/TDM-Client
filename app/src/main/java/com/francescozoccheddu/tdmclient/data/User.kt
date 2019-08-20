@@ -35,8 +35,8 @@ fun loadScoreFromPrefs(prefs: SharedPreferences, keyPrefix: String): Score? {
     val multiplier = prefs.getFloat("$keyPrefix:${Score::multiplier.name}", -1f)
     val nextLevelScore = prefs.getInt("$keyPrefix:${Score::nextLevelScore.name}", -1)
     val lastNotifiedLevel = prefs.getInt("$keyPrefix:${Score::lastNotifiedLevel.name}", -1)
-    if (score < 0 || level < 0 || multiplier < 0 || lastNotifiedLevel < 0)
-        return null
+    return if (score < 0 || level < 0 || multiplier < 0 || lastNotifiedLevel < 0)
+        null
     else
-        return Score(score, level, multiplier, if (nextLevelScore < 0) null else nextLevelScore, lastNotifiedLevel)
+        Score(score, level, multiplier, if (nextLevelScore < 0) null else nextLevelScore, lastNotifiedLevel)
 }

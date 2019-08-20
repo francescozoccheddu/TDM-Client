@@ -172,7 +172,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
 
     val hasScore get() = this::_score.isInitialized
 
-    lateinit private var _score: Score
+    private lateinit var _score: Score
 
     var notifyLevel = 0
         set(value) {

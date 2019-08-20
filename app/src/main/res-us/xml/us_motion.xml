@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Transition app:constraintSetStart="@id/us_cs_idle"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_score_root"
+                app:touchRegionId="@id/us_score_root"
+        />
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_idle"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_sheet_root"
+                app:touchRegionId="@id/us_sheet_root"
+        />
+
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_idle"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_level_root"
+                app:touchRegionId="@id/us_level_root"
+        />
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_idle"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_gain_root"
+                app:touchRegionId="@id/us_gain_root"
+        />
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_expanded"
+                app:constraintSetEnd="@id/us_cs_idle"
+                app:motionInterpolator="bounce"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragRight"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_sheet_root"
+                app:touchRegionId="@id/us_sheet_root"
+        />
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_gain"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_score_root"
+                app:touchRegionId="@id/us_score_root"
+        />
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_gain"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_sheet_root"
+                app:touchRegionId="@id/us_sheet_root"
+        />
+
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_gain"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_level_root"
+                app:touchRegionId="@id/us_level_root"
+        />
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_gain"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    >
+
+        <OnSwipe
+                app:dragDirection="dragLeft"
+                app:touchAnchorSide="left"
+                app:touchAnchorId="@id/us_gain_root"
+                app:touchRegionId="@id/us_gain_root"
+        />
+
+    </Transition>
+
+    <Transition app:constraintSetStart="@id/us_cs_gone"
+                app:constraintSetEnd="@id/us_cs_expanded"
+                app:motionInterpolator="easeOut"
+                app:duration="500"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_gone"
+                app:constraintSetEnd="@id/us_cs_idle"
+                app:motionInterpolator="bounce"
+                app:duration="300"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_gone"
+                app:constraintSetEnd="@id/us_cs_gain"
+                app:motionInterpolator="bounce"
+                app:duration="300"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_idle"
+                app:constraintSetEnd="@id/us_cs_gain"
+                app:motionInterpolator="bounce"
+                app:duration="300"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_gain"
+                app:constraintSetEnd="@id/us_cs_idle"
+                app:motionInterpolator="linear"
+                app:duration="300"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_idle"
+                app:constraintSetEnd="@id/us_cs_gone"
+                app:motionInterpolator="linear"
+                app:duration="300"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_gain"
+                app:constraintSetEnd="@id/us_cs_gone"
+                app:motionInterpolator="linear"
+                app:duration="300"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_expanded"
+                app:constraintSetEnd="@id/us_cs_gain"
+                app:motionInterpolator="bounce"
+                app:duration="500"
+    />
+
+    <Transition app:constraintSetStart="@id/us_cs_expanded"
+                app:constraintSetEnd="@id/us_cs_gone"
+                app:motionInterpolator="bounce"
+                app:duration="500"
+    />
+
+
+    <ConstraintSet android:id="@+id/us_cs_idle">
+
+        <Constraint android:id="@id/us_scrim"
+                    android:alpha="0"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+        />
+
+        <Constraint android:id="@id/us_sheet_root"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toRightOf="parent"
+                    app:layout_constraintWidth_percent="1"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintWidth_default="percent"
+        />
+
+        <Constraint android:id="@id/us_gain_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBaseline_toBaselineOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+                    android:translationX="@dimen/us_translation_x"
+        />
+
+        <Constraint android:id="@id/us_score_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintRight_toLeftOf="@id/us_sheet_root"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="@dimen/us_margin_top"
+                    android:translationX="@dimen/us_translation_x"
+        />
+
+        <Constraint android:id="@id/us_level_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+                    android:rotation="-10"
+                    android:translationX="@dimen/us_translation_x"
+        />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/us_cs_gain">
+
+        <Constraint android:id="@id/us_scrim"
+                    android:alpha="0"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+        />
+
+        <Constraint android:id="@id/us_sheet_root"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toRightOf="parent"
+                    app:layout_constraintWidth_percent="1"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintWidth_default="percent"
+        />
+
+        <Constraint android:id="@id/us_gain_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:rotation="5"
+                    app:layout_constraintBottom_toTopOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+                    android:translationX="@dimen/us_translation_x"
+        />
+
+        <Constraint android:id="@id/us_score_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintRight_toLeftOf="@id/us_sheet_root"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="@dimen/us_margin_top"
+                    android:translationX="@dimen/us_translation_x"
+        />
+
+        <Constraint android:id="@id/us_level_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+                    android:rotation="-10"
+                    android:translationX="@dimen/us_translation_x"
+        />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/us_cs_gone">
+
+        <Constraint android:id="@id/us_scrim"
+                    android:alpha="0"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+        />
+
+        <Constraint android:id="@id/us_sheet_root"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toRightOf="parent"
+                    app:layout_constraintWidth_percent="1"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintWidth_default="percent"
+        />
+
+        <Constraint android:id="@id/us_gain_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBaseline_toBaselineOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+        />
+
+        <Constraint android:id="@id/us_score_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toLeftOf="@id/us_sheet_root"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="@dimen/us_margin_top"
+        />
+
+        <Constraint android:id="@id/us_level_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintBaseline_toBaselineOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+                    android:rotation="0"
+        />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/us_cs_expanded">
+
+        <Constraint android:id="@id/us_scrim"
+                    android:alpha="0.5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+        />
+
+        <Constraint android:id="@id/us_sheet_root"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintWidth_percent="1"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintWidth_default="percent"
+        />
+
+        <Constraint android:id="@id/us_gain_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBaseline_toBaselineOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+        />
+
+        <Constraint android:id="@id/us_score_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toLeftOf="@id/us_sheet_root"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="@dimen/us_margin_top"
+        />
+
+        <Constraint android:id="@id/us_level_root"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintBaseline_toBaselineOf="@id/us_score_root"
+                    app:layout_constraintRight_toRightOf="@id/us_score_root"
+                    android:rotation="0"
+        />
+
+    </ConstraintSet>
+
+</MotionScene>

@@ -7,7 +7,7 @@ import kotlin.math.roundToLong
 
 
 fun dateDiff(date1: Date, date2: Date): Float {
-    val diffMs = date2.getTime() - date1.getTime()
+    val diffMs = date2.time - date1.time
     return diffMs / 1000f
 }
 
@@ -26,7 +26,7 @@ private val datetimezoneFormat = SimpleDateFormat(datetimeFormat.toPattern() + "
 }
 
 fun dateParseISO(date: String): Date {
-    var builder = StringBuilder(date.trim())
+    val builder = StringBuilder(date.trim())
     val format: SimpleDateFormat = when (builder.length) {
         9 -> {
             // YYYY-MM-DD

@@ -12,6 +12,7 @@ import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
 import com.francescozoccheddu.tdmclient.ui.components.RoutingController
 import com.francescozoccheddu.tdmclient.ui.components.SearchBarComponent
+import com.francescozoccheddu.tdmclient.ui.components.UserStatsComponent
 import com.francescozoccheddu.tdmclient.ui.utils.Permissions
 import com.francescozoccheddu.tdmclient.utils.android.dp
 import com.francescozoccheddu.tdmclient.utils.android.hsv
@@ -73,6 +74,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.bg.bg_root
 import kotlinx.android.synthetic.main.ma.ma_map
 import kotlinx.android.synthetic.main.sb.sb_root
+import kotlinx.android.synthetic.main.us.us_root
 import kotlin.math.roundToInt
 
 
@@ -109,6 +111,7 @@ class MainActivity : AppCompatActivity() {
     private val permissions = Permissions(this)
     private lateinit var routingController: RoutingController
     private lateinit var searchBarComponent: SearchBarComponent
+    private lateinit var userStatsComponent: UserStatsComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,6 +128,8 @@ class MainActivity : AppCompatActivity() {
             }
             onFocusChanged = { routingController.enabled = !searchBarComponent.focused }
         }
+
+        userStatsComponent = UserStatsComponent(us_root)
 
         routingController = RoutingController(bg_root).apply {
             onDestinationChanged += {
@@ -181,11 +186,11 @@ class MainActivity : AppCompatActivity() {
                             .fromUri(MAP_STYLE_URI)
                             .withImage(
                                 MB_IMAGE_DESTINATION,
-                                resources.getDrawable(R.drawable.ic_place, null), true
+                                resources.getDrawable(R.drawable.place, null), true
                             )
                             .withImage(
                                 MB_IMAGE_POI,
-                                resources.getDrawable(R.drawable.ic_poi, null), true
+                                resources.getDrawable(R.drawable.poi, null), true
                             )
                             .withSource(GeoJsonSource(MB_SOURCE_POIS))
                             .withSource(GeoJsonSource(MB_SOURCE_COVERAGE_POINTS))
@@ -547,9 +552,9 @@ class MainActivity : AppCompatActivity() {
                         .useDefaultLocationEngine(true)
                         .build()
                 )
-                setLocationComponentEnabled(true)
-                setCameraMode(CameraMode.NONE)
-                setRenderMode(RenderMode.COMPASS)
+                isLocationComponentEnabled = true
+                cameraMode = CameraMode.NONE
+                renderMode = RenderMode.COMPASS
             }
         }
     }

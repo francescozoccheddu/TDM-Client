@@ -61,8 +61,8 @@ class MainService : Service() {
         private const val POI_EXPIRATION_TIME = 120f
         private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
         private val USER = User(0, "0")
-        private val STOP_ACTION = "IntentActionStop"
-        private val START_ACTIVITY_ACTION = "IntentActionStartActivity"
+        private const val STOP_ACTION = "IntentActionStop"
+        private const val START_ACTIVITY_ACTION = "IntentActionStartActivity"
 
         val MAP_BOUNDS = LatLngBounds.Builder()
             .include(LatLng(39.1806426351715, 9.07530756367117))

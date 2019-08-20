@@ -19,4 +19,6 @@
     <string name="bg_duration_hint">Quanto tempo vuoi dedicarmi?</string>
     <string name="bg_duration_cancel">Annulla</string>
     <string name="bg_duration_start">Inizia</string>
+    <string name="bg_walk_nearby">Vicinato</string>
+    <string name="bg_walk_destination">Destinazione</string>
 </resources>

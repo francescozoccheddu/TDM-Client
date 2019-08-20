@@ -72,10 +72,10 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
         if (head == null)
             head = borrowNode(value, null, null)
         else {
-            if (tail == null)
-                tail = borrowNode(value, head, null)
+            tail = if (tail == null)
+                borrowNode(value, head, null)
             else
-                tail = borrowNode(value, tail, null)
+                borrowNode(value, tail, null)
         }
     }
 
@@ -134,13 +134,13 @@ class FixedSizeSortedQueue<Type>(val size: Int, val comparer: (Type, Type) -> Bo
             lastNode = node!!
             node = if (firstComparison) lastNode.previous else lastNode.next
         } while (node != null && firstComparison == comparer(value, node.value))
-        if (firstComparison) {
+        return if (firstComparison) {
             addBefore(lastNode, value)
-            return lastNode.previous
+            lastNode.previous
         }
         else {
             addAfter(lastNode, value)
-            return lastNode.next
+            lastNode.next
         }
     }
 

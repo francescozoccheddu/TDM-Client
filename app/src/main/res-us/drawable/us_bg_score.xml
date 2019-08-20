@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid
+            android:color="@color/backgroundStats"
+    />
+    <corners
+            android:radius="@dimen/us_score_radius"
+    />
+    <padding
+            android:left="@dimen/us_score_padding"
+            android:right="@dimen/us_score_padding_end"
+            android:bottom="@dimen/us_score_padding"
+            android:top="@dimen/us_score_padding"
+    />
+</shape>

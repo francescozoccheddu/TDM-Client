@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="backgroundStats">#E53935</color>
+    <color name="backgroundStatsDark">#D32F2F</color>
+    <color name="backgroundStatsLight">#EF5350</color>
+    <color name="backgroundStatsLightest">#F05B58</color>
+</resources>

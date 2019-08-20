@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="us_gain_radius">4dp</dimen>
+    <dimen name="us_gain_text_size">12sp</dimen>
+    <dimen name="us_gain_text_size_extra">10sp</dimen>
+    <dimen name="us_gain_padding">6dp</dimen>
+    <dimen name="us_gain_padding_end">34dp</dimen>
+    <dimen name="us_gain_elevation">2dp</dimen>
+
+    <dimen name="us_score_radius">4dp</dimen>
+    <dimen name="us_score_text_size">18sp</dimen>
+    <dimen name="us_score_text_size_extra">12sp</dimen>
+    <dimen name="us_score_padding">8dp</dimen>
+    <dimen name="us_score_padding_end">38dp</dimen>
+    <dimen name="us_score_elevation">4dp</dimen>
+
+    <dimen name="us_level_radius">4dp</dimen>
+    <dimen name="us_level_text_size">14sp</dimen>
+    <dimen name="us_level_text_size_extra">10sp</dimen>
+    <dimen name="us_level_padding">6dp</dimen>
+    <dimen name="us_level_padding_end">36dp</dimen>
+    <dimen name="us_level_elevation">3dp</dimen>
+
+    <dimen name="us_sheet_elevation">5dp</dimen>
+    <dimen name="us_translation_x">10dp</dimen>
+    <dimen name="us_margin_top">40dp</dimen>
+
+    <dimen name="uss_header_large_text_size">24sp</dimen>
+    <dimen name="uss_value_large_text_size">64sp</dimen>
+    <dimen name="uss_header_text_size">20sp</dimen>
+    <dimen name="uss_value_text_size">48sp</dimen>
+    <dimen name="uss_margins">16dp</dimen>
+    <dimen name="uss_vertical_spacing">8dp</dimen>
+    <dimen name="uss_close_size">64dp</dimen>
+
+</resources>

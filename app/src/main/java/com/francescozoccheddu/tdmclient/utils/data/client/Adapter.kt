@@ -82,16 +82,16 @@ class VolleyAdapterRequest<ResponseType>(
             response: NetworkResponse,
             interpreter: (Any?) -> ResponseType
         ): Nullable<ResponseType>? {
-            try {
+            return try {
                 val charset = Charset.forName(HttpHeaderParser.parseCharset(response.headers, CHARSET))
                 val json = String(response.data, charset)
-                return Nullable(interpreter(fromJSON(json)))
+                Nullable(interpreter(fromJSON(json)))
             } catch (e: UnsupportedEncodingException) {
-                return null
+                null
             } catch (je: JSONException) {
-                return null
+                null
             } catch (ue: Interpreter.UninterpretableResponseException) {
-                return null
+                null
             }
         }
 
@@ -143,11 +143,11 @@ class VolleyAdapterRequest<ResponseType>(
     }
 
     override fun getBody(): ByteArray? {
-        try {
-            return requestBody.toByteArray(charset(CHARSET))
+        return try {
+            requestBody.toByteArray(charset(CHARSET))
         } catch (uee: UnsupportedEncodingException) {
             VolleyLog.wtf("Unsupported Encoding while trying to get body bytes using %s", CHARSET)
-            return null
+            null
         }
     }
 

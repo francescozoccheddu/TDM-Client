@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid
+            android:color="@color/backgroundStatsLightest"
+    />
+    <corners
+            android:radius="@dimen/us_gain_radius"
+    />
+    <padding
+            android:left="@dimen/us_gain_padding"
+            android:right="@dimen/us_gain_padding_end"
+            android:bottom="@dimen/us_gain_padding"
+            android:top="@dimen/us_gain_padding"
+    />
+</shape>
