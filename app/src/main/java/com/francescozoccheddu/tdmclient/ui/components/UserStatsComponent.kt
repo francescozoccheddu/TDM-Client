@@ -1,19 +1,21 @@
 package com.francescozoccheddu.tdmclient.ui.components
 
 import android.view.ViewGroup
-import androidx.constraintlayout.motion.widget.MotionLayout
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.utils.android.OverlayMotionLayout
 
 class UserStatsComponent(parent: ViewGroup) {
 
-    private val root = parent.findViewById<MotionLayout>(R.id.us_root)
+    private val root = parent.findViewById<OverlayMotionLayout>(R.id.us_root)
 
     init {
-
         parent.findViewById<UserStatsSheet>(R.id.us_sheet_root).onClose = this::requestClose
+        root.addHitRect(R.id.us_score_root)
+        root.addHitRect(R.id.us_level_root)
+        root.addHitRect(R.id.us_gain_root)
+        root.addHitRect(R.id.us_sheet_root)
         root.setTransition(R.id.us_cs_idle, R.id.us_cs_idle)
         root.transitionToEnd()
-
     }
 
     private fun updateCloseTransition() {
