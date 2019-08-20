@@ -49,7 +49,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
         searchProvider.onResultsChanged += { update() }
 
         val closeButton = parent.findViewById<ImageButton>(R.id.tg_search_close)
-        val clearButton = parent.findViewById<ImageButton>(R.id.sb_clear)
+        val clearButton = parent.findViewById<InOutImageButton>(R.id.sb_clear)
         val progressBar = parent.findViewById<ProgressBar>(R.id.sb_loading)
 
         resultList.apply {
@@ -67,12 +67,10 @@ class SearchBarComponent(private val parent: ViewGroup) {
 
         searchProvider.onLoadingChange += { progressBar.visible = it }
 
-        val clearAvd = InOutAVD(clearButton)
-
         editText.addTextChangedListener(object : TextWatcher {
 
             override fun afterTextChanged(s: Editable) {
-                clearAvd.state = if (s.isNotEmpty()) InOutAVD.State.VISIBLE else InOutAVD.State.GONE
+                clearButton.shown = s.isNotEmpty()
                 searchProvider.query = s.toString()
             }
 

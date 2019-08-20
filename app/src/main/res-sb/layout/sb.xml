@@ -33,11 +33,11 @@
         
         <LinearLayout
                 android:orientation="vertical"
-                      android:id="@+id/sb_content"
-                      android:visibility="gone"
-                      android:layout_margin="@dimen/sb_padding"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content">
+                android:id="@+id/sb_content"
+                android:visibility="gone"
+                android:layout_margin="@dimen/sb_padding"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="42dp"
@@ -88,7 +88,7 @@
                         android:layout_margin="2dp"
                 />
                 
-                <ImageButton
+                <com.francescozoccheddu.tdmclient.ui.components.InOutImageButton
                         android:id="@+id/sb_clear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

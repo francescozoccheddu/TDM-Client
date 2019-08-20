@@ -9,10 +9,8 @@ class UserStatsComponent(parent: ViewGroup) {
     private val root = parent.findViewById<MotionLayout>(R.id.us_root)
 
     init {
-        val closeButton = parent.findViewById<InOutImageButton>(R.id.uss_close).apply {
-            setOnClickListener { requestClose() }
-        }
 
+        parent.findViewById<UserStatsSheet>(R.id.us_sheet_root).onClose = this::requestClose
         root.setTransition(R.id.us_cs_idle, R.id.us_cs_idle)
         root.transitionToEnd()
 
