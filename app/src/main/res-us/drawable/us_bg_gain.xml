@@ -4,11 +4,12 @@
             android:color="@color/backgroundStatsLightest"
     />
     <corners
-            android:radius="@dimen/us_gain_radius"
+            android:topLeftRadius="@dimen/us_gain_radius"
+            android:topRightRadius="@dimen/us_gain_radius"
     />
     <padding
             android:left="@dimen/us_gain_padding"
-            android:right="@dimen/us_gain_padding_end"
+            android:right="@dimen/us_gain_padding"
             android:bottom="@dimen/us_gain_padding"
             android:top="@dimen/us_gain_padding"
     />

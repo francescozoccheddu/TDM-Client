@@ -24,42 +24,21 @@
             android:elevation="@dimen/us_sheet_elevation"
     >
         
-        <include layout="@layout/us_sheet"/>
+        <include layout="@layout/uss"/>
     
     </FrameLayout>
     
-    <LinearLayout
+    <FrameLayout
             android:id="@+id/us_gain_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:transformPivotX="0px"
-            android:transformPivotY="0px"
-            android:rotation="5"
-            android:textSize="@dimen/us_gain_text_size"
-            android:background="@drawable/us_bg_gain"
-            android:elevation="@dimen/us_gain_elevation"
-            android:orientation="horizontal"
-            android:gravity="left|center_vertical"
+            android:clipChildren="true"
+            android:clipToPadding="true"
     >
         
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+"
-                android:textSize="@dimen/us_gain_text_size_extra"
-                android:layout_marginRight="1sp"
-                android:layout_marginLeft="1sp"
-                android:alpha="0.8"
-        />
-        
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="100"
-                android:textSize="@dimen/us_gain_text_size"
-        />
+        <include layout="@layout/us_gain"/>
     
-    </LinearLayout>
+    </FrameLayout>
     
     <LinearLayout
             android:id="@+id/us_score_root"

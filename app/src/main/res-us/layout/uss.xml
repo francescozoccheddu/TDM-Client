@@ -5,10 +5,11 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/uss"
         android:padding="@dimen/uss_margins"
         android:background="@color/backgroundStatsDark">
     
-    <ImageButton
+    <com.francescozoccheddu.tdmclient.ui.components.InOutImageButton
             android:id="@+id/uss_close"
             android:layout_width="@dimen/uss_close_size"
             android:layout_height="@dimen/uss_close_size"
