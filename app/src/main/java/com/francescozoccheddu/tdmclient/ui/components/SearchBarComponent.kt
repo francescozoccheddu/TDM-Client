@@ -67,12 +67,12 @@ class SearchBarComponent(private val parent: ViewGroup) {
 
         searchProvider.onLoadingChange += { progressBar.visible = it }
 
-        val clearAvd = CrossAVD(clearButton)
+        val clearAvd = InOutAVD(clearButton)
 
         editText.addTextChangedListener(object : TextWatcher {
 
             override fun afterTextChanged(s: Editable) {
-                clearAvd.state = if (s.isNotEmpty()) CrossAVD.State.VISIBLE else CrossAVD.State.GONE
+                clearAvd.state = if (s.isNotEmpty()) InOutAVD.State.VISIBLE else InOutAVD.State.GONE
                 searchProvider.query = s.toString()
             }
 
