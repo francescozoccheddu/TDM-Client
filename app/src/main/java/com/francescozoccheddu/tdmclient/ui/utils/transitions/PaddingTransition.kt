@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.transitions
+package com.francescozoccheddu.tdmclient.ui.utils.transitions
 
 
 import android.animation.Animator

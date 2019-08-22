@@ -10,7 +10,7 @@ import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
-import com.francescozoccheddu.tdmclient.utils.data.snap
+import com.francescozoccheddu.tdmclient.utils.commons.snap
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.mapboxsdk.geometry.LatLng
 

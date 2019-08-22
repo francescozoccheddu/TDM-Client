@@ -1,10 +1,12 @@
-package com.francescozoccheddu.tdmclient.ui.components
+package com.francescozoccheddu.tdmclient.ui.components.us
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import com.francescozoccheddu.tdmclient.R
+import com.francescozoccheddu.tdmclient.data.UserStats
+import com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
 import com.francescozoccheddu.tdmclient.utils.commons.event
 import com.francescozoccheddu.tdmclient.utils.commons.invoke
 
@@ -31,5 +33,6 @@ class UserStatsSheet @JvmOverloads constructor(
         closeButton.hide()
     }
 
+    var stats = UserStats(0, 0, 1f, null, 0)
 
 }

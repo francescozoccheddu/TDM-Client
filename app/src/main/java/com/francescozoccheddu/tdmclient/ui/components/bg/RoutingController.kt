@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.components
+package com.francescozoccheddu.tdmclient.ui.components.bg
 
 import android.view.ViewGroup
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier

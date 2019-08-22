@@ -10,10 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.ui.MainService.Companion.MAP_BOUNDS
-import com.francescozoccheddu.tdmclient.ui.components.RoutingController
-import com.francescozoccheddu.tdmclient.ui.components.SearchBarComponent
-import com.francescozoccheddu.tdmclient.ui.components.UserStatsComponent
-import com.francescozoccheddu.tdmclient.ui.utils.Permissions
+import com.francescozoccheddu.tdmclient.ui.components.bg.RoutingController
+import com.francescozoccheddu.tdmclient.ui.components.sb.SearchBarComponent
+import com.francescozoccheddu.tdmclient.ui.components.us.UserStatsComponent
+import com.francescozoccheddu.tdmclient.utils.android.Permissions
 import com.francescozoccheddu.tdmclient.utils.android.dp
 import com.francescozoccheddu.tdmclient.utils.android.hsv
 import com.francescozoccheddu.tdmclient.utils.data.latLng
@@ -22,6 +22,7 @@ import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.LineString
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -129,7 +130,10 @@ class MainActivity : AppCompatActivity() {
             onFocusChanged = { routingController.enabled = !searchBarComponent.focused }
         }
 
-        userStatsComponent = UserStatsComponent(us_root)
+        userStatsComponent = UserStatsComponent(us_root).apply {
+            onLevelNotified = { service?.notifyLevel = it }
+            loadLastNotifiedLevel(this@MainActivity)
+        }
 
         routingController = RoutingController(bg_root).apply {
             onDestinationChanged += {
@@ -169,6 +173,7 @@ class MainActivity : AppCompatActivity() {
             }
             onPickingDestinationChanged += {
                 updateTopGroup()
+                userStatsComponent.enabled = !routingController.pickingDestination
             }
         }
 
@@ -308,7 +313,7 @@ class MainActivity : AppCompatActivity() {
                                         ),
                                         iconOptional(false),
                                         textOptional(true),
-                                        textField(get("score")),
+                                        textField(get("userStats")),
                                         textSize(
                                             interpolate(
                                                 linear(), zoom(),
@@ -357,6 +362,7 @@ class MainActivity : AppCompatActivity() {
                         setMaxZoomPreference(MAX_ZOOM)
                         setMinZoomPreference(MIN_ZOOM)
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
+                        cameraPosition = CameraPosition.Builder().target(MAP_BOUNDS.center).zoom(12.0).build()
                         if (permissions.granted)
                             enableLocationComponent(style)
                         setSource(style, MB_SOURCE_DESTINATION, routingController.destination?.point)
@@ -469,9 +475,8 @@ class MainActivity : AppCompatActivity() {
         updateRouting()
     }
 
-    private fun onScoreChange() {
+    private fun onStatsChange() {
         //topGroupController.sl = service?.sl ?: topGroupController.sl
-        println("Score=${service?.score?.score}")
     }
 
     private fun onCoveragePointDataChange() {
@@ -495,7 +500,7 @@ class MainActivity : AppCompatActivity() {
                     old.onLocationChange -= this::onLocationChanged
                     old.onLocatableChange -= this::onLocatableChange
                     old.onOnlineChange -= this::onOnlineChange
-                    old.onScoreChange -= this::onScoreChange
+                    old.onStatsChange -= this::onStatsChange
                     old.onCoveragePointDataChange -= this::onCoveragePointDataChange
                     old.onCoverageQuadDataChange -= this::onCoverageQuadDataChange
                     old.onPoiDataChange -= this::onPoiDataChange
@@ -504,14 +509,15 @@ class MainActivity : AppCompatActivity() {
                     value.onLocationChange += this::onLocationChanged
                     value.onLocatableChange += this::onLocatableChange
                     value.onOnlineChange += this::onOnlineChange
-                    value.onScoreChange += this::onScoreChange
+                    value.onStatsChange += this::onStatsChange
                     value.onCoveragePointDataChange += this::onCoveragePointDataChange
                     value.onCoverageQuadDataChange += this::onCoverageQuadDataChange
                     value.onPoiDataChange += this::onPoiDataChange
+                    value.notifyLevel = userStatsComponent.lastNotifiedLevel
                     onLocationChanged()
                     onLocatableChange()
                     onOnlineChange()
-                    onScoreChange()
+                    onStatsChange()
                     onCoveragePointDataChange()
                     onCoverageQuadDataChange()
                     onPoiDataChange()
@@ -599,6 +605,7 @@ class MainActivity : AppCompatActivity() {
             service = null
             unbindService(serviceConnection)
         }
+        userStatsComponent.saveLastNotifiedLevel(this)
         ma_map.onPause()
     }
 

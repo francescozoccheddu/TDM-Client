@@ -1,16 +1,17 @@
-package com.francescozoccheddu.tdmclient.ui.transitions
+package com.francescozoccheddu.tdmclient.ui.utils.transitions
+
 
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
-import androidx.cardview.widget.CardView
 import androidx.transition.Transition
 import androidx.transition.TransitionValues
 
 
-class CardColorTransition : Transition {
+class ElevationTransition : Transition {
 
     constructor()
 
@@ -29,9 +30,7 @@ class CardColorTransition : Transition {
     }
 
     private fun captureValues(transitionValues: TransitionValues) {
-        val view = transitionValues.view
-        if (view is CardView)
-            transitionValues.values[PROPERTY] = view.cardBackgroundColor.defaultColor
+        transitionValues.values[PROPERTY] = transitionValues.view.elevation
     }
 
     override fun createAnimator(
@@ -43,21 +42,21 @@ class CardColorTransition : Transition {
             return null
         }
 
-        val start = startValues.values[PROPERTY] as Int
-        val end = endValues.values[PROPERTY] as Int
-        val view = endValues.view as CardView
-        view.setCardBackgroundColor(start)
+        val start = startValues.values[PROPERTY] as Float
+        val end = endValues.values[PROPERTY] as Float
+        val view = endValues.view
+        view.elevation = start
 
-        val animator = ValueAnimator.ofArgb(start, end)
+        val animator = ValueAnimator.ofFloat(start, end)
         animator.addUpdateListener { animation ->
-            view.setCardBackgroundColor(animation.animatedValue as Int)
+            view.elevation = animation.animatedValue as Float
         }
 
         return animator
     }
 
     private companion object {
-        private val PROPERTY = "${this::class.java.canonicalName}:${CardView::getCardBackgroundColor.name}"
+        private val PROPERTY = "${this::class.java.canonicalName}:${View::getElevation.name}"
         private val PROPERTIES = arrayOf(PROPERTY)
     }
 }

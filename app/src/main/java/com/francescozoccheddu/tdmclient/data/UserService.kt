@@ -12,7 +12,7 @@ private val DEFAULT_RETRY_POLICY = RetryPolicy(2f)
 
 data class UserGetRequest(val user: User, val notifyLevel: Int? = null)
 
-private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserGetRequest, Score>() {
+private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserGetRequest, UserStats>() {
 
     override fun interpretRequest(request: UserGetRequest) =
         JSONObject().apply {
@@ -23,9 +23,9 @@ private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserGe
                 put("notifyLevel", request.notifyLevel)
         }
 
-    override fun interpretResponse(request: UserGetRequest, response: JSONObject): Score {
+    override fun interpretResponse(request: UserGetRequest, response: JSONObject): UserStats {
         try {
-            return parseScore(response)
+            return parseUserStats(response)
         } catch (_: Exception) {
             throw Interpreter.UninterpretableResponseException()
         }
@@ -33,7 +33,7 @@ private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserGe
 
 })
 
-typealias UserService = Server.PollService<UserGetRequest, Score, Score>
+typealias UserService = Server.PollService<UserGetRequest, UserStats, UserStats>
 
 fun makeUserService(server: Server, user: User): UserService =
     server.PollService(

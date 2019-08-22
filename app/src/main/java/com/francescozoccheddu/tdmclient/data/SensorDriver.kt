@@ -3,7 +3,6 @@ package com.francescozoccheddu.tdmclient.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
-import android.os.Looper
 import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.FixedSizeSortedQueue
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
@@ -13,13 +12,13 @@ import com.francescozoccheddu.tdmclient.utils.data.client.error
 import java.util.*
 import kotlin.math.max
 
-class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: Looper = Looper.myLooper()!!) {
+class SensorDriver(server: Server, val user: User, val sensor: Sensor) {
 
     companion object {
-        val DEFAULT_PREFS_NAME = "${this::class.java.canonicalName}:score"
-        val DEFAULT_SCORE_PREF_KEY = "${this::class.java.canonicalName}:score"
+        val DEFAULT_PREFS_NAME = "${this::class.java.canonicalName}:userStats"
+        val DEFAULT_STATS_PREF_KEY = "${this::class.java.canonicalName}:userStats"
 
-        private const val MAX_SCORE_REQUESTS = 4
+        private const val MAX_STATS_REQUESTS = 4
 
         private const val MAX_MEASUREMENTS_REQUESTS = 4
         private const val MAX_UNREACHABLE_ATTEMPTS = 3
@@ -39,7 +38,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
     private val queue = FixedSizeSortedQueue.by(MAX_QUEUE_SIZE, true) { value: LocalizedMeasurement -> value.time }
 
     private val userService = makeUserService(server, user).apply {
-        onData += { score = it }
+        onData += { stats = it }
     }
     private val measurementService = makeMeasurementService(server).apply {
         onRequestStatusChanged += {
@@ -170,25 +169,25 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             ticker.tickInterval = value
         }
 
-    val hasScore get() = this::_score.isInitialized
+    val hasStats get() = this::_userStats.isInitialized
 
-    private lateinit var _score: Score
+    private lateinit var _userStats: UserStats
 
     var notifyLevel = 0
         set(value) {
             if (value != field) {
                 field = value
                 userService.pollRequest = UserGetRequest(user, value)
-                requestScoreUpdate()
+                requestStatsUpdate()
             }
         }
 
-    var score
-        get() = _score
+    var stats
+        get() = _userStats
         private set(value) {
-            if (!hasScore || value != _score) {
-                _score = value
-                onScoreChange()
+            if (!hasStats || value != _userStats) {
+                _userStats = value
+                onStatsChange()
             }
         }
 
@@ -200,40 +199,40 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor, looper: L
             }
         }
 
-    val onScoreChange = ProcEvent()
+    val onStatsChange = ProcEvent()
 
     val onReachableChange = ProcEvent()
 
-    fun loadScore(prefs: SharedPreferences, key: String = DEFAULT_SCORE_PREF_KEY) {
-        if (!hasScore) {
-            val score = loadScoreFromPrefs(prefs, key)
-            if (score != null)
-                this.score = score
+    fun loadStats(prefs: SharedPreferences, key: String = DEFAULT_STATS_PREF_KEY) {
+        if (!hasStats) {
+            val stats = loadUserStats(prefs, key)
+            if (stats != null)
+                this.stats = stats
         }
     }
 
-    fun saveScore(prefs: SharedPreferences.Editor, key: String = DEFAULT_SCORE_PREF_KEY) {
-        if (hasScore)
-            saveScoreToPrefs(prefs, score, key)
+    fun saveStats(prefs: SharedPreferences.Editor, key: String = DEFAULT_STATS_PREF_KEY) {
+        if (hasStats)
+            saveUserStats(prefs, stats, key)
     }
 
-    fun loadScore(context: Context, prefsName: String = DEFAULT_PREFS_NAME, key: String = DEFAULT_SCORE_PREF_KEY) {
-        if (!hasScore) {
-            loadScore(context.getSharedPreferences(prefsName, Context.MODE_PRIVATE), key)
+    fun loadStats(context: Context, prefsName: String = DEFAULT_PREFS_NAME, key: String = DEFAULT_STATS_PREF_KEY) {
+        if (!hasStats) {
+            loadStats(context.getSharedPreferences(prefsName, Context.MODE_PRIVATE), key)
         }
     }
 
-    fun saveScore(context: Context, prefsName: String = DEFAULT_PREFS_NAME, key: String = DEFAULT_SCORE_PREF_KEY) {
-        if (hasScore) {
+    fun saveStats(context: Context, prefsName: String = DEFAULT_PREFS_NAME, key: String = DEFAULT_STATS_PREF_KEY) {
+        if (hasStats) {
             val prefs = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
             val editor = prefs.edit()
-            saveScore(editor, key)
+            saveStats(editor, key)
             editor.apply()
         }
     }
 
-    fun requestScoreUpdate() {
-        if (userService.pendingRequests.size >= MAX_SCORE_REQUESTS)
+    fun requestStatsUpdate() {
+        if (userService.pendingRequests.size >= MAX_STATS_REQUESTS)
             userService.pendingRequests.minBy { it.startTime }?.cancel()
         userService.poll()
     }

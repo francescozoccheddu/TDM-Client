@@ -24,7 +24,7 @@ data class LocalizedMeasurement(val time: Date, val location: Location, val meas
 data class MeasurementPutRequest(val user: User, val measurements: Collection<LocalizedMeasurement>)
 
 
-private val INTERPRETER = object : SimpleInterpreter<MeasurementPutRequest, Score>() {
+private val INTERPRETER = object : SimpleInterpreter<MeasurementPutRequest, UserStats>() {
     override fun interpretRequest(request: MeasurementPutRequest): JSONObject? =
         JSONObject().apply {
             put("id", request.user.id)
@@ -43,16 +43,16 @@ private val INTERPRETER = object : SimpleInterpreter<MeasurementPutRequest, Scor
             }))
         }
 
-    override fun interpretResponse(request: MeasurementPutRequest, response: JSONObject): Score {
+    override fun interpretResponse(request: MeasurementPutRequest, response: JSONObject): UserStats {
         try {
-            return parseScore(response)
+            return parseUserStats(response)
         } catch (_: Exception) {
             throw Interpreter.UninterpretableResponseException()
         }
     }
 }
 
-typealias MeasurementService = Server.Service<MeasurementPutRequest, Score>
+typealias MeasurementService = Server.Service<MeasurementPutRequest, UserStats>
 
 fun makeMeasurementService(server: Server): MeasurementService =
     server.Service(

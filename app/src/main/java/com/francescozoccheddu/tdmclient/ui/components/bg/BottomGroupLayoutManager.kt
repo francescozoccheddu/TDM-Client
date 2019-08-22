@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.components
+package com.francescozoccheddu.tdmclient.ui.components.bg
 
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +17,8 @@ import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.commons.Event
 import com.francescozoccheddu.tdmclient.utils.commons.event
 import com.francescozoccheddu.tdmclient.utils.commons.invoke
-import com.francescozoccheddu.tdmclient.utils.data.snapDown
-import com.francescozoccheddu.tdmclient.utils.data.snapUp
+import com.francescozoccheddu.tdmclient.utils.commons.snapDown
+import com.francescozoccheddu.tdmclient.utils.commons.snapUp
 import kotlin.math.roundToInt
 
 class BottomGroupLayoutManager(private val parent: ViewGroup) {
@@ -157,7 +157,8 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
 
     }
 
-    val duration = object : DurationComponent {
+    val duration = object :
+        DurationComponent {
 
         private val knob = parent.findViewById<KnobView>(R.id.bg_duration_time)
 

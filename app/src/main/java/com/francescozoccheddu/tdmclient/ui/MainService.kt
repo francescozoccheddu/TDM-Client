@@ -16,7 +16,7 @@ import com.francescozoccheddu.tdmclient.data.Measurement
 import com.francescozoccheddu.tdmclient.data.PoiService
 import com.francescozoccheddu.tdmclient.data.RouteRequest
 import com.francescozoccheddu.tdmclient.data.RouteService
-import com.francescozoccheddu.tdmclient.data.Score
+import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.data.SensorDriver
 import com.francescozoccheddu.tdmclient.data.User
 import com.francescozoccheddu.tdmclient.data.makeCoverageService
@@ -100,7 +100,7 @@ class MainService : Service() {
     val onLocatableChange = ProcEvent()
     val onConnectedChange = ProcEvent()
     val onOnlineChange = ProcEvent()
-    val onScoreChange = ProcEvent()
+    val onStatsChange = ProcEvent()
     val onCoveragePointDataChange = ProcEvent()
     val onCoverageQuadDataChange = ProcEvent()
     val onPoiDataChange = ProcEvent()
@@ -167,11 +167,11 @@ class MainService : Service() {
             sensorDriver.notifyLevel = value
         }
 
-    val score: Score?
-        get() = if (sensorDriver.hasScore) sensorDriver.score else null
+    val userStats: UserStats?
+        get() = if (sensorDriver.hasStats) sensorDriver.stats else null
 
-    fun requestScoreUpdate() {
-        sensorDriver.requestScoreUpdate()
+    fun requestStatsUpdate() {
+        sensorDriver.requestStatsUpdate()
     }
 
     fun requestRoute(to: LatLng?, time: Float): Server.Service<RouteRequest, List<Point>>.Request {
@@ -297,10 +297,10 @@ class MainService : Service() {
                 USER,
                 FakeSensor(fakeMeasurement)
             ).apply {
-                onScoreChange += this@MainService.onScoreChange
+                onStatsChange += this@MainService.onStatsChange
                 onReachableChange += { connected = sensorDriver.reachable && online }
                 measureInterval = MEASURE_INTERVAL_TIME
-                loadScore(this@MainService)
+                loadStats(this@MainService)
             }
         }
 
@@ -323,7 +323,7 @@ class MainService : Service() {
             connected = ConnectivityStatusReceiver.isOnline(this)
             locatable = LocationStatusReceiver.isEnabled(this)
             locationEngine.getLastLocation(locationCallback)
-            requestScoreUpdate()
+            requestStatsUpdate()
         }
 
         if (!PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -352,7 +352,7 @@ class MainService : Service() {
 
     override fun onUnbind(intent: Intent?): Boolean {
         bound = false
-        sensorDriver.saveScore(this)
+        sensorDriver.saveStats(this)
         return true
     }
 
@@ -379,7 +379,7 @@ class MainService : Service() {
         sensorDriver.measuring = false
         sensorDriver.pushing = false
         server.cancelAll()
-        sensorDriver.saveScore(this)
+        sensorDriver.saveStats(this)
     }
 
 }

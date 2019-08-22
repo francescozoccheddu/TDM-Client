@@ -88,7 +88,7 @@
                         android:layout_margin="2dp"
                 />
                 
-                <com.francescozoccheddu.tdmclient.ui.components.InOutImageButton
+                <com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
                         android:id="@+id/sb_clear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
