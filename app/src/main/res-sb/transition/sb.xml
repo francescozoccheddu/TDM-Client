@@ -8,10 +8,10 @@
         </targets>
     </fade>
     <transitionSet android:transitionOrdering="together">
-        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.ElevationTransition"/>
-        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.CardRadiusTransition"/>
-        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.MarginTransition"/>
-        <transition class="com.francescozoccheddu.tdmclient.ui.transitions.AlphaTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.utils.transitions.ElevationTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.utils.transitions.CardRadiusTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.utils.transitions.MarginTransition"/>
+        <transition class="com.francescozoccheddu.tdmclient.ui.utils.transitions.AlphaTransition"/>
         <changeBounds>
             <targets>
                 <target android:excludeId="@id/sb_root"/>

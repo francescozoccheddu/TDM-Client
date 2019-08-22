@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.transitions
+package com.francescozoccheddu.tdmclient.ui.utils.transitions
 
 import android.animation.Animator
 import android.animation.ValueAnimator
@@ -10,7 +10,7 @@ import androidx.transition.Transition
 import androidx.transition.TransitionValues
 
 
-class CardRadiusTransition : Transition {
+class CardColorTransition : Transition {
 
     constructor()
 
@@ -30,9 +30,8 @@ class CardRadiusTransition : Transition {
 
     private fun captureValues(transitionValues: TransitionValues) {
         val view = transitionValues.view
-        if (view is CardView) {
-            transitionValues.values[PROPERTY] = view.radius
-        }
+        if (view is CardView)
+            transitionValues.values[PROPERTY] = view.cardBackgroundColor.defaultColor
     }
 
     override fun createAnimator(
@@ -44,21 +43,21 @@ class CardRadiusTransition : Transition {
             return null
         }
 
-        val start = startValues.values[PROPERTY] as Float
-        val end = endValues.values[PROPERTY] as Float
+        val start = startValues.values[PROPERTY] as Int
+        val end = endValues.values[PROPERTY] as Int
         val view = endValues.view as CardView
-        view.radius = start
+        view.setCardBackgroundColor(start)
 
-        val animator = ValueAnimator.ofFloat(start, end)
+        val animator = ValueAnimator.ofArgb(start, end)
         animator.addUpdateListener { animation ->
-            view.radius = animation.animatedValue as Float
+            view.setCardBackgroundColor(animation.animatedValue as Int)
         }
 
         return animator
     }
 
     private companion object {
-        private val PROPERTY = "${this::class.java.canonicalName}:${CardView::getRadius.name}"
+        private val PROPERTY = "${this::class.java.canonicalName}:${CardView::getCardBackgroundColor.name}"
         private val PROPERTIES = arrayOf(PROPERTY)
     }
 }

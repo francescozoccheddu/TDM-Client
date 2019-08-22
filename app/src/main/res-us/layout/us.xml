@@ -16,7 +16,7 @@
             android:alpha="0"
     />
     
-    <com.francescozoccheddu.tdmclient.ui.components.UserStatsSheet
+    <com.francescozoccheddu.tdmclient.ui.components.us.UserStatsSheet
             android:id="@+id/us_sheet_root"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -49,6 +49,7 @@
     >
         
         <TextView
+                android:id="@+id/us_score_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2560"
@@ -92,6 +93,7 @@
         />
         
         <TextView
+                android:id="@+id/us_level_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"

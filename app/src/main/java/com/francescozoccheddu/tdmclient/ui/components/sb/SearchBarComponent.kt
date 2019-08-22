@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.components
+package com.francescozoccheddu.tdmclient.ui.components.sb
 
 
 import android.content.Context
@@ -17,6 +17,7 @@ import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
+import com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
 import com.francescozoccheddu.tdmclient.ui.utils.LocationSearchProvider
 import com.francescozoccheddu.tdmclient.utils.android.setMargins
 import com.francescozoccheddu.tdmclient.utils.android.visible
@@ -95,6 +96,8 @@ class SearchBarComponent(private val parent: ViewGroup) {
             update()
             onFocusChanged?.invoke(focused)
         }
+
+        scrim.isClickable = false
 
     }
 

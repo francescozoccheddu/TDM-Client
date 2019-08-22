@@ -1,4 +1,4 @@
-package com.francescozoccheddu.tdmclient.ui.components
+package com.francescozoccheddu.tdmclient.ui.utils
 
 import android.content.Context
 import android.util.AttributeSet

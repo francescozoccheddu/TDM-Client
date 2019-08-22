@@ -9,7 +9,7 @@
         android:padding="@dimen/uss_margins"
         android:background="@color/backgroundStatsDark">
     
-    <com.francescozoccheddu.tdmclient.ui.components.InOutImageButton
+    <com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
             android:id="@+id/uss_close"
             android:layout_width="@dimen/uss_close_size"
             android:layout_height="@dimen/uss_close_size"

@@ -5,7 +5,7 @@ import org.json.JSONObject
 
 data class User(val id: Int, val passkey: String)
 
-data class Score(
+data class UserStats(
     val score: Int,
     val level: Int,
     val multiplier: Float,
@@ -13,30 +13,30 @@ data class Score(
     val lastNotifiedLevel: Int
 )
 
-fun parseScore(json: JSONObject) = Score(
-    json.getInt("score"),
+fun parseUserStats(json: JSONObject) = UserStats(
+    json.getInt("userStats"),
     json.getInt("level"),
     json.getDouble("multiplier").toFloat(),
     if (json.isNull("nextLevelScore")) null else json.getInt("nextLevelScore"),
     json.getInt("lastNotifiedLevel")
 )
 
-fun saveScoreToPrefs(prefs: SharedPreferences.Editor, score: Score, keyPrefix: String) {
-    prefs.putInt("$keyPrefix:${Score::score.name}", score.score)
-    prefs.putInt("$keyPrefix:${Score::level.name}", score.level)
-    prefs.putFloat("$keyPrefix:${Score::multiplier.name}", score.multiplier)
-    prefs.putInt("$keyPrefix:${Score::nextLevelScore.name}", score.nextLevelScore ?: -1)
-    prefs.putInt("$keyPrefix:${Score::lastNotifiedLevel.name}", score.lastNotifiedLevel)
+fun saveUserStats(prefs: SharedPreferences.Editor, userStats: UserStats, keyPrefix: String) {
+    prefs.putInt("$keyPrefix:${UserStats::score.name}", userStats.score)
+    prefs.putInt("$keyPrefix:${UserStats::level.name}", userStats.level)
+    prefs.putFloat("$keyPrefix:${UserStats::multiplier.name}", userStats.multiplier)
+    prefs.putInt("$keyPrefix:${UserStats::nextLevelScore.name}", userStats.nextLevelScore ?: -1)
+    prefs.putInt("$keyPrefix:${UserStats::lastNotifiedLevel.name}", userStats.lastNotifiedLevel)
 }
 
-fun loadScoreFromPrefs(prefs: SharedPreferences, keyPrefix: String): Score? {
-    val score = prefs.getInt("$keyPrefix:${Score::score.name}", -1)
-    val level = prefs.getInt("$keyPrefix:${Score::level.name}", -1)
-    val multiplier = prefs.getFloat("$keyPrefix:${Score::multiplier.name}", -1f)
-    val nextLevelScore = prefs.getInt("$keyPrefix:${Score::nextLevelScore.name}", -1)
-    val lastNotifiedLevel = prefs.getInt("$keyPrefix:${Score::lastNotifiedLevel.name}", -1)
+fun loadUserStats(prefs: SharedPreferences, keyPrefix: String): UserStats? {
+    val score = prefs.getInt("$keyPrefix:${UserStats::score.name}", -1)
+    val level = prefs.getInt("$keyPrefix:${UserStats::level.name}", -1)
+    val multiplier = prefs.getFloat("$keyPrefix:${UserStats::multiplier.name}", -1f)
+    val nextLevelScore = prefs.getInt("$keyPrefix:${UserStats::nextLevelScore.name}", -1)
+    val lastNotifiedLevel = prefs.getInt("$keyPrefix:${UserStats::lastNotifiedLevel.name}", -1)
     return if (score < 0 || level < 0 || multiplier < 0 || lastNotifiedLevel < 0)
         null
     else
-        Score(score, level, multiplier, if (nextLevelScore < 0) null else nextLevelScore, lastNotifiedLevel)
+        UserStats(score, level, multiplier, if (nextLevelScore < 0) null else nextLevelScore, lastNotifiedLevel)
 }

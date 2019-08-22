@@ -1,17 +1,16 @@
-package com.francescozoccheddu.tdmclient.ui.transitions
-
+package com.francescozoccheddu.tdmclient.ui.utils.transitions
 
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
+import androidx.cardview.widget.CardView
 import androidx.transition.Transition
 import androidx.transition.TransitionValues
 
 
-class ElevationTransition : Transition {
+class CardRadiusTransition : Transition {
 
     constructor()
 
@@ -30,7 +29,10 @@ class ElevationTransition : Transition {
     }
 
     private fun captureValues(transitionValues: TransitionValues) {
-        transitionValues.values[PROPERTY] = transitionValues.view.elevation
+        val view = transitionValues.view
+        if (view is CardView) {
+            transitionValues.values[PROPERTY] = view.radius
+        }
     }
 
     override fun createAnimator(
@@ -44,19 +46,19 @@ class ElevationTransition : Transition {
 
         val start = startValues.values[PROPERTY] as Float
         val end = endValues.values[PROPERTY] as Float
-        val view = endValues.view
-        view.elevation = start
+        val view = endValues.view as CardView
+        view.radius = start
 
         val animator = ValueAnimator.ofFloat(start, end)
         animator.addUpdateListener { animation ->
-            view.elevation = animation.animatedValue as Float
+            view.radius = animation.animatedValue as Float
         }
 
         return animator
     }
 
     private companion object {
-        private val PROPERTY = "${this::class.java.canonicalName}:${View::getElevation.name}"
+        private val PROPERTY = "${this::class.java.canonicalName}:${CardView::getRadius.name}"
         private val PROPERTIES = arrayOf(PROPERTY)
     }
 }

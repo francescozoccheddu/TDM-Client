@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/us_gain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/us_gain_text_size"
@@ -9,6 +10,7 @@
         android:orientation="horizontal"
         android:gravity="left|center_vertical"
         android:layout_marginRight="@dimen/us_gain_padding_end"
+        android:visibility="gone"
 >
     
     <TextView
@@ -22,6 +24,7 @@
     />
     
     <TextView
+            android:id="@+id/us_gain_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="100"
