@@ -3,10 +3,10 @@ package com.francescozoccheddu.tdmclient.ui.components.us
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.ViewGroup
-import android.widget.TextView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.utils.android.OverlayMotionLayout
+import com.robinhood.ticker.TickerView
 import kotlin.math.max
 
 class UserStatsComponent(parent: ViewGroup) {
@@ -20,8 +20,8 @@ class UserStatsComponent(parent: ViewGroup) {
 
     private val root = parent.findViewById<OverlayMotionLayout>(R.id.us_root)
     private val gainComponent = GainComponent(parent)
-    private val scoreText = parent.findViewById<TextView>(R.id.us_score_tv)
-    private val levelText = parent.findViewById<TextView>(R.id.us_level_tv)
+    private val scoreText = parent.findViewById<TickerView>(R.id.us_score_tv)
+    private val levelText = parent.findViewById<TickerView>(R.id.us_level_tv)
     private val sheet = parent.findViewById<UserStatsSheet>(R.id.us_sheet_root)
 
     init {
@@ -76,7 +76,7 @@ class UserStatsComponent(parent: ViewGroup) {
                 field = value
                 sheet.stats = value
                 scoreText.text = value.score.toString()
-                levelText.text = value.level.toString()
+                levelText.text = (value.level + 1).toString()
                 lastNotifiedLevel = max(value.lastNotifiedLevel, lastNotifiedLevel)
                 if (value.level > lastNotifiedLevel) {
                     lastNotifiedLevel = value.level

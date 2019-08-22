@@ -42,11 +42,15 @@
                     android:textSize="@dimen/uss_header_large_text_size"
             />
             
-            <TextView
+            <com.robinhood.ticker.TickerView
+                    android:id="@+id/uss_score_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2560"
                     android:textSize="@dimen/uss_value_large_text_size"
+                    android:text="0"
+                    app:ticker_defaultPreferredScrollingDirection="up"
+                    app:ticker_defaultCharacterList="number"
+                    app:ticker_animationDuration="200"
             />
         
         </LinearLayout>
@@ -65,11 +69,15 @@
                     android:textSize="@dimen/uss_header_text_size"
             />
             
-            <TextView
+            <com.robinhood.ticker.TickerView
+                    android:id="@+id/uss_level_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3"
                     android:textSize="@dimen/uss_value_text_size"
+                    android:text="1"
+                    app:ticker_defaultPreferredScrollingDirection="up"
+                    app:ticker_defaultCharacterList="number"
+                    app:ticker_animationDuration="200"
             />
         
         </LinearLayout>
@@ -88,11 +96,15 @@
                     android:textSize="@dimen/uss_header_text_size"
             />
             
-            <TextView
+            <com.robinhood.ticker.TickerView
+                    android:id="@+id/uss_multiplier_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1.4"
                     android:textSize="@dimen/uss_value_text_size"
+                    android:text="1"
+                    app:ticker_defaultPreferredScrollingDirection="up"
+                    app:ticker_defaultCharacterList="number"
+                    app:ticker_animationDuration="200"
             />
         
         </LinearLayout>
@@ -111,11 +123,15 @@
                     android:textSize="@dimen/uss_header_text_size"
             />
             
-            <TextView
+            <com.robinhood.ticker.TickerView
+                    android:id="@+id/uss_next_level_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="5000"
                     android:textSize="@dimen/uss_value_text_size"
+                    android:text="0"
+                    app:ticker_defaultPreferredScrollingDirection="up"
+                    app:ticker_defaultCharacterList="number"
+                    app:ticker_animationDuration="200"
             />
         
         </LinearLayout>

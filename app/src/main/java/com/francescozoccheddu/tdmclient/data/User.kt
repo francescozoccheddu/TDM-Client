@@ -14,7 +14,7 @@ data class UserStats(
 )
 
 fun parseUserStats(json: JSONObject) = UserStats(
-    json.getInt("userStats"),
+    json.getInt("score"),
     json.getInt("level"),
     json.getDouble("multiplier").toFloat(),
     if (json.isNull("nextLevelScore")) null else json.getInt("nextLevelScore"),
