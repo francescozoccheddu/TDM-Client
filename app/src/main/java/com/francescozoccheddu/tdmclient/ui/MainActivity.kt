@@ -313,7 +313,7 @@ class MainActivity : AppCompatActivity() {
                                         ),
                                         iconOptional(false),
                                         textOptional(true),
-                                        textField(get("userStats")),
+                                        textField(get("score")),
                                         textSize(
                                             interpolate(
                                                 linear(), zoom(),
@@ -476,7 +476,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onStatsChange() {
-        //topGroupController.sl = service?.sl ?: topGroupController.sl
+        val stats = this.service?.userStats
+        if (stats != null)
+            userStatsComponent.stats = stats
     }
 
     private fun onCoveragePointDataChange() {

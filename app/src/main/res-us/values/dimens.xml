@@ -5,7 +5,7 @@
     <dimen name="us_gain_text_size">12sp</dimen>
     <dimen name="us_gain_text_size_extra">10sp</dimen>
     <dimen name="us_gain_padding">3dp</dimen>
-    <dimen name="us_gain_padding_end">34dp</dimen>
+    <dimen name="us_gain_padding_end">20dp</dimen>
     <dimen name="us_gain_elevation">2dp</dimen>
     
     <dimen name="us_score_radius">4dp</dimen>
