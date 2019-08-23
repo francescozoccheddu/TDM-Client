@@ -39,9 +39,9 @@ class LocationSearchProvider {
                 }
             }
 
-            private val tvName = viewGroup.findViewById<TextView>(R.id.tv_name)
-            private val ivIcon = viewGroup.findViewById<ImageView>(R.id.iv_icon)
-            private val tvDistance = viewGroup.findViewById<TextView>(R.id.tv_distance)
+            private val tvName = viewGroup.findViewById<TextView>(R.id.sb_item_name)
+            private val ivIcon = viewGroup.findViewById<ImageView>(R.id.sb_item_icon)
+            private val tvDistance = viewGroup.findViewById<TextView>(R.id.sb_item_distance)
 
             fun bind(location: PlaceQuerier.Location) {
                 tvName.text = location.name
