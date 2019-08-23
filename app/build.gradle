@@ -46,4 +46,6 @@ dependencies {
     // UI
     implementation 'com.francescozoccheddu.knob:Knob:0.3'
     implementation 'com.robinhood.ticker:ticker:2.0.2'
+    implementation 'com.airbnb.android:lottie:3.0.1'
+    implementation 'nl.dionsegijn:konfetti:1.1.3'
 }

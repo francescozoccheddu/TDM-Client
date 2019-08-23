@@ -2,14 +2,20 @@ package com.francescozoccheddu.tdmclient.ui.components.us
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.view.ViewGroup
+import com.airbnb.lottie.LottieAnimationView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.utils.android.OverlayMotionLayout
+import com.francescozoccheddu.tdmclient.utils.android.hsv
 import com.robinhood.ticker.TickerView
+import nl.dionsegijn.konfetti.KonfettiView
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
 import kotlin.math.max
 
-class UserStatsComponent(parent: ViewGroup) {
+class UserStatsComponent(parent: ViewGroup, private val confetti: KonfettiView) {
 
     private companion object {
         private const val MIN_NOTIFY_GAIN = 20
@@ -23,6 +29,7 @@ class UserStatsComponent(parent: ViewGroup) {
     private val scoreText = parent.findViewById<TickerView>(R.id.us_score_tv)
     private val levelText = parent.findViewById<TickerView>(R.id.us_level_tv)
     private val sheet = parent.findViewById<UserStatsSheet>(R.id.us_sheet_root)
+    private val fireworks = parent.findViewById<LottieAnimationView>(R.id.us_fireworks)
 
     init {
         parent.findViewById<UserStatsSheet>(R.id.us_sheet_root).onClose = this::requestClose
@@ -32,6 +39,8 @@ class UserStatsComponent(parent: ViewGroup) {
         root.addHitRect(R.id.us_sheet_root)
         root.setTransition(R.id.us_cs_gone, R.id.us_cs_gone)
         root.transitionToEnd()
+        // TODO Remove me
+        scoreText.setOnClickListener { party() }
     }
 
     private fun updateCloseTransition() {
@@ -67,6 +76,28 @@ class UserStatsComponent(parent: ViewGroup) {
             }
         }
 
+    private val tempLocation = IntArray(2)
+
+    private fun party() {
+        fireworks.playAnimation()
+        fireworks.getLocationOnScreen(tempLocation)
+        var x = tempLocation[0].toFloat() + fireworks.width / 2f
+        var y = tempLocation[1].toFloat() + fireworks.height / 2f
+        confetti.getLocationOnScreen(tempLocation)
+        x -= tempLocation[0]
+        y -= tempLocation[1]
+        confetti.build()
+            .addColors(hsv(0f, 1f, 1f), hsv(30f, 1f, 1f), hsv(60f, 1f, 1f), hsv(330f, 1f, 1f))
+            .setDirection(0.0, 359.0)
+            .setSpeed(2f, 10f)
+            .setFadeOutEnabled(true)
+            .setTimeToLive(5000L)
+            .addShapes(Shape.RECT, Shape.CIRCLE)
+            .addSizes(Size(5))
+            .setPosition(x, y)
+            .burst(300)
+    }
+
     var stats = UserStats(0, 0, 1f, null, 0)
         set(value) {
             if (value != field) {
@@ -80,7 +111,7 @@ class UserStatsComponent(parent: ViewGroup) {
                 lastNotifiedLevel = max(value.lastNotifiedLevel, lastNotifiedLevel)
                 if (value.level > lastNotifiedLevel) {
                     lastNotifiedLevel = value.level
-                    // TODO Fireworks
+                    party()
                     onLevelNotified?.invoke(value.level)
                 }
             }

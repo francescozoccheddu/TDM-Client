@@ -73,6 +73,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import kotlinx.android.synthetic.main.bg.bg_root
+import kotlinx.android.synthetic.main.ma.ma_confetti
 import kotlinx.android.synthetic.main.ma.ma_map
 import kotlinx.android.synthetic.main.sb.sb_root
 import kotlinx.android.synthetic.main.us.us_root
@@ -133,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        userStatsComponent = UserStatsComponent(us_root).apply {
+        userStatsComponent = UserStatsComponent(us_root, ma_confetti).apply {
             onLevelNotified = { service?.notifyLevel = it }
             loadLastNotifiedLevel(this@MainActivity)
         }
