@@ -1,9 +1,7 @@
 <resources>
     
-    <!-- Base application theme. -->
     <style name="AppTheme"
            parent="Theme.MaterialComponents.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/background</item>
         <item name="colorPrimaryDark">@color/backgroundDark</item>
         <item name="colorAccent">@color/foreground</item>

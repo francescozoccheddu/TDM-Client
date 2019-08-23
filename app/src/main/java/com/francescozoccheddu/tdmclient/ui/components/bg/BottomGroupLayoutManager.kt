@@ -274,8 +274,8 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
         cardView.setCardBackgroundColor(color)
         cardView.radius = when (state) {
             State.ACTION -> parent.resources.getDimension(R.dimen.bg_action_size) / 2f
-            State.DURATION, State.WALK -> parent.resources.getDimension(R.dimen.bg_walk_duration_radius)
-            State.INFO -> parent.resources.getDimension(R.dimen.bg_info_radius)
+            State.DURATION, State.WALK -> parent.resources.getDimension(R.dimen.bg_sheet_radius)
+            State.INFO -> parent.resources.getDimension(R.dimen.bg_bar_radius)
             State.HIDDEN -> 0f
         }
         cardView.setMargins(
@@ -291,7 +291,8 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
         cardView.elevation = when (state) {
             State.ACTION -> parent.resources.getDimension(R.dimen.bg_action_elevation)
             State.HIDDEN -> 0f
-            else -> parent.resources.getDimension(R.dimen.bg_no_action_elevation)
+            State.INFO -> parent.resources.getDimension(R.dimen.bg_bar_elevation)
+            else -> parent.resources.getDimension(R.dimen.bg_sheet_elevation)
         }
     }
 

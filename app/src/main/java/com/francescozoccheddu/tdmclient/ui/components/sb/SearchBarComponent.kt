@@ -159,8 +159,11 @@ class SearchBarComponent(private val parent: ViewGroup) {
             card.setMargins(margins)
             content.setMargins(padding)
         }
-        card.alpha = if (focused) 1f else 0.75f
-        card.elevation = if (enabled) parent.resources.getDimension(R.dimen.sb_elevation) else 0f
+        card.alpha = if (focused) 1f else 0.85f
+        card.elevation =
+            if (focused) parent.resources.getDimension(R.dimen.sb_focused_elevation)
+            else if (enabled) parent.resources.getDimension(R.dimen.sb_elevation)
+            else 0f
     }
 
     var enabled = false

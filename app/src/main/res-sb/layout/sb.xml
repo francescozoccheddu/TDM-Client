@@ -28,7 +28,8 @@
             app:cardCornerRadius="4dp"
             android:clickable="true"
             app:cardUseCompatPadding="false"
-            app:cardBackgroundColor="@color/backgroundDark"
+            app:cardBackgroundColor="@color/sb_background"
+            android:theme="@style/AppTheme.sb"
     >
         
         <LinearLayout
