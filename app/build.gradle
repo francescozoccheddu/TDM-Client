@@ -45,6 +45,5 @@ dependencies {
     implementation 'com.android.volley:volley:1.1.1'
     // UI
     implementation 'com.francescozoccheddu.knob:Knob:0.3'
-    implementation 'com.francescozoccheddu.animatorhelpers:AnimatorHelpers:0.1'
     implementation 'com.robinhood.ticker:ticker:2.0.2'
 }
