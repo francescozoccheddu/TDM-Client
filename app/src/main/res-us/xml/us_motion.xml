@@ -179,6 +179,18 @@
                     android:layout_height="match_parent"
         />
         
+        <Constraint
+                android:id="@id/us_fireworks"
+                android:layout_width="@dimen/us_firework_size"
+                android:layout_height="@dimen/us_firework_size"
+                app:layout_constraintTop_toTopOf="@id/us_level_root"
+                app:layout_constraintBottom_toBottomOf="@id/us_level_root"
+                app:layout_constraintLeft_toLeftOf="@id/us_level_root"
+                app:layout_constraintRight_toRightOf="@id/us_level_root"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintVertical_bias="0.5"
+        />
+        
         <Constraint android:id="@id/us_sheet_root"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -225,6 +237,18 @@
                     android:layout_height="match_parent"
         />
         
+        <Constraint
+                android:id="@id/us_fireworks"
+                android:layout_width="@dimen/us_firework_size"
+                android:layout_height="@dimen/us_firework_size"
+                app:layout_constraintTop_toTopOf="@id/us_level_root"
+                app:layout_constraintBottom_toBottomOf="@id/us_level_root"
+                app:layout_constraintLeft_toLeftOf="@id/us_level_root"
+                app:layout_constraintRight_toRightOf="@id/us_level_root"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintVertical_bias="0.5"
+        />
+        
         <Constraint android:id="@id/us_sheet_root"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -266,6 +290,18 @@
                     android:alpha="0.5"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+        />
+        
+        <Constraint
+                android:id="@id/us_fireworks"
+                android:layout_width="@dimen/us_firework_size"
+                android:layout_height="@dimen/us_firework_size"
+                app:layout_constraintTop_toTopOf="@id/us_level_root"
+                app:layout_constraintBottom_toBottomOf="@id/us_level_root"
+                app:layout_constraintLeft_toLeftOf="@id/us_level_root"
+                app:layout_constraintRight_toRightOf="@id/us_level_root"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintVertical_bias="0.5"
         />
         
         <Constraint android:id="@id/us_sheet_root"

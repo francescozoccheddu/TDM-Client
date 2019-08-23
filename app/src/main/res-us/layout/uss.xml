@@ -222,6 +222,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
     />
+    
+    <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/uss_coins"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_rawRes="@raw/simley_stack"
+            app:lottie_loop="true"
+            app:lottie_autoPlay="true"
+    />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

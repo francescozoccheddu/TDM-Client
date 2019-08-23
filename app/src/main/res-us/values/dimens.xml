@@ -15,6 +15,9 @@
     <dimen name="us_score_padding_end">38dp</dimen>
     <dimen name="us_score_elevation">4dp</dimen>
     
+    <dimen name="us_firework_elevation">5dp</dimen>
+    <dimen name="us_firework_size">128dp</dimen>
+    
     <dimen name="us_level_radius">4dp</dimen>
     <dimen name="us_level_text_size">14sp</dimen>
     <dimen name="us_level_text_size_extra">10sp</dimen>
@@ -22,7 +25,7 @@
     <dimen name="us_level_padding_end">36dp</dimen>
     <dimen name="us_level_elevation">3dp</dimen>
     
-    <dimen name="us_sheet_elevation">5dp</dimen>
+    <dimen name="us_sheet_elevation">6dp</dimen>
     <dimen name="us_translation_x">10dp</dimen>
     <dimen name="us_margin_top">40dp</dimen>
     

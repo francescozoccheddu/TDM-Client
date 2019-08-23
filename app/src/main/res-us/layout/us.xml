@@ -16,6 +16,19 @@
             android:alpha="0"
     />
     
+
+    
+    <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/us_fireworks"
+            android:layout_width="@dimen/us_firework_size"
+            android:layout_height="@dimen/us_firework_size"
+            app:lottie_rawRes="@raw/fireworks"
+            app:lottie_loop="false"
+            app:lottie_autoPlay="false"
+            android:elevation="@dimen/us_firework_elevation"
+            android:outlineProvider="none"
+    />
+    
     <com.francescozoccheddu.tdmclient.ui.components.us.UserStatsSheet
             android:id="@+id/us_sheet_root"
             android:layout_width="0dp"
