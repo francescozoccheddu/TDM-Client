@@ -21,18 +21,22 @@
     />
     
     <LinearLayout
+            android:id="@+id/uss_values_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:animateLayoutChanges="true"
     >
         
         <LinearLayout
+                android:id="@+id/uss_score_root"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="@dimen/uss_vertical_spacing"
+                android:animateLayoutChanges="true"
         >
             
             <TextView
@@ -52,14 +56,26 @@
                     app:ticker_defaultCharacterList="number"
                     app:ticker_animationDuration="200"
             />
+            
+            <TextView
+                    android:id="@+id/uss_score_help"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uss_score_help"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:visibility="gone"
+            />
         
         </LinearLayout>
         
         <LinearLayout
+                android:id="@+id/uss_level_root"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="@dimen/uss_vertical_spacing"
+                android:animateLayoutChanges="true"
+        
         >
             
             <TextView
@@ -79,14 +95,26 @@
                     app:ticker_defaultCharacterList="number"
                     app:ticker_animationDuration="200"
             />
+            
+            <TextView
+                    android:id="@+id/uss_level_help"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uss_level_help"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:visibility="gone"
+            />
         
         </LinearLayout>
         
         <LinearLayout
+                android:id="@+id/uss_multiplier_root"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="@dimen/uss_vertical_spacing"
+                android:animateLayoutChanges="true"
+        
         >
             
             <TextView
@@ -106,14 +134,27 @@
                     app:ticker_defaultCharacterList="number"
                     app:ticker_animationDuration="200"
             />
+            
+            <TextView
+                    android:id="@+id/uss_multiplier_help"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uss_multiplier_help"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:visibility="gone"
+            />
         
         </LinearLayout>
         
         <LinearLayout
+                android:id="@+id/uss_next_level_root"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="@dimen/uss_vertical_spacing"
+                android:visibility="gone"
+                android:animateLayoutChanges="true"
+        
         >
             
             <TextView
@@ -132,6 +173,15 @@
                     app:ticker_defaultPreferredScrollingDirection="up"
                     app:ticker_defaultCharacterList="number"
                     app:ticker_animationDuration="200"
+            />
+            
+            <TextView
+                    android:id="@+id/uss_next_level_help"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uss_next_level_help"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:visibility="gone"
             />
         
         </LinearLayout>

@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.TextView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
+import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.commons.event
 import com.francescozoccheddu.tdmclient.utils.commons.invoke
 import com.robinhood.ticker.TickerView
@@ -15,18 +17,44 @@ class UserStatsSheet @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    private val nextLevelRoot: View
 
     init {
         View.inflate(context, R.layout.uss, this)
+        findViewById<View>(R.id.uss_score_root).setOnClickListener { toggleHelp(scoreHelp) }
+        findViewById<View>(R.id.uss_level_root).setOnClickListener { toggleHelp(levelHelp) }
+        findViewById<View>(R.id.uss_multiplier_root).setOnClickListener { toggleHelp(multiplierHelp) }
+        nextLevelRoot = findViewById<View>(R.id.uss_next_level_root).apply {
+            setOnClickListener { toggleHelp(nextLevelHelp) }
+        }
     }
 
-    private val score = findViewById<TickerView>(R.id.uss_score_tv)
-    private val level = findViewById<TickerView>(R.id.uss_level_tv)
-    private val multiplier = findViewById<TickerView>(R.id.uss_multiplier_tv)
-    private val nextLevel = findViewById<TickerView>(R.id.uss_next_level_tv)
+    private val scoreHelp = findViewById<TextView>(R.id.uss_score_help)
+    private val levelHelp = findViewById<TextView>(R.id.uss_level_help)
+    private val multiplierHelp = findViewById<TextView>(R.id.uss_multiplier_help)
+    private val nextLevelHelp = findViewById<TextView>(R.id.uss_next_level_help)
+
+    private fun toggleHelp(view: View) {
+        showHelp(if (view.visible) null else view)
+    }
+
+    private fun showHelp(view: View?) {
+        scoreHelp.visible = scoreHelp == view
+        levelHelp.visible = levelHelp == view
+        multiplierHelp.visible = multiplierHelp == view
+        nextLevelHelp.visible = nextLevelHelp == view
+    }
+
+    private val scoreText = findViewById<TickerView>(R.id.uss_score_tv)
+    private val levelText = findViewById<TickerView>(R.id.uss_level_tv)
+    private val multiplierText = findViewById<TickerView>(R.id.uss_multiplier_tv)
+    private val nextLevelText = findViewById<TickerView>(R.id.uss_next_level_tv)
 
     private val closeButton = findViewById<InOutImageButton>(R.id.uss_close).apply {
-        setOnClickListener { onClose() }
+        setOnClickListener {
+            showHelp(null)
+            onClose()
+        }
     }
 
     var onClose = event()
@@ -36,6 +64,7 @@ class UserStatsSheet @JvmOverloads constructor(
     }
 
     fun onClosed() {
+        showHelp(null)
         closeButton.hide()
     }
 
@@ -43,10 +72,21 @@ class UserStatsSheet @JvmOverloads constructor(
         set(value) {
             if (value != field) {
                 field = value
-                score.text = value.score.toString()
-                level.text = (value.level + 1).toString()
-                multiplier.text = value.multiplier.toString()
-                nextLevel.text = value.nextLevelScore.toString()
+                scoreText.text = value.score.toString()
+                levelText.text = (value.level + 1).toString()
+                multiplierText.text = value.multiplier.toString()
+                val nextLevelScore = value.nextLevelScore
+                nextLevelRoot.visible = nextLevelScore != null
+                if (nextLevelScore != null) {
+                    nextLevelText.text = nextLevelScore.toString()
+                    nextLevelHelp.text = resources.getString(
+                        R.string.uss_next_level_help,
+                        nextLevelScore - value.score,
+                        value.level + 1
+                    )
+                }
+                else
+                    nextLevelHelp.visible = false
             }
         }
 
