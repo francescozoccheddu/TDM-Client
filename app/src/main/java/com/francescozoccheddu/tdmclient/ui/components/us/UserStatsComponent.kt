@@ -30,7 +30,7 @@ class UserStatsComponent(parent: ViewGroup) {
         root.addHitRect(R.id.us_level_root)
         root.addHitRect(R.id.us_gain_root)
         root.addHitRect(R.id.us_sheet_root)
-        root.setTransition(R.id.us_cs_idle, R.id.us_cs_idle)
+        root.setTransition(R.id.us_cs_gone, R.id.us_cs_gone)
         root.transitionToEnd()
     }
 
@@ -55,7 +55,7 @@ class UserStatsComponent(parent: ViewGroup) {
             )
     }
 
-    var enabled = true
+    var enabled = false
         set(value) {
             if (value != field) {
                 field = value

@@ -13,6 +13,7 @@ import android.widget.ProgressBar
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Transition
 import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
 import com.francescozoccheddu.tdmclient.R
@@ -29,6 +30,35 @@ class SearchBarComponent(private val parent: ViewGroup) {
     private val transition = TransitionInflater
         .from(parent.context)
         .inflateTransition(R.transition.sb)
+        .apply {
+            addListener(object : Transition.TransitionListener {
+
+                override fun onTransitionEnd(transition: Transition) {
+                    updateVisibility()
+                }
+
+                override fun onTransitionResume(transition: Transition) {
+                    updateVisibility()
+                }
+
+                override fun onTransitionPause(transition: Transition) {
+                    updateVisibility()
+                }
+
+                override fun onTransitionCancel(transition: Transition) {
+                    updateVisibility()
+                }
+
+                override fun onTransitionStart(transition: Transition) {
+                    updateVisibility()
+                }
+
+            })
+        }
+
+    private fun updateVisibility() {
+        visible = enabled || card.height > 0
+    }
 
     private val searchProvider = LocationSearchProvider()
     private val editText = parent.findViewById<EditText>(R.id.tg_search_text)
@@ -141,6 +171,7 @@ class SearchBarComponent(private val parent: ViewGroup) {
                 editText.isFocusableInTouchMode = value
                 clearFocus()
                 update()
+                updateVisibility()
             }
         }
 
@@ -149,6 +180,16 @@ class SearchBarComponent(private val parent: ViewGroup) {
     }
 
     var onFocusChanged: ((Boolean) -> Unit)? = null
+
+    var visible = false
+        private set(value) {
+            if (value != field) {
+                field = value
+                onVisibilityChanged?.invoke(visible)
+            }
+        }
+
+    var onVisibilityChanged: ((Boolean) -> Unit)? = null
 
     var onDestinationChosen: ((PlaceQuerier.Location) -> Unit)? = null
 

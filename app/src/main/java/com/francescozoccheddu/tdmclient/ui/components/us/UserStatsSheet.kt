@@ -1,8 +1,10 @@
 package com.francescozoccheddu.tdmclient.ui.components.us
 
+import android.animation.LayoutTransition
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.francescozoccheddu.tdmclient.R
@@ -21,6 +23,10 @@ class UserStatsSheet @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.uss, this)
+        findViewById<ViewGroup>(R.id.uss_values_root).apply {
+            layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+            layoutTransition = layoutTransition
+        }
         findViewById<View>(R.id.uss_score_root).setOnClickListener { toggleHelp(scoreHelp) }
         findViewById<View>(R.id.uss_level_root).setOnClickListener { toggleHelp(levelHelp) }
         findViewById<View>(R.id.uss_multiplier_root).setOnClickListener { toggleHelp(multiplierHelp) }
@@ -82,7 +88,7 @@ class UserStatsSheet @JvmOverloads constructor(
                     nextLevelHelp.text = resources.getString(
                         R.string.uss_next_level_help,
                         nextLevelScore - value.score,
-                        value.level + 1
+                        value.level + 2
                     )
                 }
                 else

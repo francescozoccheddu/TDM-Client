@@ -128,6 +128,9 @@ class MainActivity : AppCompatActivity() {
                 routingController.setDestination(it.point, it.name, true)
             }
             onFocusChanged = { routingController.enabled = !searchBarComponent.focused }
+            onVisibilityChanged = {
+                updateStatsComponent()
+            }
         }
 
         userStatsComponent = UserStatsComponent(us_root).apply {
@@ -172,8 +175,7 @@ class MainActivity : AppCompatActivity() {
                     permissions.openSettings()
             }
             onPickingDestinationChanged += {
-                updateTopGroup()
-                userStatsComponent.enabled = !routingController.pickingDestination
+                updateSearchBarComponent()
             }
         }
 
@@ -454,11 +456,15 @@ class MainActivity : AppCompatActivity() {
                 RoutingController.Problem.OUTSIDE_AREA
             else null
         }
-        updateTopGroup()
+        updateSearchBarComponent()
     }
 
-    private fun updateTopGroup() {
+    private fun updateSearchBarComponent() {
         searchBarComponent.enabled = routingController.pickingDestination
+    }
+
+    private fun updateStatsComponent() {
+        userStatsComponent.enabled = !searchBarComponent.visible && service?.userStats != null
     }
 
     private fun onLocationChanged() {
@@ -479,6 +485,7 @@ class MainActivity : AppCompatActivity() {
         val stats = this.service?.userStats
         if (stats != null)
             userStatsComponent.stats = stats
+        updateStatsComponent()
     }
 
     private fun onCoveragePointDataChange() {
