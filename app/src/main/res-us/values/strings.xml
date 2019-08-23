@@ -1,25 +1,19 @@
 <resources>
     <string name="uss_score">punteggio</string>
-    <string name="uss_score_help">
-        <b>Il tuo punteggio attuale</b>
-        \nPasseggia nelle zone evidenziate nella mappa per guadagnare punti!
+    <string name="uss_score_help"><b>Il tuo punteggio attuale</b>\nPasseggia nelle zone evidenziate nella mappa per
+        guadagnare punti!
     </string>
     <string name="uss_level">livello</string>
-    <string name="uss_level_help">
-        <b>Il tuo livello attuale</b>
-        \nDetermina il moltiplicatore del punteggio.
-        \nOttieni più punti per aumentare il livello.
+    <string name="uss_level_help"><b>Il tuo livello attuale</b>\nDetermina il moltiplicatore del punteggio. \nOttieni
+        più punti per aumentare il livello.
     </string>
     <string name="uss_multiplier">moltiplicatore</string>
-    <string name="uss_multiplier_help">
-        <b>Il moltiplicatore del punteggio</b>
-        \nUn moltiplicatore più alto ti consentirà di guadagnare punti più velocemente.
-        \nOttieni più punti per aumentare il moltiplicatore!
+    <string name="uss_multiplier_help"><b>Il moltiplicatore del punteggio</b>\nUn moltiplicatore più alto ti consentirà
+        di guadagnare punti più velocemente. \nOttieni più punti per aumentare il moltiplicatore!
     </string>
     <string name="uss_next_level">punti per il prossimo livello</string>
-    <string name="uss_next_level_help">
-        <b>Punteggio necessario per passare al prossimo livello</b>
-        \nOttieni altri %1$d punti per passare al livello %2$d!
+    <string name="uss_next_level_help"><b>Punteggio necessario per passare al prossimo livello</b>\nOttieni altri %1$d
+        punti per passare al livello %2$d!
     </string>
     <string name="uss_link_rules">
         <a href="https://www.example.com">Regolamento</a>
