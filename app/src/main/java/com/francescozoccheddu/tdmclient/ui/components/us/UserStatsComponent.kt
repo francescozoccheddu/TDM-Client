@@ -2,7 +2,6 @@ package com.francescozoccheddu.tdmclient.ui.components.us
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.francescozoccheddu.tdmclient.R
@@ -39,8 +38,6 @@ class UserStatsComponent(parent: ViewGroup, private val confetti: KonfettiView) 
         root.addHitRect(R.id.us_sheet_root)
         root.setTransition(R.id.us_cs_gone, R.id.us_cs_gone)
         root.transitionToEnd()
-        // TODO Remove me
-        scoreText.setOnClickListener { party() }
     }
 
     private fun updateCloseTransition() {
