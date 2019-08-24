@@ -16,9 +16,9 @@ import com.francescozoccheddu.tdmclient.data.Measurement
 import com.francescozoccheddu.tdmclient.data.PoiService
 import com.francescozoccheddu.tdmclient.data.RouteRequest
 import com.francescozoccheddu.tdmclient.data.RouteService
-import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.data.SensorDriver
 import com.francescozoccheddu.tdmclient.data.User
+import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.data.makeCoverageService
 import com.francescozoccheddu.tdmclient.data.makePoiService
 import com.francescozoccheddu.tdmclient.data.makeRouteService
@@ -55,7 +55,7 @@ class MainService : Service() {
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
         private const val LOCATION_EXPIRATION_TIME = 15f
         private const val MEASURE_INTERVAL_TIME = 3f
-        private const val COVERAGE_INTERVAL_TIME = 5f
+        private const val COVERAGE_INTERVAL_TIME = 2f
         private const val COVERAGE_EXPIRATION_TIME = 60f
         private const val POI_INTERVAL_TIME = 10f
         private const val POI_EXPIRATION_TIME = 120f
