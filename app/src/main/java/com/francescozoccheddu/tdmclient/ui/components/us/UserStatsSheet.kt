@@ -2,10 +2,13 @@ package com.francescozoccheddu.tdmclient.ui.components.us
 
 import android.animation.LayoutTransition
 import android.content.Context
+import android.graphics.drawable.Animatable2
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.UserStats
@@ -33,12 +36,23 @@ class UserStatsSheet @JvmOverloads constructor(
         nextLevelRoot = findViewById<View>(R.id.uss_next_level_root).apply {
             setOnClickListener { toggleHelp(nextLevelHelp) }
         }
+        (findViewById<ImageView>(R.id.uss_coins).drawable as Animatable2).apply {
+            start()
+            registerAnimationCallback(object : Animatable2.AnimationCallback() {
+
+                override fun onAnimationEnd(drawable: Drawable?) {
+                    start()
+                }
+
+            })
+        }
     }
 
     private val scoreHelp = findViewById<TextView>(R.id.uss_score_help)
     private val levelHelp = findViewById<TextView>(R.id.uss_level_help)
     private val multiplierHelp = findViewById<TextView>(R.id.uss_multiplier_help)
     private val nextLevelHelp = findViewById<TextView>(R.id.uss_next_level_help)
+
 
     private fun toggleHelp(view: View) {
         showHelp(if (view.visible) null else view)
