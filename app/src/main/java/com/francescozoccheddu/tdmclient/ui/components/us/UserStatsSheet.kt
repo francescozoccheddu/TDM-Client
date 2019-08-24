@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
@@ -99,10 +100,13 @@ class UserStatsSheet @JvmOverloads constructor(
                 nextLevelRoot.visible = nextLevelScore != null
                 if (nextLevelScore != null) {
                     nextLevelText.text = nextLevelScore.toString()
-                    nextLevelHelp.text = resources.getString(
-                        R.string.uss_next_level_help,
-                        nextLevelScore - value.score,
-                        value.level + 2
+                    nextLevelHelp.text = HtmlCompat.fromHtml(
+                        resources.getString(
+                            R.string.uss_next_level_help,
+                            nextLevelScore - value.score,
+                            value.level + 2
+                        ),
+                        HtmlCompat.FROM_HTML_MODE_LEGACY
                     )
                 }
                 else
