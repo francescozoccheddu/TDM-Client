@@ -17,6 +17,7 @@ import com.francescozoccheddu.tdmclient.utils.android.Permissions
 import com.francescozoccheddu.tdmclient.utils.android.dp
 import com.francescozoccheddu.tdmclient.utils.android.hsv
 import com.francescozoccheddu.tdmclient.utils.data.latLng
+import com.francescozoccheddu.tdmclient.utils.data.latlng
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
@@ -145,22 +146,6 @@ class MainActivity : AppCompatActivity() {
             }
             onRouteChanged += {
                 if (this@MainActivity::map.isInitialized) {
-                    val route = routingController.route
-                    if (route != null) {
-                        val a = service?.location
-                        val b = routingController.destination
-                        if (a != null && b != null)
-                            map.animateCamera(
-                                CameraUpdateFactory.newLatLngBounds(
-                                    LatLngBounds
-                                        .Builder()
-                                        .include(a.latLng)
-                                        .include(b)
-                                        .build(),
-                                    resources.getDimensionPixelSize(R.dimen.map_bounds_padding)
-                                ), (CAMERA_ANIMATION_DURATION * 1000).roundToInt()
-                            )
-                    }
                     val style = map.style
                     if (style != null)
                         setDirectionsLine(style)
@@ -402,6 +387,18 @@ class MainActivity : AppCompatActivity() {
     private fun setDirectionsLine(style: Style) {
         val directions = routingController.route
         val geometry = if (directions != null) LineString.fromPolyline(directions.geometry()!!, PRECISION_6) else null
+        if (geometry != null) {
+            val builder = LatLngBounds.Builder()
+            geometry.coordinates().forEach {
+                builder.include(it.latlng)
+            }
+            map.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                    builder.build(),
+                    resources.getDimensionPixelSize(R.dimen.map_bounds_padding)
+                ), (CAMERA_ANIMATION_DURATION * 1000).roundToInt()
+            )
+        }
         setSource(style, MB_SOURCE_DIRECTIONS, geometry)
     }
 

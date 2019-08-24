@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="map_bounds_padding">20dp</dimen>
-
+    <dimen name="map_bounds_padding">36dp</dimen>
 </resources>
