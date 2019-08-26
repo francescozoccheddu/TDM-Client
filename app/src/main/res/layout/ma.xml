@@ -1,36 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.MainActivity">
     
-    <com.mapbox.mapboxsdk.maps.MapView
-            xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    <com.mapbox.mapboxsdk.maps.MapView xmlns:mapbox="http://schemas.android.com/apk/res-auto"
             android:id="@+id/ma_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            mapbox:mapbox_uiCompass="false"
-            mapbox:mapbox_cameraZoomMin="10"
-            mapbox:mapbox_cameraZoomMax="18"
-            mapbox:mapbox_uiRotateGestures="false"
-            mapbox:mapbox_uiTiltGestures="false"
-            mapbox:mapbox_uiLogo="false"
-            mapbox:mapbox_uiAttribution="false"
-            mapbox:mapbox_compassAnimationEnabled="true"
             mapbox:mapbox_accuracyAnimationEnabled="true"
-    />
+            mapbox:mapbox_cameraZoomMax="18"
+            mapbox:mapbox_cameraZoomMin="10"
+            mapbox:mapbox_compassAnimationEnabled="true"
+            mapbox:mapbox_uiAttribution="false"
+            mapbox:mapbox_uiCompass="false"
+            mapbox:mapbox_uiLogo="false"
+            mapbox:mapbox_uiTiltGestures="false" />
     
     <nl.dionsegijn.konfetti.KonfettiView
             android:id="@+id/ma_confetti"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="0dp"
-            android:outlineProvider="none"
-    />
-    <include layout="@layout/sb"/>
-    <include layout="@layout/bg"/>
-    <include layout="@layout/us"/>
+            android:outlineProvider="none" />
+    
+    <include layout="@layout/sb" />
+    
+    <include layout="@layout/bg" />
+    
+    <include layout="@layout/us" />
 
 </FrameLayout>

@@ -73,9 +73,10 @@ class MainService : Service() {
             action = STOP_ACTION
         }
 
-        fun makeStartActivityIntent(context: Context) = Intent(context, MainService::class.java).apply {
-            action = START_ACTIVITY_ACTION
-        }
+        fun makeStartActivityIntent(context: Context) =
+            Intent(context, MainService::class.java).apply {
+                action = START_ACTIVITY_ACTION
+            }
 
         fun bind(context: Context, connection: ServiceConnection) {
             val intent = Intent(context, MainService::class.java)
