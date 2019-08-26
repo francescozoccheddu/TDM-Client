@@ -3,6 +3,7 @@ package com.francescozoccheddu.tdmclient.ui.utils
 import com.francescozoccheddu.tdmclient.data.getDirections
 import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
+import com.francescozoccheddu.tdmclient.utils.data.latlng
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.mapboxsdk.geometry.LatLng
 
@@ -16,7 +17,7 @@ class Router {
     private var spotRequest: Server.Service<*, *>.Request? = null
     private lateinit var attachedRequest: Server.Service<*, *>.Request
 
-    var onResult: ((DirectionsRoute?) -> Unit)? = null
+    var onResult: ((LatLng?, DirectionsRoute?) -> Unit)? = null
 
     fun request(to: LatLng?, time: Float) {
         cancel()
@@ -24,19 +25,19 @@ class Router {
         running = true
         spotRequest = service.requestRoute(to, time).apply {
             attachedRequest = this
-            onStatusChange += {
+            onStatusChange += { req ->
                 if (!status.pending) {
                     spotRequest = null
                     if (status.succeeded)
-                        getDirections(it.response, to != null) {
+                        getDirections(req.response, to != null) {
                             if (running && this@Router.attachedRequest == this) {
                                 running = false
-                                onResult?.invoke(it)
+                                onResult?.invoke(to?: req.response.last().latlng, it)
                             }
                         }
                     else if (running) {
                         running = false
-                        onResult?.invoke(null)
+                        onResult?.invoke(null, null)
                     }
                 }
             }

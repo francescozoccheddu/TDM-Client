@@ -17,13 +17,15 @@ class RoutingController(parent: ViewGroup) {
     private val router = Router()
 
     init {
-        router.onResult = {
-            route = it
+        router.onResult = { to, steps ->
+            route = steps
             updateState()
-            if (it == null) {
+            if (steps == null) {
                 ui.state = BottomGroupController.State.ROUTING_FAILED
                 failureNotificationCountdown.pull()
             }
+            else if (destination == null)
+                destination = to
         }
         ui.onWalkIntent = {
             ui.state = BottomGroupController.State.CHOOSING_WALK_MODE
@@ -44,7 +46,7 @@ class RoutingController(parent: ViewGroup) {
             if (service != null)
                 router.request(destination, ui.time * 60f)
             else
-                router.onResult?.invoke(null)
+                router.onResult?.invoke(null, null)
         }
         ui.onRetryRouting = {
             failureNotificationCountdown.cancel()
