@@ -53,13 +53,13 @@ class MainService : Service() {
         private const val KILL_WITH_TASK = false
         private const val LOCATION_POLL_INTERVAL = 1f
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
-        private const val LOCATION_EXPIRATION_TIME = 15f
+        private const val LOCATION_EXPIRATION_TIME = 30f
         private const val MEASURE_INTERVAL_TIME = 3f
         private const val COVERAGE_INTERVAL_TIME = 2f
         private const val COVERAGE_EXPIRATION_TIME = 60f
         private const val POI_INTERVAL_TIME = 10f
         private const val POI_EXPIRATION_TIME = 120f
-        private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
+        private const val SERVER_ADDRESS = "http://192.168.1.2:8080/"
         private val USER = User(0, "0")
         private const val STOP_ACTION = "IntentActionStop"
         private const val START_ACTIVITY_ACTION = "IntentActionStartActivity"
