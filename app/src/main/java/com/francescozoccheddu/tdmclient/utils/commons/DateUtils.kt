@@ -89,7 +89,10 @@ fun hmIntervalString(minutes: Int): String {
 
 fun hrIntervalString(resources: Resources, minutes: Int): String {
     return if (minutes < 60)
-        resources.getQuantityString(R.plurals.date_minutes, minutes, minutes)
+        if (minutes < 1)
+            resources.getString(R.string.date_minutes_zero)
+        else
+            resources.getQuantityString(R.plurals.date_minutes, minutes, minutes)
     else {
         val h = minutes / 60
         val m = minutes % 60
