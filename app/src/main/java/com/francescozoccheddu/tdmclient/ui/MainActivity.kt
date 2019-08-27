@@ -18,6 +18,7 @@ import com.francescozoccheddu.tdmclient.utils.android.dp
 import com.francescozoccheddu.tdmclient.utils.android.hsv
 import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.data.latlng
+import com.francescozoccheddu.tdmclient.utils.data.mapboxAccessToken
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
@@ -73,6 +74,8 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textRadialOffset
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation
+import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigationOptions
 import kotlinx.android.synthetic.main.bg.bg_root
 import kotlinx.android.synthetic.main.ma.ma_confetti
 import kotlinx.android.synthetic.main.ma.ma_map
@@ -115,6 +118,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var routingController: RoutingController
     private lateinit var searchBarComponent: SearchBarComponent
     private lateinit var userStatsComponent: UserStatsComponent
+    private lateinit var navigation: MapboxNavigation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             loadLastNotifiedLevel(this@MainActivity)
         }
 
-        routingController = RoutingController(bg_root).apply {
+        routingController = RoutingController(bg_root, this).apply {
             onDestinationChanged += {
                 setSource(MB_SOURCE_DESTINATION, routingController.destination?.point)
             }
@@ -165,12 +169,30 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        navigation = MapboxNavigation(
+            this@MainActivity,
+            mapboxAccessToken,
+            MapboxNavigationOptions.builder().navigationNotification(null).build()
+        ).apply {
+            addProgressChangeListener { location, routeProgress ->
+                routingController.updateRoutingInstructions(routeProgress)
+            }
+            addMilestoneEventListener { routeProgress, instruction, milestone ->
+                routingController.updateRoutingInstructions(routeProgress)
+            }
+            addNavigationEventListener { running ->
+                if (!running)
+                    routingController.cancelRouting()
+            }
+        }
+
         // Map
         ma_map.apply {
             onCreate(savedInstanceState)
             getMapAsync { map ->
                 this@MainActivity.map = map.apply {
-                    val iconColor = ContextCompat.getColor(this@MainActivity, R.color.backgroundDark)
+                    val iconColor =
+                        ContextCompat.getColor(this@MainActivity, R.color.backgroundDark)
                     val routeColor = ContextCompat.getColor(this@MainActivity, R.color.background)
                     val heatmapMinRadius = width * MIN_HEATMAP_RADIUS_WIDTH_FACTOR
                     val heatmapMaxRadius = width * MAX_HEATMAP_RADIUS_WIDTH_FACTOR
@@ -350,18 +372,27 @@ class MainActivity : AppCompatActivity() {
                         setMaxZoomPreference(MAX_ZOOM)
                         setMinZoomPreference(MIN_ZOOM)
                         setLatLngBoundsForCameraTarget(MAP_BOUNDS)
-                        cameraPosition = CameraPosition.Builder().target(MAP_BOUNDS.center).zoom(12.0).build()
+                        cameraPosition =
+                            CameraPosition.Builder().target(MAP_BOUNDS.center).zoom(12.0).build()
                         if (permissions.granted)
                             enableLocationComponent(style)
-                        setSource(style, MB_SOURCE_DESTINATION, routingController.destination?.point)
+                        setSource(
+                            style,
+                            MB_SOURCE_DESTINATION,
+                            routingController.destination?.point
+                        )
                         setDirectionsLine(style)
                         setSource(style, MB_SOURCE_COVERAGE_POINTS, service?.coveragePointData)
                         setSource(style, MB_SOURCE_COVERAGE_QUADS, service?.coverageQuadData)
                         setSource(style, MB_SOURCE_POIS, service?.poiData)
                         addOnMapClickListener { click ->
-                            if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(click)) {
+                            if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(
+                                    click
+                                )
+                            ) {
                                 val screenPoint = map.projection.toScreenLocation(click)
-                                val features = map.queryRenderedFeatures(screenPoint, MB_LAYER_DESTINATION)
+                                val features =
+                                    map.queryRenderedFeatures(screenPoint, MB_LAYER_DESTINATION)
                                 if (features.isNotEmpty()) {
                                     routingController.removeDestination()
                                     true
@@ -383,11 +414,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun setDirectionsLine(style: Style) {
         val directions = routingController.route
-        val geometry = if (directions != null) LineString.fromPolyline(directions.geometry()!!, PRECISION_6) else null
+        val geometry = if (directions != null) LineString.fromPolyline(
+            directions.geometry()!!,
+            PRECISION_6
+        )
+        else null
         if (geometry != null) {
+            navigation.startNavigation(directions!!)
             val builder = LatLngBounds.Builder()
             geometry.coordinates().forEach {
                 builder.include(it.latlng)
@@ -399,6 +434,8 @@ class MainActivity : AppCompatActivity() {
                 ), (CAMERA_ANIMATION_DURATION * 1000).roundToInt()
             )
         }
+        else
+            navigation.stopNavigation()
         setSource(style, MB_SOURCE_DIRECTIONS, geometry)
     }
 
@@ -628,6 +665,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        navigation.onDestroy()
         ma_map.onDestroy()
     }
 

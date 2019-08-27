@@ -1,5 +1,6 @@
 package com.francescozoccheddu.tdmclient.ui.components.bg
 
+import android.content.Context
 import android.view.ViewGroup
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.ui.utils.Router
@@ -10,11 +11,14 @@ import com.francescozoccheddu.tdmclient.utils.data.point
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.services.android.navigation.R
+import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress
+import com.mapbox.services.android.navigation.v5.utils.ManeuverUtils
 
-class RoutingController(parent: ViewGroup) {
+class RoutingController(parent: ViewGroup, context: Context) {
 
     private val ui = BottomGroupController(parent)
-    private val router = Router()
+    private val router = Router(context)
 
     init {
         router.onResult = { to, steps ->
@@ -87,6 +91,8 @@ class RoutingController(parent: ViewGroup) {
         private set(value) {
             if (value != field) {
                 field = value
+                ui.maneuverInstruction = null
+                ui.maneuverIcon = null
                 onRouteChanged()
             }
         }
@@ -135,6 +141,26 @@ class RoutingController(parent: ViewGroup) {
         updateState()
     }
 
+    fun cancelRouting() {
+        cancelRouting(true)
+    }
+
+    fun updateRoutingInstructions(progress: RouteProgress) {
+        val banner = progress.bannerInstruction()?.primary
+        if (banner != null)
+            ui.maneuverInstruction = banner.text
+        val leg = progress.currentLegProgress()
+        val step = leg?.upComingStep() ?: leg?.currentStep()
+        if (step != null)
+            ui.maneuverIcon = ManeuverUtils.getManeuverResource(step)
+    }
+
+    fun completeRouting() {
+        completedNotificationCountdown.pull()
+        cancelRouting(true)
+        updateState()
+    }
+
     val onPickingDestinationChanged = ProcEvent()
     val onDestinationChanged = ProcEvent()
     val onRouteChanged = ProcEvent()
@@ -143,19 +169,34 @@ class RoutingController(parent: ViewGroup) {
         get() = router.service
         set(value) {
             router.service = value
+            R.drawable.ic_maneuver_arrive
         }
 
     enum class Problem {
         OFFLINE, UNLOCATABLE, LOCATING, PERMISSIONS_UNGRANTED, OUTSIDE_AREA, UNBOUND
     }
 
-    private val failureNotificationCountdown = Timer().Countdown().apply {
-        runnable = Runnable {
-            destination = null
-            updateState()
+    private val completedNotificationCountdown: Timer.Countdown
+
+    private val failureNotificationCountdown: Timer.Countdown
+
+    init {
+        val timer = Timer()
+        completedNotificationCountdown = timer.Countdown().apply {
+            runnable = Runnable {
+                updateState()
+            }
+            time = 2f
         }
-        time = 4f
+        failureNotificationCountdown = timer.Countdown().apply {
+            runnable = Runnable {
+                destination = null
+                updateState()
+            }
+            time = 4f
+        }
     }
+
 
     private fun updateState() {
         val problem = this.problem
@@ -164,6 +205,8 @@ class RoutingController(parent: ViewGroup) {
                 BottomGroupController.State.HIDDEN
             else if (failureNotificationCountdown.running)
                 BottomGroupController.State.ROUTING_FAILED
+            else if (completedNotificationCountdown.running)
+                BottomGroupController.State.ROUTE_COMPLETED
             else if (problem != null)
                 when (problem) {
                     Problem.OFFLINE -> BottomGroupController.State.OFFLINE
@@ -211,6 +254,7 @@ class RoutingController(parent: ViewGroup) {
                         failureNotificationCountdown.cancel()
                         destination = null
                     }
+                    completedNotificationCountdown.cancel()
                     cancelRouting(false)
                 }
                 updateState()

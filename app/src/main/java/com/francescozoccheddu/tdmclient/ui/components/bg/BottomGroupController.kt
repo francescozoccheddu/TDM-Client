@@ -11,7 +11,7 @@ class BottomGroupController(private val parent: ViewGroup) {
     enum class State {
         LOCATING, UNLOCATABLE, PERMISSIONS_UNGRANTED, ROUTING, HIDDEN,
         OFFLINE, OUTSIDE_AREA, PICKING_DESTINATION, CONFIRMING_DESTINATION, IDLE,
-        CHOOSING_WALK_MODE, CHOOSING_DURATION, ROUTED, ROUTING_FAILED
+        CHOOSING_WALK_MODE, CHOOSING_DURATION, ROUTED, ROUTING_FAILED, ROUTE_COMPLETED
     }
 
     var destinationName: String? = null
@@ -19,6 +19,33 @@ class BottomGroupController(private val parent: ViewGroup) {
             if (value != field) {
                 field = value
                 if (state == State.CONFIRMING_DESTINATION)
+                    updateState()
+            }
+        }
+
+    var maneuverInstruction: String? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                if (state == State.ROUTED)
+                    updateState()
+            }
+        }
+
+    var maneuverInfo: String? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                if (state == State.ROUTED)
+                    updateState()
+            }
+        }
+
+    var maneuverIcon: Int? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                if (state == State.ROUTED)
                     updateState()
             }
         }
@@ -47,7 +74,7 @@ class BottomGroupController(private val parent: ViewGroup) {
         layout.state = when (state) {
             State.PICKING_DESTINATION, State.LOCATING, State.UNLOCATABLE, State.PERMISSIONS_UNGRANTED,
             State.CONFIRMING_DESTINATION, State.ROUTING, State.OFFLINE, State.OUTSIDE_AREA,
-            State.ROUTING_FAILED, State.ROUTED -> BottomGroupLayoutManager.State.INFO
+            State.ROUTING_FAILED, State.ROUTED, State.ROUTE_COMPLETED -> BottomGroupLayoutManager.State.INFO
             State.HIDDEN -> BottomGroupLayoutManager.State.HIDDEN
             State.IDLE -> BottomGroupLayoutManager.State.ACTION
             State.CHOOSING_DURATION -> BottomGroupLayoutManager.State.DURATION
@@ -60,7 +87,7 @@ class BottomGroupController(private val parent: ViewGroup) {
             State.CHOOSING_DURATION, State.PICKING_DESTINATION, State.ROUTED -> getColor(R.color.background)
             State.HIDDEN -> layout.color
             State.OUTSIDE_AREA -> getColor(R.color.bg_backgroundWarning)
-            State.CONFIRMING_DESTINATION -> getColor(R.color.bg_backgroundOk)
+            State.CONFIRMING_DESTINATION, State.ROUTE_COMPLETED -> getColor(R.color.bg_backgroundOk)
         }
         layout.info.text = when (state) {
             State.PICKING_DESTINATION -> getString(R.string.bg_picking)
@@ -71,8 +98,9 @@ class BottomGroupController(private val parent: ViewGroup) {
             State.OFFLINE -> getString(R.string.bg_offline)
             State.OUTSIDE_AREA -> getString(R.string.bg_outside_area)
             State.ROUTING_FAILED -> getString(R.string.bg_routing_failed)
-            State.ROUTED -> getString(R.string.bg_routed)
+            State.ROUTED -> maneuverInstruction ?: getString(R.string.bg_routed)
             State.CONFIRMING_DESTINATION -> destinationName ?: getString(R.string.bg_unknown_place)
+            State.ROUTE_COMPLETED -> getString(R.string.bg_route_completed)
             else -> layout.info.text
         }
         layout.info.loading = when (state) {
@@ -84,7 +112,8 @@ class BottomGroupController(private val parent: ViewGroup) {
             State.OFFLINE -> R.drawable.bg_offline
             State.PERMISSIONS_UNGRANTED, State.ROUTING_FAILED -> R.drawable.bg_warning
             State.CONFIRMING_DESTINATION, State.PICKING_DESTINATION -> R.drawable.place
-            State.ROUTED -> R.drawable.bg_directions
+            State.ROUTED -> maneuverIcon ?: R.drawable.bg_directions
+            State.ROUTE_COMPLETED -> R.drawable.bg_route_completed
             else -> layout.info.icon
         }
         layout.info.action = when (state) {
@@ -95,6 +124,10 @@ class BottomGroupController(private val parent: ViewGroup) {
             State.CONFIRMING_DESTINATION -> getString(R.string.bg_action_destinated)
             State.ROUTED -> getString(R.string.bg_action_routed)
             State.ROUTING_FAILED -> getString(R.string.bg_action_routing_failed)
+            else -> null
+        }
+        layout.info.extendedText = when (state) {
+            State.ROUTED -> maneuverInfo
             else -> null
         }
     }

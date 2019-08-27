@@ -1,5 +1,6 @@
 package com.francescozoccheddu.tdmclient.ui.utils
 
+import android.content.Context
 import com.francescozoccheddu.tdmclient.data.getDirections
 import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
@@ -7,7 +8,7 @@ import com.francescozoccheddu.tdmclient.utils.data.latlng
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-class Router {
+class Router(private val context : Context) {
 
     var service: MainService? = null
 
@@ -29,7 +30,7 @@ class Router {
                 if (!status.pending) {
                     spotRequest = null
                     if (status.succeeded)
-                        getDirections(req.response, to != null) {
+                        getDirections(context, req.response, to != null) {
                             if (running && this@Router.attachedRequest == this) {
                                 running = false
                                 onResult?.invoke(to?: req.response.last().latlng, it)
