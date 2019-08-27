@@ -6,6 +6,7 @@ import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.ui.utils.Router
 import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
+import com.francescozoccheddu.tdmclient.utils.commons.hrIntervalString
 import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.data.point
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
@@ -14,8 +15,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.services.android.navigation.R
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress
 import com.mapbox.services.android.navigation.v5.utils.ManeuverUtils
+import kotlin.math.roundToInt
 
-class RoutingController(parent: ViewGroup, context: Context) {
+class RoutingController(parent: ViewGroup, private val context: Context) {
 
     private val ui = BottomGroupController(parent)
     private val router = Router(context)
@@ -93,6 +95,7 @@ class RoutingController(parent: ViewGroup, context: Context) {
                 field = value
                 ui.maneuverInstruction = null
                 ui.maneuverIcon = null
+                ui.maneuverInfo = null
                 onRouteChanged()
             }
         }
@@ -153,6 +156,8 @@ class RoutingController(parent: ViewGroup, context: Context) {
         val step = leg?.upComingStep() ?: leg?.currentStep()
         if (step != null)
             ui.maneuverIcon = ManeuverUtils.getManeuverResource(step)
+        ui.maneuverInfo =
+            hrIntervalString(context.resources, (progress.durationRemaining() / 60.0).roundToInt())
     }
 
     fun completeRouting() {

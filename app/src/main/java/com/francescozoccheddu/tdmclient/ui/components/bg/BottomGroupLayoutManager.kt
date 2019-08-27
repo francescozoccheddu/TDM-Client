@@ -16,6 +16,7 @@ import com.francescozoccheddu.tdmclient.utils.android.setMargins
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.francescozoccheddu.tdmclient.utils.commons.Event
 import com.francescozoccheddu.tdmclient.utils.commons.event
+import com.francescozoccheddu.tdmclient.utils.commons.hmIntervalString
 import com.francescozoccheddu.tdmclient.utils.commons.invoke
 import com.francescozoccheddu.tdmclient.utils.commons.snapDown
 import com.francescozoccheddu.tdmclient.utils.commons.snapUp
@@ -106,6 +107,7 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
         private val blinkAnimation = AnimationUtils.loadAnimation(parent.context, R.anim.bg_blink)
 
         private val textView = parent.findViewById<TextView>(R.id.bg_info_tv)
+        private val extendedTextView = parent.findViewById<TextView>(R.id.bg_info_ext_tv)
         private val imageView = parent.findViewById<ImageView>(R.id.bg_info_iv)
         private val progressBar = parent.findViewById<ProgressBar>(R.id.bg_info_pb)
         private val button = parent.findViewById<Button>(R.id.bg_info_bt).apply {
@@ -125,9 +127,10 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
             set(value) {
                 if (value != field) {
                     field = value
-                    textView.text = value
-                    textView.startAnimation(blinkAnimation)
-                    //TODO Add textview
+                    extendedTextView.text = value ?: ""
+                    if (value != null)
+                        extendedTextView.startAnimation(blinkAnimation)
+                    extendedTextView.visible = value != null
                 }
             }
 
@@ -160,7 +163,6 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
                     field = value
                     imageView.setImageResource(value)
                     imageView.startAnimation(blinkAnimation)
-
                 }
             }
 
@@ -175,37 +177,12 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
 
         init {
 
-            val provider = object {
-
-                private val builder = StringBuilder(6)
-
-                operator fun invoke(value: Float): String {
-                    val tm = value.roundToInt()
-                    val m = tm % 60
-                    val h = tm / 60
-                    val sb = builder
-                    sb.setLength(0)
-                    if (h > 0) {
-                        sb.append(h)
-                        sb.append('h')
-                    }
-                    if (m > 0) {
-                        if (sb.isNotEmpty())
-                            sb.append(' ')
-                        sb.append(m)
-                        sb.append('m')
-                    }
-                    return sb.toString()
-                }
-
-            }
-
             knob.thickText = object : KnobView.ThickTextProvider {
                 override fun provide(view: KnobView, track: Int, thick: Int, value: Float) =
-                    provider(value)
+                    hmIntervalString(value.roundToInt())
             }
             knob.labelText = object : KnobView.LabelTextProvider {
-                override fun provide(view: KnobView, value: Float) = provider(value)
+                override fun provide(view: KnobView, value: Float) = hmIntervalString(value.roundToInt())
             }
 
             parent.findViewById<View>(R.id.bg_duration_cancel).setOnClickListener { onCancel() }
