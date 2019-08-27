@@ -16,6 +16,7 @@
     <string name="bg_action_routed">Termina</string>
     <string name="bg_unknown_place">Luogo sconosciuto</string>
     <string name="bg_routed">Percorso calcolato</string>
+    <string name="bg_route_completed">Destinazione raggiunta!</string>
     <string name="bg_duration_hint">Quanto tempo vuoi dedicarmi?</string>
     <string name="bg_duration_cancel">Annulla</string>
     <string name="bg_duration_start">Inizia</string>

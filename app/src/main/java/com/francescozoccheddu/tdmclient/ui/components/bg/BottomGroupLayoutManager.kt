@@ -41,6 +41,7 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
 
     interface InfoComponent {
         var text: String
+        var extendedText: String?
         var icon: Int
         var action: String?
         var onAction: Event
@@ -120,6 +121,16 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
                 }
             }
 
+        override var extendedText: String? = null
+            set(value) {
+                if (value != field) {
+                    field = value
+                    textView.text = value
+                    textView.startAnimation(blinkAnimation)
+                    //TODO Add textview
+                }
+            }
+
         override var action: String? = null
             set(value) {
                 if (value != field) {
@@ -190,7 +201,8 @@ class BottomGroupLayoutManager(private val parent: ViewGroup) {
             }
 
             knob.thickText = object : KnobView.ThickTextProvider {
-                override fun provide(view: KnobView, track: Int, thick: Int, value: Float) = provider(value)
+                override fun provide(view: KnobView, track: Int, thick: Int, value: Float) =
+                    provider(value)
             }
             knob.labelText = object : KnobView.LabelTextProvider {
                 override fun provide(view: KnobView, value: Float) = provider(value)

@@ -59,7 +59,7 @@ class MainService : Service() {
         private const val COVERAGE_EXPIRATION_TIME = 60f
         private const val POI_INTERVAL_TIME = 10f
         private const val POI_EXPIRATION_TIME = 120f
-        private const val SERVER_ADDRESS = "http://192.168.1.2:8080/"
+        private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
         private val USER = User(0, "0")
         private const val STOP_ACTION = "IntentActionStop"
         private const val START_ACTIVITY_ACTION = "IntentActionStartActivity"
