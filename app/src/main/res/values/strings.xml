@@ -3,8 +3,8 @@
     <string name="mapbox_access_token">
         pk.eyJ1IjoiZnJhbmNlc2NvenoiLCJhIjoiY2pzYndrOTg5MGVrdzN5cGR2ZjdkY3ZnMiJ9.MCiDPh-MIjlWxN1IdzrYSg
     </string>
+    <string name="date_minutes_zero">meno di un minuto</string>
     <plurals name="date_minutes">
-        <item quantity="zero">meno di un minuto</item>
         <item quantity="one">1 minuto</item>
         <item quantity="other">%1$d minuti</item>
     </plurals>
