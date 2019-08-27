@@ -5,11 +5,11 @@
     </string>
     <plurals name="date_minutes">
         <item quantity="zero">meno di un minuto</item>
-        <item quantity="one">%1 minuto</item>
+        <item quantity="one">1 minuto</item>
         <item quantity="other">%1$d minuti</item>
     </plurals>
     <plurals name="date_hours">
-        <item quantity="one">%1 ora</item>
+        <item quantity="one">1 ora</item>
         <item quantity="other">%1$d ore</item>
     </plurals>
     <string name="date_format_hours_minutes">%1$s e %2$s</string>
