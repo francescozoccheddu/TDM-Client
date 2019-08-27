@@ -76,11 +76,14 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation
 import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigationOptions
+import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgressState
 import kotlinx.android.synthetic.main.bg.bg_root
 import kotlinx.android.synthetic.main.ma.ma_confetti
 import kotlinx.android.synthetic.main.ma.ma_map
 import kotlinx.android.synthetic.main.sb.sb_root
 import kotlinx.android.synthetic.main.us.us_root
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
 import kotlin.math.roundToInt
 
 
@@ -167,6 +170,25 @@ class MainActivity : AppCompatActivity() {
             onPickingDestinationChanged += {
                 updateSearchBarComponent()
             }
+            onRouteCompleted += {
+                ma_confetti.apply {
+                    build()
+                        .addColors(
+                            hsv(0f, 1f, 1f),
+                            hsv(180f, 1f, 1f),
+                            hsv(120f, 1f, 1f),
+                            hsv(60f, 1f, 1f)
+                        )
+                        .setDirection(0.0, 180.0)
+                        .setSpeed(0f, 7f)
+                        .setFadeOutEnabled(true)
+                        .setTimeToLive(5000L)
+                        .addShapes(Shape.RECT, Shape.CIRCLE)
+                        .addSizes(Size(6))
+                        .setPosition(0f, width.toFloat(), -100f)
+                        .streamFor(100, 1000)
+                }
+            }
         }
 
         navigation = MapboxNavigation(
@@ -174,11 +196,18 @@ class MainActivity : AppCompatActivity() {
             mapboxAccessToken,
             MapboxNavigationOptions.builder().navigationNotification(null).build()
         ).apply {
+
             addProgressChangeListener { location, routeProgress ->
-                routingController.updateRoutingInstructions(routeProgress)
+                if (routeProgress.currentState() == RouteProgressState.ROUTE_ARRIVED)
+                    routingController.completeRouting()
+                else
+                    routingController.updateRoutingInstructions(routeProgress)
             }
             addMilestoneEventListener { routeProgress, instruction, milestone ->
-                routingController.updateRoutingInstructions(routeProgress)
+                if (routeProgress.currentState() == RouteProgressState.ROUTE_ARRIVED)
+                    routingController.completeRouting()
+                else
+                    routingController.updateRoutingInstructions(routeProgress)
             }
             addNavigationEventListener { running ->
                 if (!running)
@@ -386,7 +415,7 @@ class MainActivity : AppCompatActivity() {
                         setSource(style, MB_SOURCE_COVERAGE_QUADS, service?.coverageQuadData)
                         setSource(style, MB_SOURCE_POIS, service?.poiData)
                         addOnMapClickListener { click ->
-                            if (routingController.pickingDestination && MainService.MAP_BOUNDS.contains(
+                            if (routingController.pickingDestination && MAP_BOUNDS.contains(
                                     click
                                 )
                             ) {

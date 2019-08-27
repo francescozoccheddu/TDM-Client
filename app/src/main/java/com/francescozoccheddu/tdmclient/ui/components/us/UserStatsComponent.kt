@@ -86,7 +86,7 @@ class UserStatsComponent(parent: ViewGroup, private val confetti: KonfettiView) 
         confetti.build()
             .addColors(hsv(0f, 1f, 1f), hsv(30f, 1f, 1f), hsv(60f, 1f, 1f), hsv(330f, 1f, 1f))
             .setDirection(0.0, 359.0)
-            .setSpeed(2f, 10f)
+            .setSpeed(0f, 10f)
             .setFadeOutEnabled(true)
             .setTimeToLive(5000L)
             .addShapes(Shape.RECT, Shape.CIRCLE)
@@ -118,7 +118,10 @@ class UserStatsComponent(parent: ViewGroup, private val confetti: KonfettiView) 
         lastNotifiedLevel = prefs.getInt(key, 0)
     }
 
-    fun saveLastNotifiedLevel(prefs: SharedPreferences.Editor, key: String = DEFAULT_STATS_PREF_KEY) {
+    fun saveLastNotifiedLevel(
+        prefs: SharedPreferences.Editor,
+        key: String = DEFAULT_STATS_PREF_KEY
+    ) {
         prefs.putInt(key, lastNotifiedLevel)
     }
 

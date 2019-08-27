@@ -161,14 +161,18 @@ class RoutingController(parent: ViewGroup, private val context: Context) {
     }
 
     fun completeRouting() {
-        completedNotificationCountdown.pull()
-        cancelRouting(true)
-        updateState()
+        if (route != null) {
+            completedNotificationCountdown.pull()
+            cancelRouting(true)
+            updateState()
+            onRouteCompleted()
+        }
     }
 
     val onPickingDestinationChanged = ProcEvent()
     val onDestinationChanged = ProcEvent()
     val onRouteChanged = ProcEvent()
+    val onRouteCompleted = ProcEvent()
 
     var service
         get() = router.service
