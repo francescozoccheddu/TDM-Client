@@ -21,14 +21,14 @@ data class Measurement(
 )
 
 data class LocalizedMeasurement(val time: Date, val location: Location, val measurement: Measurement)
-data class MeasurementPutRequest(val user: User, val measurements: Collection<LocalizedMeasurement>)
+data class MeasurementPutRequest(val userKey: UserKey, val measurements: Collection<LocalizedMeasurement>)
 
 
 private val INTERPRETER = object : SimpleInterpreter<MeasurementPutRequest, UserStats>() {
     override fun interpretRequest(request: MeasurementPutRequest): JSONObject? =
         JSONObject().apply {
-            put("id", request.user.id)
-            put("passkey", request.user.passkey)
+            put("id", request.userKey.id)
+            put("passkey", request.userKey.passkey)
             put("measurements", JSONArray(request.measurements.map {
                 JSONObject().apply {
                     put("time", it.time.iso)
@@ -43,7 +43,11 @@ private val INTERPRETER = object : SimpleInterpreter<MeasurementPutRequest, User
             }))
         }
 
-    override fun interpretResponse(request: MeasurementPutRequest, response: JSONObject): UserStats {
+    override fun interpretResponse(
+        request: MeasurementPutRequest,
+        statusCode: Int,
+        response: JSONObject
+    ): UserStats {
         try {
             return parseUserStats(response)
         } catch (_: Exception) {

@@ -89,7 +89,7 @@ class UserStatsSheet @JvmOverloads constructor(
         closeButton.hide()
     }
 
-    var stats = UserStats(0, 0, 1f, null, 0)
+    var stats = UserStats(0, 0, 1f, null, 0, "", "")
         set(value) {
             if (value != field) {
                 field = value

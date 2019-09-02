@@ -1,7 +1,5 @@
 package com.francescozoccheddu.tdmclient.ui.components.us
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.francescozoccheddu.tdmclient.R
@@ -12,15 +10,11 @@ import com.robinhood.ticker.TickerView
 import nl.dionsegijn.konfetti.KonfettiView
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
-import kotlin.math.max
 
-class UserStatsComponent(parent: ViewGroup, private val confetti: KonfettiView) {
+class UserStatsComponent(parent: ViewGroup) {
 
     private companion object {
         private const val MIN_NOTIFY_GAIN = 20
-
-        val DEFAULT_PREFS_NAME = "${this::class.java.canonicalName}:lastNotifiedLevel"
-        val DEFAULT_STATS_PREF_KEY = "${this::class.java.canonicalName}:lastNotifiedLevel"
     }
 
     private val root = parent.findViewById<OverlayMotionLayout>(R.id.us_root)
@@ -73,9 +67,23 @@ class UserStatsComponent(parent: ViewGroup, private val confetti: KonfettiView) 
             }
         }
 
+
+    var stats = UserStats(0, 0, 1f, null, 0, "", "")
+        set(value) {
+            if (value != field) {
+                val gain = value.score - field.score
+                if (gain > MIN_NOTIFY_GAIN)
+                    gainComponent.notify(gain)
+                field = value
+                sheet.stats = value
+                scoreText.text = value.score.toString()
+                levelText.text = (value.level + 1).toString()
+            }
+        }
+
     private val tempLocation = IntArray(2)
 
-    private fun party() {
+    fun levelUpParty(confetti: KonfettiView) {
         fireworks.playAnimation()
         fireworks.getLocationOnScreen(tempLocation)
         var x = tempLocation[0].toFloat() + fireworks.width / 2f
@@ -94,59 +102,5 @@ class UserStatsComponent(parent: ViewGroup, private val confetti: KonfettiView) 
             .setPosition(x, y)
             .burst(300)
     }
-
-    var stats = UserStats(0, 0, 1f, null, 0)
-        set(value) {
-            if (value != field) {
-                val gain = value.score - field.score
-                if (gain > MIN_NOTIFY_GAIN)
-                    gainComponent.notify(gain)
-                field = value
-                sheet.stats = value
-                scoreText.text = value.score.toString()
-                levelText.text = (value.level + 1).toString()
-                lastNotifiedLevel = max(value.lastNotifiedLevel, lastNotifiedLevel)
-                if (value.level > lastNotifiedLevel) {
-                    lastNotifiedLevel = value.level
-                    party()
-                    onLevelNotified?.invoke(value.level)
-                }
-            }
-        }
-
-    fun loadLastNotifiedLevel(prefs: SharedPreferences, key: String = DEFAULT_STATS_PREF_KEY) {
-        lastNotifiedLevel = prefs.getInt(key, 0)
-    }
-
-    fun saveLastNotifiedLevel(
-        prefs: SharedPreferences.Editor,
-        key: String = DEFAULT_STATS_PREF_KEY
-    ) {
-        prefs.putInt(key, lastNotifiedLevel)
-    }
-
-    fun loadLastNotifiedLevel(
-        context: Context,
-        prefsName: String = DEFAULT_PREFS_NAME,
-        key: String = DEFAULT_STATS_PREF_KEY
-    ) {
-        loadLastNotifiedLevel(context.getSharedPreferences(prefsName, Context.MODE_PRIVATE), key)
-    }
-
-    fun saveLastNotifiedLevel(
-        context: Context,
-        prefsName: String = DEFAULT_PREFS_NAME,
-        key: String = DEFAULT_STATS_PREF_KEY
-    ) {
-        val prefs = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
-        val editor = prefs.edit()
-        saveLastNotifiedLevel(editor, key)
-        editor.apply()
-    }
-
-    var lastNotifiedLevel = 0
-        private set
-
-    var onLevelNotified: ((Int) -> Unit)? = null
 
 }

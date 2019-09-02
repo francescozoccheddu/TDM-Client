@@ -31,7 +31,11 @@ private val INTERPRETER = object : SimplePollInterpreter<CoverageRetrieveMode, C
         )
     }
 
-    override fun interpretResponse(request: CoverageRetrieveMode, response: JSONObject): CoverageData {
+    override fun interpretResponse(
+        request: CoverageRetrieveMode,
+        statusCode: Int,
+        response: JSONObject
+    ): CoverageData {
         try {
             val data = FeatureCollection.fromJson(response.getJSONObject("data").toString())
             val isotime = response.getString("time")

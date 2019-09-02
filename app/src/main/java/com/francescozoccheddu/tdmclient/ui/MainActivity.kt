@@ -142,10 +142,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        userStatsComponent = UserStatsComponent(us_root, ma_confetti).apply {
-            onLevelNotified = { service?.notifyLevel = it }
-            loadLastNotifiedLevel(this@MainActivity)
-        }
+        userStatsComponent = UserStatsComponent(us_root)
 
         routingController = RoutingController(bg_root, this).apply {
             onDestinationChanged += {
@@ -197,13 +194,13 @@ class MainActivity : AppCompatActivity() {
             MapboxNavigationOptions.builder().navigationNotification(null).build()
         ).apply {
 
-            addProgressChangeListener { location, routeProgress ->
+            addProgressChangeListener { _, routeProgress ->
                 if (routeProgress.currentState() == RouteProgressState.ROUTE_ARRIVED)
                     routingController.completeRouting()
                 else
                     routingController.updateRoutingInstructions(routeProgress)
             }
-            addMilestoneEventListener { routeProgress, instruction, milestone ->
+            addMilestoneEventListener { routeProgress, _, _ ->
                 if (routeProgress.currentState() == RouteProgressState.ROUTE_ARRIVED)
                     routingController.completeRouting()
                 else
@@ -411,9 +408,17 @@ class MainActivity : AppCompatActivity() {
                             routingController.destination?.point
                         )
                         setDirectionsLine(style)
-                        setSource(style, MB_SOURCE_COVERAGE_POINTS, service?.coveragePointData)
-                        setSource(style, MB_SOURCE_COVERAGE_QUADS, service?.coverageQuadData)
-                        setSource(style, MB_SOURCE_POIS, service?.poiData)
+                        setSource(
+                            style,
+                            MB_SOURCE_COVERAGE_POINTS,
+                            service?.dataRetriever?.coveragePointData
+                        )
+                        setSource(
+                            style,
+                            MB_SOURCE_COVERAGE_QUADS,
+                            service?.dataRetriever?.coverageQuadData
+                        )
+                        setSource(style, MB_SOURCE_POIS, service?.dataRetriever?.poiData)
                         addOnMapClickListener { click ->
                             if (routingController.pickingDestination && MAP_BOUNDS.contains(
                                     click
@@ -528,7 +533,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateStatsComponent() {
-        userStatsComponent.enabled = !searchBarComponent.visible && service?.userStats != null
+        userStatsComponent.enabled =
+            !searchBarComponent.visible && service?.userController?.stats != null
     }
 
     private fun onLocationChanged() {
@@ -545,23 +551,33 @@ class MainActivity : AppCompatActivity() {
         updateRouting()
     }
 
+    private var lastNotifiedLevel = 0
+
+    private fun onLevelUp(level: Int) {
+        if (level > lastNotifiedLevel) {
+            lastNotifiedLevel = level
+            userStatsComponent.levelUpParty(ma_confetti)
+            service?.userController?.notifyLevel(level)
+        }
+    }
+
     private fun onStatsChange() {
-        val stats = this.service?.userStats
-        if (stats != null)
-            userStatsComponent.stats = stats
+        val userController = this.service?.userController
+        if (userController?.hasStats == true)
+            userStatsComponent.stats = userController.stats
         updateStatsComponent()
     }
 
     private fun onCoveragePointDataChange() {
-        setSource(MB_SOURCE_COVERAGE_POINTS, service?.coveragePointData)
+        setSource(MB_SOURCE_COVERAGE_POINTS, service?.dataRetriever?.coveragePointData)
     }
 
     private fun onCoverageQuadDataChange() {
-        setSource(MB_SOURCE_COVERAGE_QUADS, service?.coverageQuadData)
+        setSource(MB_SOURCE_COVERAGE_QUADS, service?.dataRetriever?.coverageQuadData)
     }
 
     private fun onPoiDataChange() {
-        setSource(MB_SOURCE_POIS, service?.poiData)
+        setSource(MB_SOURCE_POIS, service?.dataRetriever?.poiData)
     }
 
     private var service: MainService? = null
@@ -573,20 +589,22 @@ class MainActivity : AppCompatActivity() {
                     old.onLocationChange -= this::onLocationChanged
                     old.onLocatableChange -= this::onLocatableChange
                     old.onOnlineChange -= this::onOnlineChange
-                    old.onStatsChange -= this::onStatsChange
-                    old.onCoveragePointDataChange -= this::onCoveragePointDataChange
-                    old.onCoverageQuadDataChange -= this::onCoverageQuadDataChange
-                    old.onPoiDataChange -= this::onPoiDataChange
+                    old.userController.onStatsChange -= this::onStatsChange
+                    old.dataRetriever.onCoveragePointDataChange -= this::onCoveragePointDataChange
+                    old.dataRetriever.onCoverageQuadDataChange -= this::onCoverageQuadDataChange
+                    old.dataRetriever.onPoiDataChange -= this::onPoiDataChange
+                    old.userController.onLevelUp -= this::onLevelUp
                 }
                 if (value != null) {
                     value.onLocationChange += this::onLocationChanged
                     value.onLocatableChange += this::onLocatableChange
                     value.onOnlineChange += this::onOnlineChange
-                    value.onStatsChange += this::onStatsChange
-                    value.onCoveragePointDataChange += this::onCoveragePointDataChange
-                    value.onCoverageQuadDataChange += this::onCoverageQuadDataChange
-                    value.onPoiDataChange += this::onPoiDataChange
-                    value.notifyLevel = userStatsComponent.lastNotifiedLevel
+                    value.userController.onStatsChange += this::onStatsChange
+                    value.dataRetriever.onCoveragePointDataChange += this::onCoveragePointDataChange
+                    value.dataRetriever.onCoverageQuadDataChange += this::onCoverageQuadDataChange
+                    value.dataRetriever.onPoiDataChange += this::onPoiDataChange
+                    value.userController.onLevelUp += this::onLevelUp
+                    value.userController.notifyLevel(lastNotifiedLevel)
                     onLocationChanged()
                     onLocatableChange()
                     onOnlineChange()
@@ -678,7 +696,6 @@ class MainActivity : AppCompatActivity() {
             service = null
             unbindService(serviceConnection)
         }
-        userStatsComponent.saveLastNotifiedLevel(this)
         ma_map.onPause()
     }
 

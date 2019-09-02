@@ -1,10 +1,9 @@
 package com.francescozoccheddu.tdmclient.data
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.location.Location
 import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.FixedSizeSortedQueue
+import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent2
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
@@ -12,13 +11,9 @@ import com.francescozoccheddu.tdmclient.utils.data.client.error
 import java.util.*
 import kotlin.math.max
 
-class SensorDriver(server: Server, val user: User, val sensor: Sensor) {
+class SensorDriver(server: Server, val userKey: UserKey, val sensor: Sensor) {
 
     companion object {
-        val DEFAULT_PREFS_NAME = "${this::class.java.canonicalName}:userStats"
-        val DEFAULT_STATS_PREF_KEY = "${this::class.java.canonicalName}:userStats"
-
-        private const val MAX_STATS_REQUESTS = 4
 
         private const val MAX_MEASUREMENTS_REQUESTS = 4
         private const val MAX_UNREACHABLE_ATTEMPTS = 3
@@ -35,15 +30,14 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor) {
         fun measure(): Measurement
     }
 
-    private val queue = FixedSizeSortedQueue.by(MAX_QUEUE_SIZE, true) { value: LocalizedMeasurement -> value.time }
+    private val queue =
+        FixedSizeSortedQueue.by(MAX_QUEUE_SIZE, true) { value: LocalizedMeasurement -> value.time }
 
-    private val userService = makeUserService(server, user).apply {
-        onData += { stats = it }
-    }
+
     private val measurementService = makeMeasurementService(server).apply {
         onRequestStatusChanged += {
             if (it.status.succeeded) {
-                userService.submit(it.startTime, it.response)
+                onStatsChange(it.startTime, it.response)
                 reachable = true
                 failureCount = 0
             }
@@ -95,7 +89,7 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor) {
                 }
                 measurementService.Request(
                     MeasurementPutRequest(
-                        user,
+                        userKey,
                         measurements
                     )
                 ).start()
@@ -169,28 +163,6 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor) {
             ticker.tickInterval = value
         }
 
-    val hasStats get() = this::_userStats.isInitialized
-
-    private lateinit var _userStats: UserStats
-
-    var notifyLevel = 0
-        set(value) {
-            if (value != field) {
-                field = value
-                userService.pollRequest = UserGetRequest(user, value)
-                requestStatsUpdate()
-            }
-        }
-
-    var stats
-        get() = _userStats
-        private set(value) {
-            if (!hasStats || value != _userStats) {
-                _userStats = value
-                onStatsChange()
-            }
-        }
-
     var reachable = true
         private set(value) {
             if (value != field) {
@@ -199,46 +171,11 @@ class SensorDriver(server: Server, val user: User, val sensor: Sensor) {
             }
         }
 
-    val onStatsChange = ProcEvent()
+    val onStatsChange = FuncEvent2<Date, UserStats>()
 
     val onReachableChange = ProcEvent()
 
-    fun loadStats(prefs: SharedPreferences, key: String = DEFAULT_STATS_PREF_KEY) {
-        if (!hasStats) {
-            val stats = loadUserStats(prefs, key)
-            if (stats != null)
-                this.stats = stats
-        }
-    }
-
-    fun saveStats(prefs: SharedPreferences.Editor, key: String = DEFAULT_STATS_PREF_KEY) {
-        if (hasStats)
-            saveUserStats(prefs, stats, key)
-    }
-
-    fun loadStats(context: Context, prefsName: String = DEFAULT_PREFS_NAME, key: String = DEFAULT_STATS_PREF_KEY) {
-        if (!hasStats) {
-            loadStats(context.getSharedPreferences(prefsName, Context.MODE_PRIVATE), key)
-        }
-    }
-
-    fun saveStats(context: Context, prefsName: String = DEFAULT_PREFS_NAME, key: String = DEFAULT_STATS_PREF_KEY) {
-        if (hasStats) {
-            val prefs = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
-            val editor = prefs.edit()
-            saveStats(editor, key)
-            editor.apply()
-        }
-    }
-
-    fun requestStatsUpdate() {
-        if (userService.pendingRequests.size >= MAX_STATS_REQUESTS)
-            userService.pendingRequests.minBy { it.startTime }?.cancel()
-        userService.poll()
-    }
-
     fun cancelAll() {
-        userService.cancelAll()
         measurementService.cancelAll()
     }
 

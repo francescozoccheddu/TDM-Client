@@ -16,7 +16,7 @@ import java.nio.charset.Charset
 class VolleyAdapterRequest<ResponseType>(
     url: String,
     private val requestBody: String,
-    private val interpreter: (Any?) -> ResponseType,
+    private val interpreter: (Int, Any?) -> ResponseType,
     private val listener: Response.Listener<ResponseType>,
     errorListener: Response.ErrorListener
 ) : Request<ResponseType>(Method.POST, url, errorListener) {
@@ -80,12 +80,12 @@ class VolleyAdapterRequest<ResponseType>(
 
         fun <ResponseType> parseResponse(
             response: NetworkResponse,
-            interpreter: (Any?) -> ResponseType
+            interpreter: (Int, Any?) -> ResponseType
         ): Nullable<ResponseType>? {
             return try {
                 val charset = Charset.forName(HttpHeaderParser.parseCharset(response.headers, CHARSET))
                 val json = String(response.data, charset)
-                Nullable(interpreter(fromJSON(json)))
+                Nullable(interpreter(response.statusCode, fromJSON(json)))
             } catch (e: UnsupportedEncodingException) {
                 null
             } catch (je: JSONException) {

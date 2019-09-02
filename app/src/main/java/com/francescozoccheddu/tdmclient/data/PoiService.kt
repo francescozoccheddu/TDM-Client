@@ -11,15 +11,19 @@ import org.json.JSONObject
 private const val SERVICE_ADDRESS = "getpois"
 private val DEFAULT_RETRY_POLICY = RetryPolicy(2f)
 
-private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<User, FeatureCollection>() {
-    override fun interpretRequest(request: User): JSONObject? =
+private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserKey, FeatureCollection>() {
+    override fun interpretRequest(request: UserKey): JSONObject? =
         JSONObject().apply {
             put("id", request.id)
             put("passkey", request.passkey)
             put("mode", "points")
         }
 
-    override fun interpretResponse(request: User, response: JSONObject) =
+    override fun interpretResponse(
+        request: UserKey,
+        statusCode: Int,
+        response: JSONObject
+    ) =
         try {
             FeatureCollection.fromJson(response.getJSONObject("pois").toString())
         } catch (_: Exception) {
@@ -27,12 +31,12 @@ private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<User, 
         }
 })
 
-typealias PoiService = Server.AutoPollService<User, FeatureCollection, FeatureCollection>
+typealias PoiService = Server.AutoPollService<UserKey, FeatureCollection, FeatureCollection>
 
-fun makePoiService(server: Server, user: User): PoiService =
+fun makePoiService(server: Server, userKey: UserKey): PoiService =
     server.AutoPollService(
         SERVICE_ADDRESS,
-        user,
+        userKey,
         INTERPRETER
     ).apply {
         customRetryPolicy = DEFAULT_RETRY_POLICY

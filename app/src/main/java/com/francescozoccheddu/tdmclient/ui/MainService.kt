@@ -9,19 +9,13 @@ import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.francescozoccheddu.tdmclient.data.CoverageRetrieveMode
-import com.francescozoccheddu.tdmclient.data.CoverageService
+import com.francescozoccheddu.tdmclient.data.DataRetriever
 import com.francescozoccheddu.tdmclient.data.FakeSensor
 import com.francescozoccheddu.tdmclient.data.Measurement
-import com.francescozoccheddu.tdmclient.data.PoiService
 import com.francescozoccheddu.tdmclient.data.RouteRequest
-import com.francescozoccheddu.tdmclient.data.RouteService
 import com.francescozoccheddu.tdmclient.data.SensorDriver
-import com.francescozoccheddu.tdmclient.data.User
-import com.francescozoccheddu.tdmclient.data.UserStats
-import com.francescozoccheddu.tdmclient.data.makeCoverageService
-import com.francescozoccheddu.tdmclient.data.makePoiService
-import com.francescozoccheddu.tdmclient.data.makeRouteService
+import com.francescozoccheddu.tdmclient.data.UserController
+import com.francescozoccheddu.tdmclient.data.UserKey
 import com.francescozoccheddu.tdmclient.ui.utils.ServiceNotification
 import com.francescozoccheddu.tdmclient.utils.android.ConnectivityStatusReceiver
 import com.francescozoccheddu.tdmclient.utils.android.LocationStatusReceiver
@@ -55,12 +49,9 @@ class MainService : Service() {
         private const val LOCATION_POLL_MAX_WAIT = LOCATION_POLL_INTERVAL * 5
         private const val LOCATION_EXPIRATION_TIME = 30f
         private const val MEASURE_INTERVAL_TIME = 3f
-        private const val COVERAGE_INTERVAL_TIME = 2f
-        private const val COVERAGE_EXPIRATION_TIME = 60f
-        private const val POI_INTERVAL_TIME = 10f
-        private const val POI_EXPIRATION_TIME = 120f
+
         private const val SERVER_ADDRESS = "http://192.168.43.57:8080/"
-        private val USER = User(0, "0")
+        private val USER = UserKey(0, "0")
         private const val STOP_ACTION = "IntentActionStop"
         private const val START_ACTIVITY_ACTION = "IntentActionStartActivity"
 
@@ -101,19 +92,6 @@ class MainService : Service() {
     val onLocatableChange = ProcEvent()
     val onConnectedChange = ProcEvent()
     val onOnlineChange = ProcEvent()
-    val onStatsChange = ProcEvent()
-    val onCoveragePointDataChange = ProcEvent()
-    val onCoverageQuadDataChange = ProcEvent()
-    val onPoiDataChange = ProcEvent()
-
-    val coveragePointData: FeatureCollection?
-        get() = if (coveragePointService.hasData && !coveragePointService.expired) coveragePointService.data else null
-
-    val coverageQuadData: FeatureCollection?
-        get() = if (coverageQuadService.hasData && !coverageQuadService.expired) coverageQuadService.data else null
-
-    val poiData: FeatureCollection?
-        get() = if (poiService.hasData && !poiService.expired) poiService.data else null
 
     val insideMeasurementArea
         get() = run {
@@ -153,35 +131,18 @@ class MainService : Service() {
             if (value != field) {
                 field = value
                 connected = sensorDriver.reachable && value
-                val coveragePollPeriod = if (value && bound) COVERAGE_INTERVAL_TIME else null
-                coveragePointService.periodicPoll = coveragePollPeriod
-                coverageQuadService.periodicPoll = coveragePollPeriod
-                poiService.periodicPoll = if (value && bound) POI_INTERVAL_TIME else null
+                dataRetriever.polling = value && bound
                 sensorDriver.pushing = value
                 onOnlineChange()
             }
         }
 
-    var notifyLevel: Int
-        get() = sensorDriver.notifyLevel
-        set(value) {
-            sensorDriver.notifyLevel = value
-        }
+    lateinit var userController: UserController
+        private set
 
-    val userStats: UserStats?
-        get() = if (sensorDriver.hasStats) sensorDriver.stats else null
+    lateinit var dataRetriever: DataRetriever
+        private set
 
-    fun requestStatsUpdate() {
-        sensorDriver.requestStatsUpdate()
-    }
-
-    fun requestRoute(to: LatLng?, time: Float): Server.Service<RouteRequest, List<Point>>.Request {
-        val from = location
-        if (from != null)
-            return routeService.Request(RouteRequest(from.latLng, to, time))
-        else
-            throw IllegalStateException("'${this::location.name}' is null")
-    }
 
     private val locationCallback = object : LocationEngineCallback<LocationEngineResult> {
         override fun onSuccess(result: LocationEngineResult?) {
@@ -201,22 +162,17 @@ class MainService : Service() {
     private lateinit var locationEngine: LocationEngine
     private lateinit var server: Server
     private lateinit var sensorDriver: SensorDriver
-    private lateinit var coveragePointService: CoverageService
-    private lateinit var coverageQuadService: CoverageService
-    private lateinit var poiService: PoiService
-    private lateinit var routeService: RouteService
+
     private lateinit var notification: ServiceNotification
     private var bound = false
         set(value) {
             if (value != field) {
                 field = value
                 notification.foreground = !value
-                val coveragePollPeriod = if (value && online) COVERAGE_INTERVAL_TIME else null
-                coveragePointService.periodicPoll = coveragePollPeriod
-                coverageQuadService.periodicPoll = coveragePollPeriod
-                poiService.periodicPoll = POI_INTERVAL_TIME
+                dataRetriever.polling = value && online
             }
         }
+
     private val districts: FeatureCollection? by lazy {
         try {
             val json = assets.open("map.geojson").bufferedReader().use {
@@ -244,6 +200,14 @@ class MainService : Service() {
         return null
     }
 
+    fun requestRoute(to: LatLng?, time: Float): Server.Service<RouteRequest, List<Point>>.Request {
+        val from = location
+        if (from != null)
+            return dataRetriever.requestRoute(from.latLng, to, time)
+        else
+            throw IllegalStateException("'${this::location.name}' is null")
+    }
+
     @SuppressLint("MissingPermission")
     override fun onCreate() {
         super.onCreate()
@@ -268,27 +232,10 @@ class MainService : Service() {
 
         server = Server(this, SERVER_ADDRESS)
 
-        // Prepare services
-        run {
-            coveragePointService = makeCoverageService(server).apply {
-                pollRequest = CoverageRetrieveMode.POINTS
-                expiration = COVERAGE_EXPIRATION_TIME
-                onData += { onCoveragePointDataChange() }
-                onExpire += onCoveragePointDataChange
-            }
-            coverageQuadService = makeCoverageService(server).apply {
-                pollRequest = CoverageRetrieveMode.QUADS
-                expiration = COVERAGE_EXPIRATION_TIME
-                onData += { onCoverageQuadDataChange() }
-                onExpire += onCoverageQuadDataChange
-            }
-            poiService = makePoiService(server, USER).apply {
-                expiration = POI_EXPIRATION_TIME
-                onData += { onPoiDataChange() }
-                onExpire += onPoiDataChange
-            }
-            routeService = makeRouteService(server)
-        }
+        userController = UserController(USER, server)
+        userController.loadStats(this@MainService)
+
+        dataRetriever = DataRetriever(server, USER)
 
         // Prepare sensor
         run {
@@ -298,10 +245,9 @@ class MainService : Service() {
                 USER,
                 FakeSensor(fakeMeasurement)
             ).apply {
-                onStatsChange += this@MainService.onStatsChange
+                onStatsChange += { date, stats -> userController.submitStats(stats, date) }
                 onReachableChange += { connected = sensorDriver.reachable && online }
                 measureInterval = MEASURE_INTERVAL_TIME
-                loadStats(this@MainService)
             }
         }
 
@@ -324,7 +270,7 @@ class MainService : Service() {
             connected = ConnectivityStatusReceiver.isOnline(this)
             locatable = LocationStatusReceiver.isEnabled(this)
             locationEngine.getLastLocation(locationCallback)
-            requestStatsUpdate()
+            userController.requestStatsUpdate()
         }
 
         if (!PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -338,9 +284,9 @@ class MainService : Service() {
         when (intent?.action) {
             STOP_ACTION -> stopSelf()
             START_ACTIVITY_ACTION -> {
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
+                val activityIntent = Intent(this, MainActivity::class.java)
+                activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(activityIntent)
             }
         }
         return START_STICKY
@@ -353,7 +299,7 @@ class MainService : Service() {
 
     override fun onUnbind(intent: Intent?): Boolean {
         bound = false
-        sensorDriver.saveStats(this)
+        userController.saveStats(this)
         return true
     }
 
@@ -374,13 +320,11 @@ class MainService : Service() {
         locationEngine.removeLocationUpdates(locationCallback)
         connectivityStatusReceiver.unregister(this)
         locationStatusReceiver.unregister(this)
-        coveragePointService.periodicPoll = null
-        coverageQuadService.periodicPoll = null
-        poiService.periodicPoll = null
+        dataRetriever.polling = false
         sensorDriver.measuring = false
         sensorDriver.pushing = false
         server.cancelAll()
-        sensorDriver.saveStats(this)
+        userController.saveStats(this)
     }
 
 }

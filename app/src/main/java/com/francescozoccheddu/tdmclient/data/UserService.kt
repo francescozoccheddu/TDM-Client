@@ -10,20 +10,19 @@ import org.json.JSONObject
 private const val SERVICE_ADDRESS = "getuser"
 private val DEFAULT_RETRY_POLICY = RetryPolicy(2f)
 
-data class UserGetRequest(val user: User, val notifyLevel: Int? = null)
+private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserKey, UserStats>() {
 
-private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserGetRequest, UserStats>() {
-
-    override fun interpretRequest(request: UserGetRequest) =
+    override fun interpretRequest(request: UserKey) =
         JSONObject().apply {
-            put("id", request.user.id)
-            put("passkey", request.user.passkey)
-            val level = request.notifyLevel
-            if (level != null)
-                put("notifyLevel", request.notifyLevel)
+            put("id", request.id)
+            put("passkey", request.passkey)
         }
 
-    override fun interpretResponse(request: UserGetRequest, response: JSONObject): UserStats {
+    override fun interpretResponse(
+        request: UserKey,
+        statusCode: Int,
+        response: JSONObject
+    ): UserStats {
         try {
             return parseUserStats(response)
         } catch (_: Exception) {
@@ -33,12 +32,12 @@ private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<UserGe
 
 })
 
-typealias UserService = Server.PollService<UserGetRequest, UserStats, UserStats>
+typealias UserService = Server.PollService<UserKey, UserStats, UserStats>
 
-fun makeUserService(server: Server, user: User): UserService =
+fun makeUserService(server: Server, userKey: UserKey): UserService =
     server.PollService(
         SERVICE_ADDRESS,
-        UserGetRequest(user),
+        userKey,
         INTERPRETER
     ).apply {
         customRetryPolicy = DEFAULT_RETRY_POLICY

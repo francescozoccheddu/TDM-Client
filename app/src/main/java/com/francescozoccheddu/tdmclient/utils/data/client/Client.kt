@@ -135,8 +135,8 @@ class Server(context: Context, val address: ServerAddress) {
                 nativeRequest = VolleyAdapterRequest(
                     this@Server.address.resolveService(this@Service.address),
                     getBody(request),
-                    {
-                        interpreter.interpretResponse(request, it)
+                    { statusCode, data ->
+                        interpreter.interpretResponse(request, statusCode, data)
                     },
                     VolleyResponse.Listener
                     {
@@ -154,9 +154,14 @@ class Server(context: Context, val address: ServerAddress) {
                         endTime = Date()
                         val networkResponse = it.networkResponse
                         if (networkResponse?.data != null) {
-                            val body = VolleyAdapterRequest.parseResponse(networkResponse) {
-                                interpreter.interpretResponse(request, it)
-                            }
+                            val body =
+                                VolleyAdapterRequest.parseResponse(networkResponse) { statusCode, data ->
+                                    interpreter.interpretResponse(
+                                        request,
+                                        statusCode,
+                                        data
+                                    )
+                                }
                             if (body != null)
                                 response = body.value
                         }
@@ -266,7 +271,10 @@ class Server(context: Context, val address: ServerAddress) {
         override fun requestStatusChanged(request: Request) {
             super.requestStatusChanged(request)
             if (request.status.succeeded)
-                submit(interpreter.interpretTime(request), interpreter.interpretData(request.response))
+                submit(
+                    interpreter.interpretTime(request),
+                    interpreter.interpretData(request.response)
+                )
         }
 
     }
@@ -357,7 +365,11 @@ class Server(context: Context, val address: ServerAddress) {
 }
 
 
-data class RetryPolicy(val timeout: Float = 5f, val attempts: Int = 1, val backoffMultiplier: Float = 1.0f) {
+data class RetryPolicy(
+    val timeout: Float = 5f,
+    val attempts: Int = 1,
+    val backoffMultiplier: Float = 1.0f
+) {
     init {
         if (timeout < 1.0f)
             throw IllegalArgumentException("Timeout must be at least 1 second")
