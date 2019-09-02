@@ -13,6 +13,7 @@ class DataRetriever(server: Server, user: UserKey) {
         private const val COVERAGE_EXPIRATION_TIME = 60f
         private const val AVATARS_EXPIRATION_TIME = 3600f
         private const val LEADERBOARD_EXPIRATION_TIME = 60f
+        private const val LEADERBOARD_SIZE = 10
         private const val POI_INTERVAL_TIME = 10f
         private const val POI_EXPIRATION_TIME = 120f
     }
@@ -36,11 +37,11 @@ class DataRetriever(server: Server, user: UserKey) {
     }
     private val routeService = makeRouteService(server)
 
-    private val leaderboardService = RemoteValue(makeLeaderboardService(server)).apply {
+    private val leaderboard = RemoteValue(makeLeaderboardService(server, LEADERBOARD_SIZE)).apply {
         expiration = LEADERBOARD_EXPIRATION_TIME
     }
 
-    private val avatarsService = RemoteValue(makeAvatarsService(server)).apply {
+    private val avatars = RemoteValue(makeAvatarsService(server)).apply {
         expiration = AVATARS_EXPIRATION_TIME
     }
 
@@ -64,11 +65,11 @@ class DataRetriever(server: Server, user: UserKey) {
     ) = routeService.Request(RouteRequest(from, to, time))
 
     fun getAvatars(forceUpdate: Boolean = false, callback: (AvatarSet?) -> Unit) {
-        avatarsService.get(forceUpdate, callback)
+        avatars.get(forceUpdate, callback)
     }
 
     fun getLeaderboard(forceUpdate: Boolean = false, callback: (List<User>?) -> Unit) {
-        leaderboardService.get(forceUpdate, callback)
+        leaderboard.get(forceUpdate, callback)
     }
 
     var polling = false

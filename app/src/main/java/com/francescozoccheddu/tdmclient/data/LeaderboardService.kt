@@ -11,12 +11,12 @@ import org.json.JSONObject
 private const val SERVICE_ADDRESS = "getleaderboard"
 private val DEFAULT_RETRY_POLICY = RetryPolicy(3f)
 
-private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<Unit, List<User>>() {
+private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<Int, List<User>>() {
 
-    override fun interpretRequest(request: Unit) = JSONObject()
+    override fun interpretRequest(request: Int) = JSONObject().apply { put("size", request) }
 
     override fun interpretResponse(
-        request: Unit,
+        request: Int,
         statusCode: Int,
         response: JSONObject
     ) = try {
@@ -28,12 +28,12 @@ private val INTERPRETER = PollInterpreter.from(object : SimpleInterpreter<Unit, 
 
 })
 
-typealias LeaderboardService = Server.PollService<Unit, List<User>, List<User>>
+typealias LeaderboardService = Server.PollService<Int, List<User>, List<User>>
 
-fun makeLeaderboardService(server: Server): LeaderboardService =
+fun makeLeaderboardService(server: Server, size: Int = 10): LeaderboardService =
     server.PollService(
         SERVICE_ADDRESS,
-        Unit,
+        size,
         INTERPRETER
     ).apply {
         customRetryPolicy = DEFAULT_RETRY_POLICY
