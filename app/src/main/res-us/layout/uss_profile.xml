@@ -2,16 +2,59 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/uss_profile_root"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:orientation="vertical">
     
     <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
+            android:gravity="start|center_vertical"
+            android:orientation="horizontal">
+        
+        <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/uss_profile_avatar"
+                android:layout_width="@dimen/uss_profile_avatar_size"
+                android:layout_height="@dimen/uss_profile_avatar_size"
+                android:background="?selectableItemBackgroundBorderless"
+                android:padding="10dp"
+                android:src="@drawable/sb_terrain"
+                android:tintMode="multiply"
+                app:civ_border_width="0px"
+                app:civ_circle_background_color="@color/foreground" />
+        
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+            
+            <TextView
+                    android:id="@+id/uss_profile_name"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Aldo cazzi"
+                    android:textSize="@dimen/uss_profile_name_text_size"
+                    android:textStyle="bold" />
+            
+            <TextView
+                    android:id="@+id/uss_profile_title"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="22° in classifica" />
+        
+        </LinearLayout>
+    </LinearLayout>
+    
+    <LinearLayout
             android:id="@+id/uss_profile_score_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/uss_vertical_spacing"
+            android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
             android:orientation="vertical">
         
@@ -19,14 +62,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/uss_score"
-                android:textSize="@dimen/uss_header_large_text_size" />
+                android:textSize="@dimen/uss_profile_header_large_text_size" />
         
         <com.robinhood.ticker.TickerView
                 android:id="@+id/uss_profile_score_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="@dimen/uss_value_large_text_size"
+                android:textSize="@dimen/uss_profile_value_large_text_size"
                 app:ticker_animationDuration="200"
                 app:ticker_defaultCharacterList="number"
                 app:ticker_defaultPreferredScrollingDirection="up" />
@@ -45,7 +88,7 @@
             android:id="@+id/uss_profile_level_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/uss_vertical_spacing"
+            android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             
@@ -55,14 +98,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/uss_level"
-                android:textSize="@dimen/uss_header_text_size" />
+                android:textSize="@dimen/uss_profile_header_text_size" />
         
         <com.robinhood.ticker.TickerView
                 android:id="@+id/uss_profile_level_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
-                android:textSize="@dimen/uss_value_text_size"
+                android:textSize="@dimen/uss_profile_value_text_size"
                 app:ticker_animationDuration="200"
                 app:ticker_defaultCharacterList="number"
                 app:ticker_defaultPreferredScrollingDirection="up" />
@@ -81,7 +124,7 @@
             android:id="@+id/uss_profile_multiplier_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/uss_vertical_spacing"
+            android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             
@@ -91,14 +134,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/uss_multiplier"
-                android:textSize="@dimen/uss_header_text_size" />
+                android:textSize="@dimen/uss_profile_header_text_size" />
         
         <com.robinhood.ticker.TickerView
                 android:id="@+id/uss_profile_multiplier_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
-                android:textSize="@dimen/uss_value_text_size"
+                android:textSize="@dimen/uss_profile_value_text_size"
                 app:ticker_animationDuration="200"
                 app:ticker_defaultCharacterList="number"
                 app:ticker_defaultPreferredScrollingDirection="up" />
@@ -117,7 +160,7 @@
             android:id="@+id/uss_profile_next_level_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/uss_vertical_spacing"
+            android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:visibility="gone"
@@ -128,14 +171,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/uss_next_level"
-                android:textSize="@dimen/uss_header_text_size" />
+                android:textSize="@dimen/uss_profile_header_text_size" />
         
         <com.robinhood.ticker.TickerView
                 android:id="@+id/uss_profile_next_level_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="@dimen/uss_value_text_size"
+                android:textSize="@dimen/uss_profile_value_text_size"
                 app:ticker_animationDuration="200"
                 app:ticker_defaultCharacterList="number"
                 app:ticker_defaultPreferredScrollingDirection="up" />

@@ -12,10 +12,9 @@ data class UserStats(
     val nextLevelScore: Int?,
     val lastNotifiedLevel: Int,
     val name: String,
-    val avatarUrl: String
+    val avatarUrl: String,
+    val title: String
 )
-
-data class User(val id: Int, val stats: UserStats)
 
 fun parseUserStats(json: JSONObject) = UserStats(
     json.getInt("score"),
@@ -24,7 +23,8 @@ fun parseUserStats(json: JSONObject) = UserStats(
     if (json.isNull("nextLevelScore")) null else json.getInt("nextLevelScore"),
     json.getInt("lastNotifiedLevel"),
     json.getString("name"),
-    json.getString("avatarUrl")
+    json.getString("avatarUrl"),
+    json.getString("title")
 )
 
 fun saveUserStats(prefs: SharedPreferences.Editor, userStats: UserStats, keyPrefix: String) {
@@ -35,6 +35,7 @@ fun saveUserStats(prefs: SharedPreferences.Editor, userStats: UserStats, keyPref
     prefs.putInt("$keyPrefix:${UserStats::lastNotifiedLevel.name}", userStats.lastNotifiedLevel)
     prefs.putString("$keyPrefix:${UserStats::name.name}", userStats.name)
     prefs.putString("$keyPrefix:${UserStats::avatarUrl.name}", userStats.avatarUrl)
+    prefs.putString("$keyPrefix:${UserStats::title.name}", userStats.title)
 }
 
 fun loadUserStats(prefs: SharedPreferences, keyPrefix: String): UserStats? {
@@ -45,7 +46,8 @@ fun loadUserStats(prefs: SharedPreferences, keyPrefix: String): UserStats? {
     val lastNotifiedLevel = prefs.getInt("$keyPrefix:${UserStats::lastNotifiedLevel.name}", -1)
     val name = prefs.getString("$keyPrefix:${UserStats::name.name}", null)
     val avatarUrl = prefs.getString("$keyPrefix:${UserStats::avatarUrl.name}", null)
-    return if (score < 0 || level < 0 || multiplier < 0 || lastNotifiedLevel < 0 || name == null || avatarUrl == null)
+    val title = prefs.getString("$keyPrefix:${UserStats::title.name}", null)
+    return if (score < 0 || level < 0 || multiplier < 0 || lastNotifiedLevel < 0 || name == null || avatarUrl == null || title == null)
         null
     else
         UserStats(
@@ -55,6 +57,7 @@ fun loadUserStats(prefs: SharedPreferences, keyPrefix: String): UserStats? {
             if (nextLevelScore < 0) null else nextLevelScore,
             lastNotifiedLevel,
             name,
-            avatarUrl
+            avatarUrl,
+            title
         )
 }

@@ -12,6 +12,7 @@ import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.robinhood.ticker.TickerView
+import com.squareup.picasso.Picasso
 
 class UserStatsProfilePage(parent: View) {
 
@@ -68,11 +69,17 @@ class UserStatsProfilePage(parent: View) {
     private val levelText = parent.findViewById<TickerView>(R.id.uss_profile_level_tv)
     private val multiplierText = parent.findViewById<TickerView>(R.id.uss_profile_multiplier_tv)
     private val nextLevelText = parent.findViewById<TickerView>(R.id.uss_profile_next_level_tv)
+    private val nameText = parent.findViewById<TextView>(R.id.uss_profile_name)
+    private val avatarImage = parent.findViewById<ImageView>(R.id.uss_profile_avatar)
+    private val titleText = parent.findViewById<TextView>(R.id.uss_profile_title)
 
-    var stats = UserStats(0, 0, 1f, null, 0, "", "")
+    var stats = UserStats(0, 0, 1f, null, 0, "", "", "")
         set(value) {
             if (value != field) {
                 field = value
+                nameText.text = value.name
+                titleText.text = value.title
+                Picasso.get().load(value.avatarUrl).into(avatarImage)
                 scoreText.text = value.score.toString()
                 levelText.text = (value.level + 1).toString()
                 multiplierText.text = value.multiplier.toString()

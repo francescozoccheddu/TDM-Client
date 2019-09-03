@@ -79,5 +79,6 @@ fun EditUserData.editUserStats(stats: UserStats, avatars: List<String>? = null) 
     stats.nextLevelScore,
     lastNotifiedLevel ?: stats.lastNotifiedLevel,
     name ?: stats.name,
-    if (avatars != null && avatar != null) avatars[avatar] else stats.avatarUrl
+    if (avatars != null && avatar != null) avatars[avatar] else stats.avatarUrl,
+    stats.title
 )

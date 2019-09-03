@@ -25,7 +25,8 @@ class UserStatsComponent(parent: ViewGroup) {
     private val fireworks = parent.findViewById<LottieAnimationView>(R.id.us_fireworks)
 
     init {
-        parent.findViewById<UserStatsSheet>(R.id.us_sheet_root).onCloseRequested = this::requestClose
+        parent.findViewById<UserStatsSheet>(R.id.us_sheet_root).onCloseRequested =
+            this::requestClose
         root.addHitRect(R.id.us_score_root)
         root.addHitRect(R.id.us_level_root)
         root.addHitRect(R.id.us_gain_root)
@@ -68,7 +69,7 @@ class UserStatsComponent(parent: ViewGroup) {
         }
 
 
-    var stats = UserStats(0, 0, 1f, null, 0, "", "")
+    var stats = UserStats(0, 0, 1f, null, 0, "", "", "")
         set(value) {
             if (value != field) {
                 val gain = value.score - field.score

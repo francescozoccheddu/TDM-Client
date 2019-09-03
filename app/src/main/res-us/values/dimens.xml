@@ -29,12 +29,14 @@
     <dimen name="us_translation_x">10dp</dimen>
     <dimen name="us_margin_top">40dp</dimen>
     
-    <dimen name="uss_header_large_text_size">24sp</dimen>
-    <dimen name="uss_value_large_text_size">64sp</dimen>
-    <dimen name="uss_header_text_size">20sp</dimen>
-    <dimen name="uss_value_text_size">48sp</dimen>
+    <dimen name="uss_profile_header_large_text_size">20sp</dimen>
+    <dimen name="uss_profile_value_large_text_size">46sp</dimen>
+    <dimen name="uss_profile_header_text_size">18sp</dimen>
+    <dimen name="uss_profile_value_text_size">34sp</dimen>
+    <dimen name="uss_profile_name_text_size">24sp</dimen>
+    <dimen name="uss_profile_avatar_size">96dp</dimen>
     <dimen name="uss_margins">16dp</dimen>
-    <dimen name="uss_vertical_spacing">8dp</dimen>
+    <dimen name="uss_profile_vertical_spacing">8dp</dimen>
     <dimen name="uss_close_size">64dp</dimen>
 
 </resources>
