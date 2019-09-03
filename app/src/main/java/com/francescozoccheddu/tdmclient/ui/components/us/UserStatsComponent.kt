@@ -25,7 +25,7 @@ class UserStatsComponent(parent: ViewGroup) {
     private val fireworks = parent.findViewById<LottieAnimationView>(R.id.us_fireworks)
 
     init {
-        parent.findViewById<UserStatsSheet>(R.id.us_sheet_root).onClose = this::requestClose
+        parent.findViewById<UserStatsSheet>(R.id.us_sheet_root).onCloseRequested = this::requestClose
         root.addHitRect(R.id.us_score_root)
         root.addHitRect(R.id.us_level_root)
         root.addHitRect(R.id.us_gain_root)
