@@ -67,10 +67,10 @@ fun EditUserService.setName(key: UserKey, name: String) =
     this.Request(EditUserData(key, name, null, null))
 
 fun EditUserService.setAvatar(key: UserKey, avatar: Int) =
-    this.Request(EditUserData(key, null, avatar, null))
+    this.Request(EditUserData(key, null, null, avatar))
 
 fun EditUserService.setLastNotifiedLevel(key: UserKey, lastNotifiedLevel: Int) =
-    this.Request(EditUserData(key, null, null, lastNotifiedLevel))
+    this.Request(EditUserData(key, null, lastNotifiedLevel, null))
 
 fun EditUserData.editUserStats(stats: UserStats, avatars: List<String>? = null) = UserStats(
     stats.score,

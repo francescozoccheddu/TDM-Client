@@ -1,6 +1,8 @@
 package com.francescozoccheddu.tdmclient.utils.data
 
 import androidx.annotation.FloatRange
+import com.francescozoccheddu.tdmclient.data.UserController
+import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import org.json.JSONArray
@@ -51,3 +53,5 @@ class RemoteValue<RequestType, ResponseType, DataType>(val service: Server.PollS
         }
     }
 }
+
+val UserController.statsOrNull: UserStats? get() = if (hasStats) stats else null

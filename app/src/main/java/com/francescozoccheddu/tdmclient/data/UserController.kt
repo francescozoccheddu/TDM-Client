@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
+import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
-import com.francescozoccheddu.tdmclient.utils.data.client.Status
 import java.util.*
 import kotlin.math.max
 
@@ -14,11 +14,14 @@ class UserController(val key: UserKey, server: Server) {
     companion object {
         val DEFAULT_PREFS_NAME = "${this::class.java.canonicalName}:userStats"
         val DEFAULT_STATS_PREF_KEY = "${this::class.java.canonicalName}:userStats"
-        const val MAX_SET_REQUESTS = 6
+        const val MAX_SET_REQUESTS = 3
+        const val MIN_NOTIFY_INTERVAL = 60f
     }
 
     private lateinit var _stats: UserStats
     private var lastNotifiedLevel: Int = 0
+    private lateinit var lastNotifySetDate: Date
+    private var lastNotifySetLevel = 0
 
     private val getService = makeUserService(server, key).apply {
         onData += {
@@ -82,7 +85,12 @@ class UserController(val key: UserKey, server: Server) {
 
     private fun setLastNotifiedLevel() {
         if (!hasStats || lastNotifiedLevel > stats.lastNotifiedLevel && lastNotifiedLevel <= stats.level) {
-            if (setService.pendingRequests.size < MAX_SET_REQUESTS)
+            if (setService.pendingRequests.size < MAX_SET_REQUESTS &&
+                lastNotifySetLevel < lastNotifiedLevel &&
+                (!this::lastNotifySetDate.isInitialized || dateElapsed(lastNotifySetDate) >= MIN_NOTIFY_INTERVAL)
+            ) {
+                lastNotifySetLevel = lastNotifiedLevel
+                lastNotifySetDate = Date()
                 setService.setLastNotifiedLevel(key, lastNotifiedLevel).apply {
                     onStatusChange += {
                         if (hasStats && it.status.succeeded)
@@ -90,6 +98,7 @@ class UserController(val key: UserKey, server: Server) {
                     }
                     start()
                 }
+            }
         }
     }
 

@@ -20,6 +20,7 @@ import com.francescozoccheddu.tdmclient.utils.data.latLng
 import com.francescozoccheddu.tdmclient.utils.data.latlng
 import com.francescozoccheddu.tdmclient.utils.data.mapboxAccessToken
 import com.francescozoccheddu.tdmclient.utils.data.point
+import com.francescozoccheddu.tdmclient.utils.data.statsOrNull
 import com.mapbox.core.constants.Constants.PRECISION_6
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Geometry
@@ -534,7 +535,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateStatsComponent() {
         userStatsComponent.enabled =
-            !searchBarComponent.visible && service?.userController?.stats != null
+            !searchBarComponent.visible && service?.userController?.hasStats == true
     }
 
     private fun onLocationChanged() {
@@ -562,9 +563,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onStatsChange() {
-        val userController = this.service?.userController
-        if (userController?.hasStats == true)
-            userStatsComponent.stats = userController.stats
+        val stats = service?.userController?.statsOrNull
+        if (stats != null)
+            userStatsComponent.stats = stats
         updateStatsComponent()
     }
 

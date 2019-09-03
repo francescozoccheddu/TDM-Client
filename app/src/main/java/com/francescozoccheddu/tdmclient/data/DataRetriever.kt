@@ -18,6 +18,10 @@ class DataRetriever(server: Server, user: UserKey) {
         private const val POI_EXPIRATION_TIME = 120f
     }
 
+    val onCoveragePointDataChange = ProcEvent()
+    val onCoverageQuadDataChange = ProcEvent()
+    val onPoiDataChange = ProcEvent()
+
     private val coveragePointService = makeCoverageService(server).apply {
         pollRequest = CoverageRetrieveMode.POINTS
         expiration = COVERAGE_EXPIRATION_TIME
@@ -44,10 +48,6 @@ class DataRetriever(server: Server, user: UserKey) {
     private val avatars = RemoteValue(makeAvatarsService(server)).apply {
         expiration = AVATARS_EXPIRATION_TIME
     }
-
-    val onCoveragePointDataChange = ProcEvent()
-    val onCoverageQuadDataChange = ProcEvent()
-    val onPoiDataChange = ProcEvent()
 
     val poiData: FeatureCollection?
         get() = if (poiService.hasData && !poiService.expired) poiService.data else null
