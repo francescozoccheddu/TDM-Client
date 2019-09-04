@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    
+    <TextView
+            android:id="@+id/uss_leaderboard_item_position"
+            style="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:ellipsize="none"
+            android:lines="1"
+            android:maxLines="1"
+            android:singleLine="true" />
+    
+    <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/uss_leaderboard_item_avatar"
+            android:layout_width="@dimen/uss_leaderboard_fst_avatar_size"
+            android:layout_height="@dimen/uss_leaderboard_nth_avatar_size"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/uss_leaderboard_item_position"
+            android:background="?selectableItemBackgroundBorderless"
+            android:padding="10dp"
+            android:src="@drawable/sb_terrain"
+            android:tintMode="multiply"
+            app:civ_border_width="0px"
+            app:civ_circle_background_color="@color/foreground" />
+    
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/uss_leaderboard_item_progress"
+            android:layout_toEndOf="@id/uss_leaderboard_item_avatar"
+            android:orientation="vertical">
+        
+        <TextView
+                android:id="@+id/uss_leaderboard_item_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textStyle="bold" />
+        
+        <TextView
+                android:id="@+id/uss_leaderboard_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+    
+    </LinearLayout>
+    
+    <LinearLayout
+            android:id="@+id/uss_leaderboard_item_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:gravity="end|center_vertical"
+            android:orientation="vertical">
+        
+        <TextView
+                android:id="@+id/uss_leaderboard_item_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        
+        <TextView
+                android:id="@+id/uss_leaderboard_item_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+    
+    </LinearLayout>
+
+</RelativeLayout>

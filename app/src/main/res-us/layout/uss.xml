@@ -4,7 +4,7 @@
         android:id="@+id/uss"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundStatsDark">
+        android:background="@color/uss_background">
     
     <ImageView
             android:layout_width="match_parent"
@@ -37,7 +37,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         
-        <include layout="@layout/uss_profile" />
+        <include
+                layout="@layout/uss_profile"
+                android:visibility="gone" />
+        
+        <include layout="@layout/uss_leaderboard" />
         
         <LinearLayout
                 android:layout_width="wrap_content"

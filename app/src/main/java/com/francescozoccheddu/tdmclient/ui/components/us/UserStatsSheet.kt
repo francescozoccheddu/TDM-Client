@@ -18,6 +18,7 @@ class UserStatsSheet @JvmOverloads constructor(
     }
 
     private val profilePage = UserStatsProfilePage(this)
+    private val leaderboardPage = UserStatsLeaderboardPage(this)
 
     private val closeButton = findViewById<InOutImageButton>(R.id.uss_close).apply {
         setOnClickListener {
@@ -41,4 +42,11 @@ class UserStatsSheet @JvmOverloads constructor(
         set(value) {
             profilePage.stats = value
         }
+
+    var leaderboard
+        get() = leaderboardPage.leaderboard
+        set(value) {
+            leaderboardPage.leaderboard = value
+        }
+
 }

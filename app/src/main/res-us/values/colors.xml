@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="backgroundStats">#E53935</color>
-    <color name="backgroundStatsDark">#D32F2F</color>
-    <color name="backgroundStatsLight">#F03E3A</color>
-    <color name="backgroundStatsLightest">#FA4440</color>
+    <color name="us_background_score">#E53935</color>
+    <color name="uss_background">#D32F2F</color>
+    <color name="us_background_level">#F03E3A</color>
+    <color name="us_background_gain">#FA4440</color>
 </resources>

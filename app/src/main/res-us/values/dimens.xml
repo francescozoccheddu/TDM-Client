@@ -38,5 +38,17 @@
     <dimen name="uss_margins">16dp</dimen>
     <dimen name="uss_profile_vertical_spacing">8dp</dimen>
     <dimen name="uss_close_size">64dp</dimen>
+    
+    <dimen name="uss_leaderboard_fst_avatar_size">80dp</dimen>
+    <dimen name="uss_leaderboard_snd_avatar_size">70dp</dimen>
+    <dimen name="uss_leaderboard_trd_avatar_size">65dp</dimen>
+    <dimen name="uss_leaderboard_nth_avatar_size">55dp</dimen>
+    
+    <dimen name="uss_leaderboard_fst_body_size">9.5sp</dimen>
+    <dimen name="uss_leaderboard_snd_body_size">8.5sp</dimen>
+    <dimen name="uss_leaderboard_trd_body_size">8sp</dimen>
+    <dimen name="uss_leaderboard_nth_body_size">7sp</dimen>
+    
+    <dimen name="uss_leaderboard_subtitle_size">6sp</dimen>
 
 </resources>

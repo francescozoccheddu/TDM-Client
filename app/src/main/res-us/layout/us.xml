@@ -33,7 +33,7 @@
             android:id="@+id/us_sheet_root"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@color/backgroundStatsDark"
+            android:background="@color/uss_background"
             android:elevation="@dimen/us_sheet_elevation"
     />
     
