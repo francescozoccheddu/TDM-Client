@@ -555,7 +555,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun onLocatableChange() {
         updateRouting()
-        searchBarComponent.enabled = service?.locatable == true
     }
 
     private fun onOnlineChange() {

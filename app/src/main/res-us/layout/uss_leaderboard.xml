@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/uss_leaderboard_list"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fadingEdge="vertical"
-        android:fadingEdgeLength="@dimen/uss_leaderboard_fading_edge_size"
-        android:requiresFadingEdge="vertical"
-        android:padding="@dimen/uss_margins"
-        />
+        android:layout_height="match_parent">
+    
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/uss_leaderboard_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadingEdge="vertical"
+            android:fadingEdgeLength="@dimen/uss_leaderboard_fading_edge_size"
+            android:padding="@dimen/uss_margins"
+            android:requiresFadingEdge="vertical" />
+    
+    <LinearLayout
+            android:id="@+id/uss_leaderboard_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+        
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:indeterminateOnly="true" />
+        
+        <TextView
+                style="@style/TextAppearance.MaterialComponents.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/uss_leaderboard_loading" />
+    
+    </LinearLayout>
 
+</FrameLayout>

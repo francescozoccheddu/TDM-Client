@@ -11,6 +11,7 @@ import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.Leaderboard
 import com.francescozoccheddu.tdmclient.data.LeaderboardPosition
 import com.francescozoccheddu.tdmclient.utils.android.getStyledString
+import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.squareup.picasso.Picasso
 import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator
 import me.everything.android.ui.overscroll.adapters.RecyclerViewOverScrollDecorAdapter
@@ -35,6 +36,7 @@ class UserStatsLeaderboardPage(parent: View) {
                 viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_score)
             private val tvPosition =
                 viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_position)
+
 
             fun bind(position: LeaderboardPosition) {
                 tvLevel.text =
@@ -117,11 +119,14 @@ class UserStatsLeaderboardPage(parent: View) {
             }
     }
 
+    private val loading = parent.findViewById<View>(R.id.uss_leaderboard_loading)
+
     var leaderboard: Leaderboard = emptyList()
         set(value) {
             if (value != field) {
                 field = value
                 listAdapter.setList(value)
+                loading.visible = value.isEmpty()
             }
         }
 

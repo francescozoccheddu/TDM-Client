@@ -27,4 +27,5 @@
     <string name="uss_leaderboard_page">Classifica</string>
     <string name="uss_leaderboard_score">%1$d&lt;small>pt&lt;/small></string>
     <string name="uss_leaderboard_level">&lt;small>lv&lt;/small>%1$d</string>
+    <string name="uss_leaderboard_loading">Caricamento in corso</string>
 </resources>
