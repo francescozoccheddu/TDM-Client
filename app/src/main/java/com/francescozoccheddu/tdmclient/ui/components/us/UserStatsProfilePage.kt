@@ -11,6 +11,9 @@ import com.francescozoccheddu.tdmclient.utils.android.getStyledString
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.robinhood.ticker.TickerView
 import com.squareup.picasso.Picasso
+import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator
+import me.everything.android.ui.overscroll.adapters.RecyclerViewOverScrollDecorAdapter
+import me.everything.android.ui.overscroll.adapters.ScrollViewOverScrollDecorAdapter
 
 class UserStatsProfilePage(parent: View) {
 
@@ -30,7 +33,12 @@ class UserStatsProfilePage(parent: View) {
         nextLevelRoot = parent.findViewById<View>(R.id.uss_profile_next_level_root).apply {
             setOnClickListener { toggleHelp(nextLevelHelp) }
         }
-
+        VerticalOverScrollBounceEffectDecorator(
+            ScrollViewOverScrollDecorAdapter(parent.findViewById(R.id.uss_profile_scroll)),
+            VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_FWD * 2f,
+            VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_BCK * 2f,
+            VerticalOverScrollBounceEffectDecorator.DEFAULT_DECELERATE_FACTOR
+        )
     }
 
     private val scoreHelp = parent.findViewById<TextView>(R.id.uss_profile_score_help)

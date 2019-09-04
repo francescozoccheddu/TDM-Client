@@ -57,6 +57,6 @@
     <dimen name="uss_leaderboard_subtitle_size">6sp</dimen>
     <dimen name="uss_leaderboard_position_size">12sp</dimen>
     <dimen name="uss_leaderboard_position_width">20sp</dimen>
-    <dimen name="uss_leaderboard_fading_edge_size">60dp</dimen>
+    <dimen name="uss_fading_edge_size">60dp</dimen>
 
 </resources>

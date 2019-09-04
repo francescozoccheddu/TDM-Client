@@ -8,7 +8,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fadingEdge="vertical"
-            android:fadingEdgeLength="@dimen/uss_leaderboard_fading_edge_size"
+            android:fadingEdgeLength="@dimen/uss_fading_edge_size"
             android:padding="@dimen/uss_margins"
             android:requiresFadingEdge="vertical" />
     
@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:alpha="0.75"
             android:gravity="center"
             android:orientation="vertical">
         
@@ -30,7 +31,7 @@
                 style="@style/TextAppearance.MaterialComponents.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="4dp"
                 android:text="@string/uss_leaderboard_loading" />
     
     </LinearLayout>
