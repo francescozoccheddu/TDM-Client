@@ -18,7 +18,7 @@
             android:orientation="vertical"
             android:padding="@dimen/uss_margins">
         
-        <LinearLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
@@ -29,9 +29,10 @@
                     android:id="@+id/uss_profile_avatar"
                     android:layout_width="@dimen/uss_profile_avatar_size"
                     android:layout_height="@dimen/uss_profile_avatar_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
                     android:background="?selectableItemBackgroundBorderless"
                     android:padding="@dimen/uss_profile_avatar_padding"
-                    android:src="@drawable/sb_terrain"
                     android:tintMode="multiply"
                     app:civ_border_width="0px"
                     app:civ_circle_background_color="@color/foreground" />
@@ -39,7 +40,10 @@
             <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
+                    android:layout_toStartOf="@id/uss_profile_edit"
+                    android:layout_toEndOf="@id/uss_profile_avatar"
                     android:orientation="vertical">
                 
                 <TextView
@@ -47,7 +51,7 @@
                         style="@style/TextAppearance.MaterialComponents.Body2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Aldo cazzi"
+                        android:text=""
                         android:textSize="@dimen/uss_profile_name_text_size"
                         android:textStyle="bold" />
                 
@@ -56,10 +60,20 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="22° in classifica" />
+                        android:text="" />
             
             </LinearLayout>
-        </LinearLayout>
+            
+            <ImageButton
+                    android:id="@+id/uss_profile_edit"
+                    android:layout_width="@dimen/uss_button_size"
+                    android:layout_height="@dimen/uss_button_size"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:src="@drawable/us_edit" />
+        
+        </RelativeLayout>
         
         <LinearLayout
                 android:id="@+id/uss_profile_score_root"

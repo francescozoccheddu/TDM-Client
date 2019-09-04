@@ -24,7 +24,6 @@
             android:layout_toEndOf="@id/uss_leaderboard_item_position"
             android:background="?selectableItemBackgroundBorderless"
             android:padding="10dp"
-            android:src="@drawable/sb_terrain"
             android:tintMode="multiply"
             app:civ_border_width="0px"
             app:civ_circle_background_color="@color/foreground" />

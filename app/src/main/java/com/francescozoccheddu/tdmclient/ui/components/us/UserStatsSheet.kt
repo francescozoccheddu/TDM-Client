@@ -1,5 +1,6 @@
 package com.francescozoccheddu.tdmclient.ui.components.us
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.Drawable
@@ -33,34 +34,36 @@ class UserStatsSheet @JvmOverloads constructor(
 
     class LeaderboardPageFragment : Fragment() {
 
-        lateinit var sheet: UserStatsSheet
-
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-        ): View {
-            val root = inflater.inflate(R.layout.uss_leaderboard, container, false)
-            sheet.leaderboardPage = UserStatsLeaderboardPage(root)
+        ) = inflater.inflate(R.layout.uss_leaderboard, container, false)
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            val sheet = (context as Activity).findViewById<UserStatsSheet>(R.id.us_sheet_root)
+            sheet.leaderboardPage = UserStatsLeaderboardPage(view)
             sheet.leaderboardPage.leaderboard = sheet.leaderboard
-            return root
         }
+
     }
 
     class ProfilePageFragment : Fragment() {
 
-        lateinit var sheet: UserStatsSheet
-
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-        ): View {
-            val root = inflater.inflate(R.layout.uss_profile, container, false)
-            sheet.profilePage = UserStatsProfilePage(root)
+        ) = inflater.inflate(R.layout.uss_profile, container, false)
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            val sheet = (context as Activity).findViewById<UserStatsSheet>(R.id.us_sheet_root)
+            sheet.profilePage = UserStatsProfilePage(view)
             sheet.profilePage.stats = sheet.stats
-            return root
         }
+
     }
 
     private inner class PagerAdapter(fm: FragmentManager) :
@@ -68,8 +71,8 @@ class UserStatsSheet @JvmOverloads constructor(
         override fun getCount(): Int = 2
 
         override fun getItem(position: Int): Fragment = when (position) {
-            0 -> ProfilePageFragment().apply { sheet = this@UserStatsSheet }
-            1 -> LeaderboardPageFragment().apply { sheet = this@UserStatsSheet }
+            0 -> ProfilePageFragment()
+            1 -> LeaderboardPageFragment()
             else -> throw IllegalArgumentException()
         }
 

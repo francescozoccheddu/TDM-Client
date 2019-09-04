@@ -2,7 +2,6 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/uss"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/uss_background">
@@ -53,8 +52,8 @@
             
             <com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
                     android:id="@+id/uss_close"
-                    android:layout_width="@dimen/uss_top_bar_size"
-                    android:layout_height="@dimen/uss_top_bar_size"
+                    android:layout_width="@dimen/uss_button_size"
+                    android:layout_height="@dimen/uss_button_size"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:background="?selectableItemBackgroundBorderless"

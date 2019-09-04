@@ -1,51 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.francescozoccheddu.tdmclient.utils.android.OverlayMotionLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<com.francescozoccheddu.tdmclient.utils.android.OverlayMotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/us_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutDescription="@xml/us_motion"
->
+        app:layoutDescription="@xml/us_motion">
     
     <View
             android:id="@+id/us_scrim"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/scrim"
             android:alpha="0"
-    />
-    
-
+            android:background="@color/scrim" />
     
     <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/us_fireworks"
             android:layout_width="@dimen/us_firework_size"
             android:layout_height="@dimen/us_firework_size"
-            app:lottie_rawRes="@raw/fireworks"
-            app:lottie_loop="false"
-            app:lottie_autoPlay="false"
             android:elevation="@dimen/us_firework_elevation"
             android:outlineProvider="none"
-    />
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false"
+            app:lottie_rawRes="@raw/fireworks" />
     
     <com.francescozoccheddu.tdmclient.ui.components.us.UserStatsSheet
             android:id="@+id/us_sheet_root"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@color/uss_background"
-            android:elevation="@dimen/us_sheet_elevation"
-    />
+            android:elevation="@dimen/us_sheet_elevation" />
     
     <FrameLayout
             android:id="@+id/us_gain_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clipChildren="true"
-            android:clipToPadding="true"
-    >
+            android:clipToPadding="true">
         
-        <include layout="@layout/us_gain"/>
+        <include layout="@layout/us_gain" />
     
     </FrameLayout>
     
@@ -53,34 +45,31 @@
             android:id="@+id/us_score_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2586 pt"
-            android:textSize="@dimen/us_score_text_size"
             android:background="@drawable/us_bg_score"
             android:elevation="@dimen/us_score_elevation"
-            android:orientation="horizontal"
             android:gravity="left|bottom"
-    >
+            android:orientation="horizontal"
+            android:text="2586 pt"
+            android:textSize="@dimen/us_score_text_size">
         
         <com.robinhood.ticker.TickerView
                 android:id="@+id/us_score_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/us_level_text_size"
-                android:text="0"
-                android:layout_marginRight="1sp"
                 android:layout_marginLeft="1sp"
-                app:ticker_defaultPreferredScrollingDirection="up"
-                app:ticker_defaultCharacterList="number"
+                android:layout_marginRight="1sp"
+                android:text="0"
+                android:textSize="@dimen/us_level_text_size"
                 app:ticker_animationDuration="200"
-        />
+                app:ticker_defaultCharacterList="number"
+                app:ticker_defaultPreferredScrollingDirection="up" />
         
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="pt"
                 android:alpha="0.8"
-                android:textSize="@dimen/us_score_text_size_extra"
-        />
+                android:text="pt"
+                android:textSize="@dimen/us_score_text_size_extra" />
     
     </LinearLayout>
     
@@ -88,36 +77,33 @@
             android:id="@+id/us_level_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="lv 3"
-            android:transformPivotY="0px"
-            android:textSize="@dimen/us_level_text_size"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/us_bg_level"
             android:elevation="@dimen/us_level_elevation"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal"
             android:gravity="left|bottom"
-    >
+            android:orientation="horizontal"
+            android:text="lv 3"
+            android:textSize="@dimen/us_level_text_size"
+            android:transformPivotY="0px">
         
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="lv"
-                android:textSize="@dimen/us_level_text_size_extra"
-                android:layout_marginRight="1sp"
                 android:layout_marginLeft="1sp"
+                android:layout_marginRight="1sp"
                 android:alpha="0.8"
-        />
+                android:text="lv"
+                android:textSize="@dimen/us_level_text_size_extra" />
         
         <com.robinhood.ticker.TickerView
                 android:id="@+id/us_level_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/us_level_text_size"
                 android:text="1"
-                app:ticker_defaultPreferredScrollingDirection="up"
-                app:ticker_defaultCharacterList="number"
+                android:textSize="@dimen/us_level_text_size"
                 app:ticker_animationDuration="200"
-        />
+                app:ticker_defaultCharacterList="number"
+                app:ticker_defaultPreferredScrollingDirection="up" />
     
     </LinearLayout>
 

@@ -40,7 +40,7 @@
     <dimen name="uss_profile_avatar_padding">8dp</dimen>
     <dimen name="uss_profile_stats_padding">4dp</dimen>
     <dimen name="uss_profile_vertical_spacing">8dp</dimen>
-    <dimen name="uss_top_bar_size">32dp</dimen>
+    <dimen name="uss_button_size">32dp</dimen>
     <dimen name="uss_tabs_radius">14dp</dimen>
     <dimen name="uss_tabs_height">28dp</dimen>
     
