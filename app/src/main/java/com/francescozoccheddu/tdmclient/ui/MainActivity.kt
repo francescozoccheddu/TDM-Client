@@ -143,17 +143,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        userStatsComponent = UserStatsComponent(us_root).apply {
-            onLeaderboardRequested += {
-                service?.dataRetriever?.getLeaderboard {
-                    if (it != null)
-                        leaderboard = it
-                }
-            }
-            onUserStatsRequested += {
-                service?.userController?.requestStatsUpdate()
-            }
-        }
+        userStatsComponent = UserStatsComponent(us_root)
 
         routingController = RoutingController(bg_root, this).apply {
             onDestinationChanged += {
@@ -623,7 +613,6 @@ class MainActivity : AppCompatActivity() {
                     onCoverageQuadDataChange()
                     onPoiDataChange()
                 }
-                routingController.service = value
                 updateRouting()
             }
         }
@@ -635,7 +624,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
-            service = (binder as MainService.Binding).service
+            service = MainService.instance
         }
 
     }

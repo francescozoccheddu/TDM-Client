@@ -81,12 +81,12 @@ class MainService : Service() {
                 ServiceNotification.notifySensorConnectionLost(context)
         }
 
+        var instance: MainService? = null
+            private set
+
     }
 
-
-    inner class Binding : Binder() {
-        val service get() = this@MainService
-    }
+    inner class Binding : Binder()
 
     val onLocationChange = ProcEvent()
     val onLocatableChange = ProcEvent()
@@ -273,11 +273,12 @@ class MainService : Service() {
             userController.requestStatsUpdate()
         }
 
+        instance = this
+
         if (!PermissionsManager.areLocationPermissionsGranted(this)) {
             Log.e(this::class.java.name, "Location access permissions are not granted")
             stopSelf()
         }
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -325,6 +326,8 @@ class MainService : Service() {
         sensorDriver.pushing = false
         server.cancelAll()
         userController.saveStats(this)
+        if (instance == this)
+            instance = null
     }
 
 }

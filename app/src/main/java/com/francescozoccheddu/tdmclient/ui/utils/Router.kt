@@ -8,9 +8,7 @@ import com.francescozoccheddu.tdmclient.utils.data.latlng
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.mapboxsdk.geometry.LatLng
 
-class Router(private val context : Context) {
-
-    var service: MainService? = null
+class Router(private val context: Context) {
 
     var running = false
         private set
@@ -22,7 +20,7 @@ class Router(private val context : Context) {
 
     fun request(to: LatLng?, time: Float) {
         cancel()
-        val service = this.service ?: throw IllegalStateException("'${this::service.name}' is null")
+        val service = MainService.instance ?: throw IllegalStateException("No service")
         running = true
         spotRequest = service.requestRoute(to, time).apply {
             attachedRequest = this
@@ -33,7 +31,7 @@ class Router(private val context : Context) {
                         getDirections(context, req.response, to != null) {
                             if (running && this@Router.attachedRequest == this) {
                                 running = false
-                                onResult?.invoke(to?: req.response.last().latlng, it)
+                                onResult?.invoke(to ?: req.response.last().latlng, it)
                             }
                         }
                     else if (running) {

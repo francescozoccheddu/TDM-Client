@@ -3,6 +3,7 @@ package com.francescozoccheddu.tdmclient.ui.components.bg
 import android.content.Context
 import android.view.ViewGroup
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
+import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.ui.utils.Router
 import com.francescozoccheddu.tdmclient.utils.android.Timer
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
@@ -12,7 +13,6 @@ import com.francescozoccheddu.tdmclient.utils.data.point
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.services.android.navigation.R
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress
 import com.mapbox.services.android.navigation.v5.utils.ManeuverUtils
 import kotlin.math.roundToInt
@@ -49,6 +49,7 @@ class RoutingController(parent: ViewGroup, private val context: Context) {
         ui.onConfirmRouting = {
             pickingDestination = false
             ui.state = BottomGroupController.State.ROUTING
+            val service = MainService?.instance
             if (service != null)
                 router.request(destination, ui.time * 60f)
             else
@@ -67,7 +68,7 @@ class RoutingController(parent: ViewGroup, private val context: Context) {
             ui.state = BottomGroupController.State.IDLE
         }
         ui.onDestinationConfirmed = {
-            val a = this.service?.location?.latLng
+            val a = MainService.instance?.location?.latLng
             val b = this.destination
             if (a != null && b != null)
                 ui.minTime = travelDuration(a.distanceTo(b).toFloat()) / 60f
@@ -173,13 +174,6 @@ class RoutingController(parent: ViewGroup, private val context: Context) {
     val onDestinationChanged = ProcEvent()
     val onRouteChanged = ProcEvent()
     val onRouteCompleted = ProcEvent()
-
-    var service
-        get() = router.service
-        set(value) {
-            router.service = value
-            R.drawable.ic_maneuver_arrive
-        }
 
     enum class Problem {
         OFFLINE, UNLOCATABLE, LOCATING, PERMISSIONS_UNGRANTED, OUTSIDE_AREA, UNBOUND

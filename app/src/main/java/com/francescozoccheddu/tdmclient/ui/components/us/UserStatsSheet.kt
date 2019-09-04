@@ -19,8 +19,8 @@ import androidx.viewpager.widget.ViewPager
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.Leaderboard
 import com.francescozoccheddu.tdmclient.data.UserStats
+import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
-import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.commons.event
 import com.francescozoccheddu.tdmclient.utils.commons.invoke
 import com.google.android.material.tabs.TabLayout
@@ -107,8 +107,8 @@ class UserStatsSheet @JvmOverloads constructor(
 
                 override fun onPageSelected(position: Int) {
                     when (position) {
-                        0 -> onUserStatsRequested()
-                        1 -> onLeaderboardRequested()
+                        0 -> requestUserStats()
+                        1 -> requestLeaderboard()
                     }
                 }
 
@@ -140,17 +140,28 @@ class UserStatsSheet @JvmOverloads constructor(
 
     fun onOpened() {
         closeButton.show()
-        onUserStatsRequested()
-        onLeaderboardRequested()
+        requestLeaderboard()
+        requestUserStats()
+    }
+
+    private fun requestLeaderboard() {
+        MainService.instance?.dataRetriever?.getLeaderboard {
+            if (it != null)
+                leaderboard = it
+        }
+    }
+
+    private fun requestUserStats() {
+        MainService.instance?.userController?.requestStatsUpdate {
+            if (it != null)
+                stats = it
+        }
     }
 
     fun onClosed() {
-        profilePage.hideHelp()
+        profilePage.abortAll()
         closeButton.hide()
     }
-
-    val onUserStatsRequested = ProcEvent()
-    val onLeaderboardRequested = ProcEvent()
 
     var stats = UserStats(0, 0, 1f, null, 0, "", "", "")
         set(value) {
@@ -159,7 +170,7 @@ class UserStatsSheet @JvmOverloads constructor(
                 profilePage.stats = value
         }
 
-    var leaderboard: Leaderboard = emptyList()
+    private var leaderboard: Leaderboard = emptyList()
         set(value) {
             field = value
             if (this::leaderboardPage.isInitialized)

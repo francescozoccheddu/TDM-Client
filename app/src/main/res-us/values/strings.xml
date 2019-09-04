@@ -28,4 +28,6 @@
     <string name="uss_leaderboard_score">%1$d&lt;small>pt&lt;/small></string>
     <string name="uss_leaderboard_level">&lt;small>lv&lt;/small>%1$d</string>
     <string name="uss_leaderboard_loading">Caricamento in corso</string>
+    <string name="uss_profile_name_profanity">Il nome non può contenere parole offensive o volgari.</string>
+    <string name="uss_profile_name_failure">Errore di rete.</string>
 </resources>

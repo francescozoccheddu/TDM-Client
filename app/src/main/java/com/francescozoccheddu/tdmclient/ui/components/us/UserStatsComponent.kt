@@ -104,14 +104,4 @@ class UserStatsComponent(parent: ViewGroup) {
             .burst(300)
     }
 
-    var leaderboard
-        get() = sheet.leaderboard
-        set(value) {
-            sheet.leaderboard = value
-        }
-
-    val onLeaderboardRequested = sheet.onLeaderboardRequested
-
-    val onUserStatsRequested = sheet.onUserStatsRequested
-
 }

@@ -19,6 +19,7 @@
             android:padding="@dimen/uss_margins">
         
         <RelativeLayout
+                android:id="@+id/uss_profile_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
@@ -38,10 +39,12 @@
                     app:civ_circle_background_color="@color/foreground" />
             
             <LinearLayout
+                    android:id="@+id/uss_profile_name_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="@dimen/uss_profile_name_margin"
+                    android:layout_marginEnd="@dimen/uss_profile_name_margin"
                     android:layout_toStartOf="@id/uss_profile_edit"
                     android:layout_toEndOf="@id/uss_profile_avatar"
                     android:orientation="vertical">
@@ -63,6 +66,18 @@
                         android:text="" />
             
             </LinearLayout>
+            
+            <EditText
+                    android:id="@+id/uss_profile_name_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/uss_profile_name_margin"
+                    android:layout_marginEnd="@dimen/uss_profile_name_margin"
+                    android:layout_toStartOf="@id/uss_profile_edit"
+                    android:layout_toEndOf="@id/uss_profile_avatar"
+                    android:singleLine="true"
+                    android:visibility="gone" />
             
             <ImageButton
                     android:id="@+id/uss_profile_edit"
