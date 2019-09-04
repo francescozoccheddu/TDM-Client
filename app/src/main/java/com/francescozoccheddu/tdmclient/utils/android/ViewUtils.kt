@@ -16,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.setMargins
@@ -73,11 +74,14 @@ fun Snackbar.setBackgroundColor(color: Int) = this.apply { view.setBackgroundCol
 
 fun Snackbar.setBackgroundColorRes(color: Int) = this.apply { view.setBackgroundColorRes(color) }
 
-fun Snackbar.setTextColorRes(color: Int) = textView.setTextColor(ContextCompat.getColor(context, color))
+fun Snackbar.setTextColorRes(color: Int) =
+    textView.setTextColor(ContextCompat.getColor(context, color))
 
-fun Snackbar.setActionTextColorRes(color: Int) = setActionTextColor(ContextCompat.getColor(context, color))
+fun Snackbar.setActionTextColorRes(color: Int) =
+    setActionTextColor(ContextCompat.getColor(context, color))
 
-fun View.setPaddingRes(dimens: Int) = setPadding(context.resources.getDimension(dimens).roundToInt())
+fun View.setPaddingRes(dimens: Int) =
+    setPadding(context.resources.getDimension(dimens).roundToInt())
 
 fun getNavigationBarHeight(context: Context): Int {
     val resources = context.resources
@@ -119,4 +123,12 @@ fun hsv(
         this[2] = value
     })
 
-val Float.dp get() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, Resources.getSystem().displayMetrics)
+val Float.dp
+    get() = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        this,
+        Resources.getSystem().displayMetrics
+    )
+
+fun Resources.getStyledString(resId: Int, vararg format: Any) =
+    HtmlCompat.fromHtml(getString(resId, *format), HtmlCompat.FROM_HTML_MODE_LEGACY)

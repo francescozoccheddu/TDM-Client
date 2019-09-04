@@ -7,8 +7,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.Leaderboard
 import com.francescozoccheddu.tdmclient.data.LeaderboardPosition
+import com.francescozoccheddu.tdmclient.utils.android.getStyledString
 import com.squareup.picasso.Picasso
 import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator
 import me.everything.android.ui.overscroll.adapters.RecyclerViewOverScrollDecorAdapter
@@ -22,23 +24,31 @@ class UserStatsLeaderboardPage(parent: View) {
         private inner class ViewHolder(viewGroup: ViewGroup) : RecyclerView.ViewHolder(viewGroup) {
 
             private val tvName =
-                viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.uss_leaderboard_item_name)
+                viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_name)
             private val ivAvatar =
-                viewGroup.findViewById<ImageView>(com.francescozoccheddu.tdmclient.R.id.uss_leaderboard_item_avatar)
+                viewGroup.findViewById<ImageView>(R.id.uss_leaderboard_item_avatar)
             private val tvTitle =
-                viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.uss_leaderboard_item_title)
+                viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_title)
             private val tvLevel =
-                viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.uss_leaderboard_item_level)
+                viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_level)
             private val tvScore =
-                viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.uss_leaderboard_item_score)
+                viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_score)
             private val tvPosition =
-                viewGroup.findViewById<TextView>(com.francescozoccheddu.tdmclient.R.id.uss_leaderboard_item_position)
+                viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_position)
 
             fun bind(position: LeaderboardPosition) {
-                tvLevel.text = "lv ${position.level + 1}"
+                tvLevel.text =
+                    tvLevel.resources.getStyledString(
+                        R.string.uss_leaderboard_level,
+                        position.level + 1
+                    )
                 tvTitle.text = position.title
                 tvName.text = position.name
-                tvScore.text = "${position.score}pt"
+                tvScore.text =
+                    tvScore.resources.getStyledString(
+                        R.string.uss_leaderboard_score,
+                        position.score
+                    )
                 Picasso.get().load(position.avatarUrl).into(ivAvatar)
                 val position = adapterPosition
                 tvPosition.text = "${position + 1}°"
@@ -78,7 +88,7 @@ class UserStatsLeaderboardPage(parent: View) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(
-                com.francescozoccheddu.tdmclient.R.layout.uss_leaderboard_item, parent, false
+                R.layout.uss_leaderboard_item, parent, false
             ) as ViewGroup
             return ViewHolder(view)
         }
@@ -94,7 +104,7 @@ class UserStatsLeaderboardPage(parent: View) {
     private val listAdapter = PositionListAdapter()
 
     init {
-        parent.findViewById<RecyclerView>(com.francescozoccheddu.tdmclient.R.id.uss_leaderboard_list)
+        parent.findViewById<RecyclerView>(R.id.uss_leaderboard_list)
             .apply {
                 layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 adapter = listAdapter

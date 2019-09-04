@@ -1,15 +1,13 @@
 package com.francescozoccheddu.tdmclient.ui.components.us
 
 import android.animation.LayoutTransition
-import android.graphics.drawable.Animatable2
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.text.HtmlCompat
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.UserStats
+import com.francescozoccheddu.tdmclient.utils.android.getStyledString
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.robinhood.ticker.TickerView
 import com.squareup.picasso.Picasso
@@ -78,13 +76,10 @@ class UserStatsProfilePage(parent: View) {
                 nextLevelRoot.visible = nextLevelScore != null
                 if (nextLevelScore != null) {
                     nextLevelText.text = nextLevelScore.toString()
-                    nextLevelHelp.text = HtmlCompat.fromHtml(
-                        nextLevelHelp.resources.getString(
-                            R.string.uss_next_level_help,
-                            nextLevelScore - value.score,
-                            value.level + 2
-                        ),
-                        HtmlCompat.FROM_HTML_MODE_LEGACY
+                    nextLevelHelp.text = nextLevelHelp.resources.getStyledString(
+                        R.string.uss_next_level_help,
+                        nextLevelScore - value.score,
+                        value.level + 2
                     )
                 }
                 else
