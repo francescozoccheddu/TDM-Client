@@ -9,7 +9,8 @@
             android:layout_height="match_parent"
             android:fadingEdge="vertical"
             android:fadingEdgeLength="@dimen/uss_fading_edge_size"
-            android:padding="@dimen/uss_margins"
+            android:paddingTop="@dimen/uss_margins"
+            android:paddingBottom="@dimen/uss_margins"
             android:requiresFadingEdge="vertical" />
     
     <LinearLayout

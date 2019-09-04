@@ -5,11 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.Leaderboard
 import com.francescozoccheddu.tdmclient.data.LeaderboardPosition
+import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.android.getStyledString
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.squareup.picasso.Picasso
@@ -36,9 +38,27 @@ class UserStatsLeaderboardPage(parent: View) {
                 viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_score)
             private val tvPosition =
                 viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_position)
+            private val vgRoot =
+                viewGroup.findViewById<ViewGroup>(R.id.uss_leaderboard_item_root)
 
 
             fun bind(position: LeaderboardPosition) {
+                val itsMe = position.id == MainService.instance?.userController?.key?.id
+                if (itsMe)
+                    vgRoot.setBackgroundResource(R.drawable.uss_bg_leaderboard)
+                else
+                    vgRoot.background = null
+                val color = ContextCompat.getColor(
+                    tvName.context,
+                    if (itsMe) R.color.uss_background_overlay else R.color.foreground
+                )
+                vgRoot.elevation =
+                    if (itsMe) vgRoot.resources.getDimension(R.dimen.uss_leaderboard_elevation) else 0f
+                tvPosition.setTextColor(color)
+                tvName.setTextColor(color)
+                tvTitle.setTextColor(color)
+                tvScore.setTextColor(color)
+                tvLevel.setTextColor(color)
                 tvLevel.text =
                     tvLevel.resources.getStyledString(
                         R.string.uss_leaderboard_level,

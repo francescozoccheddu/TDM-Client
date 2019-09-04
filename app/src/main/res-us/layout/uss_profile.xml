@@ -76,12 +76,16 @@
                     android:layout_marginEnd="@dimen/uss_profile_name_margin"
                     android:layout_toStartOf="@id/uss_profile_edit"
                     android:layout_toEndOf="@id/uss_profile_avatar"
+                    android:foregroundGravity="center"
+                    android:gravity="center"
                     android:visibility="gone">
                 
                 <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/uss_profile_name_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="start|center_vertical"
                         android:singleLine="true" />
             
             </com.google.android.material.textfield.TextInputLayout>

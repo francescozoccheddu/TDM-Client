@@ -2,8 +2,13 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/uss_leaderboard_item_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/uss_leaderboard_margins"
+        android:layout_marginEnd="@dimen/uss_leaderboard_margins"
+        android:paddingStart="@dimen/uss_leaderboard_padding"
+        android:paddingEnd="@dimen/uss_leaderboard_padding">
     
     <TextView
             android:id="@+id/uss_leaderboard_item_position"

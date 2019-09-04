@@ -57,7 +57,10 @@
     
     <dimen name="uss_leaderboard_subtitle_size">6sp</dimen>
     <dimen name="uss_leaderboard_position_size">12sp</dimen>
-    <dimen name="uss_leaderboard_position_width">20sp</dimen>
+    <dimen name="uss_leaderboard_position_width">16sp</dimen>
+    <dimen name="uss_leaderboard_padding">12dp</dimen>
+    <dimen name="uss_leaderboard_margins">10dp</dimen>
+    <dimen name="uss_leaderboard_elevation">4dp</dimen>
     <dimen name="uss_fading_edge_size">60dp</dimen>
 
 </resources>
