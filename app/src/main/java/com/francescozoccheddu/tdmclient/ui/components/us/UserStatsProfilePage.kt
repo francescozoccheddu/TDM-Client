@@ -32,16 +32,7 @@ class UserStatsProfilePage(parent: View) {
         nextLevelRoot = parent.findViewById<View>(R.id.uss_profile_next_level_root).apply {
             setOnClickListener { toggleHelp(nextLevelHelp) }
         }
-        (parent.findViewById<ImageView>(R.id.uss_coins).drawable as Animatable2).apply {
-            start()
-            registerAnimationCallback(object : Animatable2.AnimationCallback() {
 
-                override fun onAnimationEnd(drawable: Drawable?) {
-                    start()
-                }
-
-            })
-        }
     }
 
     private val scoreHelp = parent.findViewById<TextView>(R.id.uss_profile_score_help)

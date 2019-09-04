@@ -20,8 +20,10 @@ data class LeaderboardPosition(
     val level: Int
 )
 
+typealias Leaderboard = List<LeaderboardPosition>
+
 private val INTERPRETER =
-    PollInterpreter.from(object : SimpleInterpreter<Int, List<LeaderboardPosition>>() {
+    PollInterpreter.from(object : SimpleInterpreter<Int, Leaderboard>() {
 
         override fun interpretRequest(request: Int) = JSONObject().apply { put("size", request) }
 
@@ -47,7 +49,7 @@ private val INTERPRETER =
 
     })
 
-typealias LeaderboardService = Server.PollService<Int, List<LeaderboardPosition>, List<LeaderboardPosition>>
+typealias LeaderboardService = Server.PollService<Int, Leaderboard, Leaderboard>
 
 fun makeLeaderboardService(server: Server, size: Int = 10): LeaderboardService =
     server.PollService(

@@ -68,7 +68,7 @@ class DataRetriever(server: Server, user: UserKey) {
         avatars.get(forceUpdate, callback)
     }
 
-    fun getLeaderboard(forceUpdate: Boolean = false, callback: (List<LeaderboardPosition>?) -> Unit) {
+    fun getLeaderboard(forceUpdate: Boolean = false, callback: (Leaderboard?) -> Unit) {
         leaderboard.get(forceUpdate, callback)
     }
 

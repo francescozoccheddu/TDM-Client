@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.francescozoccheddu.tdmclient.data.Leaderboard
 import com.francescozoccheddu.tdmclient.data.LeaderboardPosition
 import com.squareup.picasso.Picasso
 import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator
@@ -106,7 +107,7 @@ class UserStatsLeaderboardPage(parent: View) {
             }
     }
 
-    var leaderboard: List<LeaderboardPosition> = emptyList()
+    var leaderboard: Leaderboard = emptyList()
         set(value) {
             if (value != field) {
                 field = value

@@ -21,60 +21,82 @@
             android:src="@drawable/us_coins"
             android:tintMode="multiply" />
     
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/uss_margins">
+            android:layout_height="match_parent">
         
-        <com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
-                android:id="@+id/uss_close"
-                android:layout_width="@dimen/uss_close_size"
-                android:layout_height="@dimen/uss_close_size"
-                android:background="?selectableItemBackgroundBorderless"
-                android:scaleType="fitXY"
-                android:src="@drawable/asl_cross"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        
-        <include
-                layout="@layout/uss_profile"
-                android:visibility="gone" />
-        
-        <include layout="@layout/uss_leaderboard" />
-        
-        <LinearLayout
-                android:layout_width="wrap_content"
+        <RelativeLayout
+                android:id="@+id/uss_top_bar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:orientation="horizontal"
+                android:padding="@dimen/uss_margins">
             
-            <TextView
+            <com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
+                    android:id="@+id/uss_close"
+                    android:layout_width="@dimen/uss_top_bar_size"
+                    android:layout_height="@dimen/uss_top_bar_size"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/asl_cross" />
+        
+        </RelativeLayout>
+        
+        <androidx.viewpager.widget.ViewPager
+                android:id="@+id/uss_pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/uss_bottom_bar"
+                android:layout_below="@id/uss_top_bar"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true" />
+        
+        <RelativeLayout
+                android:id="@+id/uss_bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:padding="@dimen/uss_margins"
+                >
+            
+            <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:autoLink="all"
-                    android:linksClickable="true"
-                    android:text="@string/uss_link_rules" />
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+                
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:autoLink="all"
+                        android:linksClickable="true"
+                        android:text="@string/uss_link_rules" />
+                
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:autoLink="all"
+                        android:linksClickable="true"
+                        android:text="@string/uss_link_privacy" />
             
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:autoLink="all"
-                    android:linksClickable="true"
-                    android:text="@string/uss_link_privacy" />
+            </LinearLayout>
+            
+            <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_logotype" />
         
-        </LinearLayout>
-        
-        <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_logotype"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+        </RelativeLayout>
     
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 
 </FrameLayout>
 

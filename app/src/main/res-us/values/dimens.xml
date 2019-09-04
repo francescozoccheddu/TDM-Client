@@ -37,7 +37,7 @@
     <dimen name="uss_profile_avatar_size">96dp</dimen>
     <dimen name="uss_margins">16dp</dimen>
     <dimen name="uss_profile_vertical_spacing">8dp</dimen>
-    <dimen name="uss_close_size">64dp</dimen>
+    <dimen name="uss_top_bar_size">32dp</dimen>
     
     <dimen name="uss_leaderboard_fst_avatar_size">80dp</dimen>
     <dimen name="uss_leaderboard_snd_avatar_size">70dp</dimen>

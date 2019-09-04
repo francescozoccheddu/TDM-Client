@@ -5,5 +5,7 @@
         android:layout_height="match_parent"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="60dp"
-        android:requiresFadingEdge="vertical" />
+        android:requiresFadingEdge="vertical"
+        android:padding="@dimen/uss_margins"
+        />
 
