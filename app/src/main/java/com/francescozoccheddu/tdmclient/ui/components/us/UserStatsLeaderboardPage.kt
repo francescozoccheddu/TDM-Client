@@ -43,6 +43,7 @@ class UserStatsLeaderboardPage(parent: View) {
 
 
             fun bind(position: LeaderboardPosition) {
+                val index = adapterPosition
                 val itsMe = position.id == MainService.instance?.userController?.key?.id
                 if (itsMe)
                     vgRoot.setBackgroundResource(R.drawable.uss_bg_leaderboard)
@@ -53,7 +54,14 @@ class UserStatsLeaderboardPage(parent: View) {
                     if (itsMe) R.color.uss_background_overlay else R.color.foreground
                 )
                 vgRoot.elevation =
-                    if (itsMe) vgRoot.resources.getDimension(R.dimen.uss_leaderboard_elevation) else 0f
+                    if (itsMe)
+                        when (index) {
+                            0 -> vgRoot.resources.getDimension(R.dimen.uss_leaderboard_fst_elevation)
+                            1 -> vgRoot.resources.getDimension(R.dimen.uss_leaderboard_snd_elevation)
+                            2 -> vgRoot.resources.getDimension(R.dimen.uss_leaderboard_trd_elevation)
+                            else -> vgRoot.resources.getDimension(R.dimen.uss_leaderboard_nth_elevation)
+                        }
+                    else 0f
                 tvPosition.setTextColor(color)
                 tvName.setTextColor(color)
                 tvTitle.setTextColor(color)
@@ -72,11 +80,10 @@ class UserStatsLeaderboardPage(parent: View) {
                         position.score
                     )
                 Picasso.get().load(position.avatarUrl).into(ivAvatar)
-                val position = adapterPosition
-                tvPosition.text = "${position + 1}°"
+                tvPosition.text = "${index + 1}°"
                 val resources = ivAvatar.resources
                 val bodySize = resources.getDimension(
-                    when (position) {
+                    when (index) {
                         0 -> com.francescozoccheddu.tdmclient.R.dimen.uss_leaderboard_fst_body_size
                         1 -> com.francescozoccheddu.tdmclient.R.dimen.uss_leaderboard_snd_body_size
                         2 -> com.francescozoccheddu.tdmclient.R.dimen.uss_leaderboard_trd_body_size
@@ -85,7 +92,7 @@ class UserStatsLeaderboardPage(parent: View) {
                 )
                 ivAvatar.layoutParams.apply {
                     val avatarSize = resources.getDimensionPixelSize(
-                        when (position) {
+                        when (index) {
                             0 -> com.francescozoccheddu.tdmclient.R.dimen.uss_leaderboard_fst_avatar_size
                             1 -> com.francescozoccheddu.tdmclient.R.dimen.uss_leaderboard_snd_avatar_size
                             2 -> com.francescozoccheddu.tdmclient.R.dimen.uss_leaderboard_trd_avatar_size
