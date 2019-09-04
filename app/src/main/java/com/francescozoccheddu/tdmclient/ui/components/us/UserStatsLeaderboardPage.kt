@@ -100,8 +100,8 @@ class UserStatsLeaderboardPage(parent: View) {
                 adapter = listAdapter
                 VerticalOverScrollBounceEffectDecorator(
                     RecyclerViewOverScrollDecorAdapter(this),
-                    VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_FWD * 4f,
-                    VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_BCK * 4f,
+                    VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_FWD * 2f,
+                    VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_BCK * 2f,
                     VerticalOverScrollBounceEffectDecorator.DEFAULT_DECELERATE_FACTOR
                 )
             }

@@ -4,7 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fadingEdge="vertical"
-        android:fadingEdgeLength="60dp"
+        android:fadingEdgeLength="@dimen/uss_leaderboard_fading_edge_size"
         android:requiresFadingEdge="vertical"
         android:padding="@dimen/uss_margins"
         />

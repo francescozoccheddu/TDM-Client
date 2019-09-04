@@ -36,8 +36,13 @@
     <dimen name="uss_profile_name_text_size">24sp</dimen>
     <dimen name="uss_profile_avatar_size">96dp</dimen>
     <dimen name="uss_margins">16dp</dimen>
+    <dimen name="uss_profile_margins">2dp</dimen>
+    <dimen name="uss_profile_avatar_padding">8dp</dimen>
+    <dimen name="uss_profile_stats_padding">4dp</dimen>
     <dimen name="uss_profile_vertical_spacing">8dp</dimen>
     <dimen name="uss_top_bar_size">32dp</dimen>
+    <dimen name="uss_tabs_radius">14dp</dimen>
+    <dimen name="uss_tabs_height">28dp</dimen>
     
     <dimen name="uss_leaderboard_fst_avatar_size">80dp</dimen>
     <dimen name="uss_leaderboard_snd_avatar_size">70dp</dimen>
@@ -50,5 +55,8 @@
     <dimen name="uss_leaderboard_nth_body_size">7sp</dimen>
     
     <dimen name="uss_leaderboard_subtitle_size">6sp</dimen>
+    <dimen name="uss_leaderboard_position_size">12sp</dimen>
+    <dimen name="uss_leaderboard_position_width">20sp</dimen>
+    <dimen name="uss_leaderboard_fading_edge_size">60dp</dimen>
 
 </resources>

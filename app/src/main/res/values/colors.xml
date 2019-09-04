@@ -4,7 +4,7 @@
     <color name="backgroundLight">#00BCD4</color>
     <color name="backgroundDark">#0D47A1</color>
     <color name="foreground">#FFF</color>
-    <color name="foregroundHint">#81D4FA</color>
+    <color name="foregroundHint">#B2FFFFFF</color>
     <color name="scrim">#000</color>
     <color name="ripple">#80FFFFFF</color>
 </resources>

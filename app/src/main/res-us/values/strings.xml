@@ -22,4 +22,7 @@
         <a href="https://www.example.com">Informativa sulla privacy</a>
     </string>
     <string name="uss_url_site">https://www.example.com</string>
+    
+    <string name="uss_profile_page">Profilo</string>
+    <string name="uss_leaderboard_page">Classifica</string>
 </resources>

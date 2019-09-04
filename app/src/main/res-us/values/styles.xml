@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <style name="us_tabs_TextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/foregroundHint</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>

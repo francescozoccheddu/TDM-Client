@@ -4,6 +4,7 @@
         android:id="@+id/uss_profile_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/uss_profile_margins"
         android:animateLayoutChanges="true"
         android:orientation="vertical"
         android:padding="@dimen/uss_margins">
@@ -20,7 +21,7 @@
                 android:layout_width="@dimen/uss_profile_avatar_size"
                 android:layout_height="@dimen/uss_profile_avatar_size"
                 android:background="?selectableItemBackgroundBorderless"
-                android:padding="10dp"
+                android:padding="@dimen/uss_profile_avatar_padding"
                 android:src="@drawable/sb_terrain"
                 android:tintMode="multiply"
                 app:civ_border_width="0px"
@@ -55,6 +56,7 @@
             android:id="@+id/uss_profile_score_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/uss_profile_stats_padding"
             android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
             android:orientation="vertical">
@@ -89,11 +91,10 @@
             android:id="@+id/uss_profile_level_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/uss_profile_stats_padding"
             android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
-            android:orientation="vertical"
-            
-            >
+            android:orientation="vertical">
         
         <TextView
                 android:layout_width="wrap_content"
@@ -125,11 +126,10 @@
             android:id="@+id/uss_profile_multiplier_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/uss_profile_stats_padding"
             android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
-            android:orientation="vertical"
-            
-            >
+            android:orientation="vertical">
         
         <TextView
                 android:layout_width="wrap_content"
@@ -161,12 +161,11 @@
             android:id="@+id/uss_profile_next_level_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/uss_profile_stats_padding"
             android:layout_marginBottom="@dimen/uss_profile_vertical_spacing"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
-            android:visibility="gone"
-            
-            >
+            android:visibility="gone">
         
         <TextView
                 android:layout_width="wrap_content"

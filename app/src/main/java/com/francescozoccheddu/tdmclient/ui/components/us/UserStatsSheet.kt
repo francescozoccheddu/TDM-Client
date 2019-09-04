@@ -22,6 +22,7 @@ import com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.commons.event
 import com.francescozoccheddu.tdmclient.utils.commons.invoke
+import com.google.android.material.tabs.TabLayout
 import me.everything.android.ui.overscroll.HorizontalOverScrollBounceEffectDecorator
 import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator
 import me.everything.android.ui.overscroll.adapters.ViewPagerOverScrollDecorAdapter
@@ -71,16 +72,23 @@ class UserStatsSheet @JvmOverloads constructor(
             1 -> LeaderboardPageFragment().apply { sheet = this@UserStatsSheet }
             else -> throw IllegalArgumentException()
         }
+
+        override fun getPageTitle(position: Int) = when (position) {
+            0 -> resources.getString(R.string.uss_profile_page)
+            1 -> resources.getString(R.string.uss_leaderboard_page)
+            else -> null
+        }
+
     }
 
     init {
         View.inflate(context, R.layout.uss, this)
-        findViewById<ViewPager>(R.id.uss_pager).apply {
+        val pager = findViewById<ViewPager>(R.id.uss_pager).apply {
             adapter = PagerAdapter((context as AppCompatActivity).supportFragmentManager)
             HorizontalOverScrollBounceEffectDecorator(
                 ViewPagerOverScrollDecorAdapter(this),
-                VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_FWD * 4f,
-                VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_BCK * 4f,
+                VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_FWD * 2f,
+                VerticalOverScrollBounceEffectDecorator.DEFAULT_TOUCH_DRAG_MOVE_RATIO_BCK * 2f,
                 VerticalOverScrollBounceEffectDecorator.DEFAULT_DECELERATE_FACTOR
             )
             addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -103,6 +111,7 @@ class UserStatsSheet @JvmOverloads constructor(
 
             })
         }
+        findViewById<TabLayout>(R.id.uss_tabs).setupWithViewPager(pager)
         (findViewById<ImageView>(R.id.uss_coins).drawable as Animatable2).apply {
             start()
             registerAnimationCallback(object : Animatable2.AnimationCallback() {
