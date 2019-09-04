@@ -6,7 +6,6 @@ import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,7 +15,10 @@ import com.francescozoccheddu.tdmclient.data.UserController
 import com.francescozoccheddu.tdmclient.data.UserStats
 import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.android.getStyledString
+import com.francescozoccheddu.tdmclient.utils.android.setImageDrawable
 import com.francescozoccheddu.tdmclient.utils.android.visible
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.robinhood.ticker.TickerView
 import com.squareup.picasso.Picasso
 import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator
@@ -71,43 +73,45 @@ class UserStatsProfilePage(parent: View) {
             editNameState = NameEditState.IDLE
     }
 
-    private val scoreText = parent.findViewById<TickerView>(R.id.uss_profile_score_tv)
-    private val levelText = parent.findViewById<TickerView>(R.id.uss_profile_level_tv)
-    private val multiplierText = parent.findViewById<TickerView>(R.id.uss_profile_multiplier_tv)
-    private val nextLevelText = parent.findViewById<TickerView>(R.id.uss_profile_next_level_tv)
-    private val nameText = parent.findViewById<TextView>(R.id.uss_profile_name)
-    private val avatarImage = parent.findViewById<ImageView>(R.id.uss_profile_avatar)
-    private val titleText = parent.findViewById<TextView>(R.id.uss_profile_title)
-    private val nameView = parent.findViewById<View>(R.id.uss_profile_name_view)
-    private val infoGroup = parent.findViewById<ViewGroup>(R.id.uss_profile_info)
-    private val nameEditText = parent.findViewById<EditText>(R.id.uss_profile_name_edit).apply {
-        setOnFocusChangeListener { view, focused ->
-            if (!focused) {
-                if (editNameState == NameEditState.EDITING)
-                    editNameState = NameEditState.IDLE
-                val service =
-                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                service.hideSoftInputFromWindow(windowToken, 0)
+    private val tvScore = parent.findViewById<TickerView>(R.id.uss_profile_score_tv)
+    private val tvLevel = parent.findViewById<TickerView>(R.id.uss_profile_level_tv)
+    private val tvMultiplier = parent.findViewById<TickerView>(R.id.uss_profile_multiplier_tv)
+    private val tvNextLevel = parent.findViewById<TickerView>(R.id.uss_profile_next_level_tv)
+    private val tvName = parent.findViewById<TextView>(R.id.uss_profile_name)
+    private val ivAvatar = parent.findViewById<ImageView>(R.id.uss_profile_avatar)
+    private val tvTitle = parent.findViewById<TextView>(R.id.uss_profile_title)
+    private val vName = parent.findViewById<View>(R.id.uss_profile_name_view)
+    private val vgInfo = parent.findViewById<ViewGroup>(R.id.uss_profile_info)
+    private val etName =
+        parent.findViewById<TextInputEditText>(R.id.uss_profile_name_edit_text).apply {
+            setOnFocusChangeListener { view, focused ->
+                if (!focused) {
+                    if (editNameState == NameEditState.EDITING)
+                        editNameState = NameEditState.IDLE
+                    val service =
+                        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    service.hideSoftInputFromWindow(windowToken, 0)
+                }
             }
         }
-    }
-    private val nameEditButton = parent.findViewById<ImageButton>(R.id.uss_profile_edit).apply {
+    private val ilName = parent.findViewById<TextInputLayout>(R.id.uss_profile_name_edit_layout)
+    private val btName = parent.findViewById<ImageButton>(R.id.uss_profile_edit).apply {
         setOnClickListener {
             if (editNameState == NameEditState.IDLE) {
-                nameEditText.setText(nameText.text)
+                etName.setText(tvName.text)
                 editNameState = NameEditState.EDITING
             }
             else if (editNameState == NameEditState.EDITING) {
                 val service = MainService.instance
                 if (service != null) {
                     editNameState = NameEditState.SAVING
-                    service.userController.setName(nameEditText.text.toString()) {
+                    service.userController.setName(etName.text.toString()) {
                         when (it) {
                             UserController.EditNameResult.SUCCESS -> editNameState =
                                 NameEditState.IDLE
                             UserController.EditNameResult.PROFANITY -> {
                                 editNameState = NameEditState.EDITING
-                                nameEditText.error =
+                                ilName.error =
                                     resources.getString(R.string.uss_profile_name_profanity)
                             }
                             UserController.EditNameResult.REQUEST_FAILURE -> {
@@ -133,11 +137,13 @@ class UserStatsProfilePage(parent: View) {
         set(value) {
             if (value != field) {
                 field = value
-                TransitionManager.beginDelayedTransition(infoGroup)
-                nameView.visible = value == NameEditState.IDLE
-                nameEditText.visible = value != NameEditState.IDLE
-                nameEditText.isEnabled = value == NameEditState.EDITING
-                nameEditButton.isEnabled = value != NameEditState.SAVING
+                TransitionManager.beginDelayedTransition(vgInfo)
+                vName.visible = value == NameEditState.IDLE
+                ilName.visible = value != NameEditState.IDLE
+                ilName.isEnabled = value == NameEditState.EDITING
+                btName.isEnabled = value != NameEditState.SAVING
+                btName.setImageDrawable(if (value == NameEditState.IDLE) R.drawable.uss_edit else R.drawable.uss_done)
+                ilName.error = null
             }
         }
 
@@ -145,16 +151,16 @@ class UserStatsProfilePage(parent: View) {
         set(value) {
             if (value != field) {
                 field = value
-                nameText.text = value.name
-                titleText.text = value.title
-                Picasso.get().load(value.avatarUrl).into(avatarImage)
-                scoreText.text = value.score.toString()
-                levelText.text = (value.level + 1).toString()
-                multiplierText.text = value.multiplier.toString()
+                tvName.text = value.name
+                tvTitle.text = value.title
+                Picasso.get().load(value.avatarUrl).into(ivAvatar)
+                tvScore.text = value.score.toString()
+                tvLevel.text = (value.level + 1).toString()
+                tvMultiplier.text = value.multiplier.toString()
                 val nextLevelScore = value.nextLevelScore
                 nextLevelRoot.visible = nextLevelScore != null
                 if (nextLevelScore != null) {
-                    nextLevelText.text = nextLevelScore.toString()
+                    tvNextLevel.text = nextLevelScore.toString()
                     nextLevelHelp.text = nextLevelHelp.resources.getStyledString(
                         R.string.uss_next_level_help,
                         nextLevelScore - value.score,

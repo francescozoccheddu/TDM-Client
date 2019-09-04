@@ -10,7 +10,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitEnd"
-            android:src="@drawable/us_mountains"
+            android:src="@drawable/uss_mountains"
             android:tintMode="multiply" />
     
     <ImageView
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitEnd"
-            android:src="@drawable/us_coins"
+            android:src="@drawable/uss_coins"
             android:tintMode="multiply" />
     
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -40,8 +40,8 @@
                     android:layout_height="@dimen/uss_tabs_height"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:background="@drawable/us_bg_tabs"
-                    app:tabBackground="@drawable/us_sel_tab"
+                    android:background="@drawable/uss_bg_tabs"
+                    app:tabBackground="@drawable/uss_sel_tab"
                     app:tabIndicatorHeight="0dp"
                     app:tabMode="scrollable"
                     app:tabPaddingEnd="16dp"

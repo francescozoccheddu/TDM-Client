@@ -1,7 +1,6 @@
 <resources>
     
-    <style name="AppTheme.sb"
-           parent="AppTheme">
+    <style name="AppTheme.sb" parent="AppTheme">
         <item name="colorPrimary">@color/sb_background</item>
         <item name="colorPrimaryDark">@color/sb_background</item>
         <item name="colorAccent">@color/sb_foreground</item>
@@ -10,6 +9,7 @@
         <item name="android:editTextColor">@color/sb_foreground</item>
         <item name="android:tint">@color/sb_foreground</item>
         <item name="colorControlHighlight">@color/sb_ripple</item>
+        <item name="colorError">@color/foregroundHint</item>
     </style>
 
 </resources>
