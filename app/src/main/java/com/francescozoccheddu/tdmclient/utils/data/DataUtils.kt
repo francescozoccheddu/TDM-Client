@@ -29,28 +29,31 @@ class RemoteValue<RequestType, ResponseType, DataType>(val service: Server.PollS
         }
 
     init {
-        service.onRequestStatusChanged += { request ->
-            if (!request.status.pending) {
-                if (request.status.succeeded)
-                    callbacks.forEach { it(service.data) }
-                else
-                    callbacks.forEach { it(null) }
-            }
+        service.onData += { notify(it) }
+        service.onRequestStatusChanged += {
+            if (service.pendingRequests.isEmpty())
+                notify(null)
         }
+    }
+
+    private fun notify(data: DataType?) {
+        val callbacksCopy = callbacks.toList()
+        callbacks.clear()
+        callbacksCopy.forEach { it(data) }
     }
 
     private val callbacks = mutableListOf<(DataType?) -> Unit>()
 
-    fun get(forceUpdate: Boolean = false, callback: (DataType?) -> Unit) {
+    fun get(forceUpdate: Boolean = false, callback: ((DataType?) -> Unit)? = null) {
         val expiration = this.expiration
         if (forceUpdate || !service.hasData || (expiration != null && dateElapsed(service.time) > expiration)) {
-            callbacks.add(callback)
+            if (callback != null)
+                callbacks.add(callback)
             if (service.pendingRequests.isEmpty())
                 service.poll()
         }
-        else {
-            callback(service.data)
-        }
+        else
+            callback?.invoke(service.data)
     }
 }
 

@@ -143,7 +143,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        userStatsComponent = UserStatsComponent(us_root)
+        userStatsComponent = UserStatsComponent(us_root).apply {
+            onLeaderboardRequested += {
+                service?.dataRetriever?.getLeaderboard {
+                    if (it != null)
+                        leaderboard = it
+                }
+            }
+            onUserStatsRequested += {
+                service?.userController?.requestStatsUpdate()
+            }
+        }
 
         routingController = RoutingController(bg_root, this).apply {
             onDestinationChanged += {

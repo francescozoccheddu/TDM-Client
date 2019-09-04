@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
 import com.francescozoccheddu.tdmclient.utils.commons.dateElapsed
+import com.francescozoccheddu.tdmclient.utils.data.RemoteValue
 import com.francescozoccheddu.tdmclient.utils.data.client.Server
 import java.util.*
 import kotlin.math.max
@@ -23,12 +24,13 @@ class UserController(val key: UserKey, server: Server) {
     private lateinit var lastNotifySetDate: Date
     private var lastNotifySetLevel = 0
 
-    private val getService = makeUserService(server, key).apply {
+    private val getValue = RemoteValue(makeUserService(server, key).apply {
         onData += {
             stats = it
             setLastNotifiedLevel()
         }
-    }
+    })
+
     private val setService = makeEditUserService(server)
 
     enum class EditNameResult {
@@ -122,7 +124,7 @@ class UserController(val key: UserKey, server: Server) {
     val onLevelUp = FuncEvent<Int>()
 
     fun submitStats(stats: UserStats, time: Date) {
-        getService.submit(time, stats)
+        getValue.service.submit(time, stats)
     }
 
     fun loadStats(prefs: SharedPreferences, key: String = DEFAULT_STATS_PREF_KEY) {
@@ -165,8 +167,8 @@ class UserController(val key: UserKey, server: Server) {
         }
     }
 
-    fun requestStatsUpdate() {
-        getService.poll()
+    fun requestStatsUpdate(force: Boolean = false, callback: ((UserStats?) -> Unit)? = null) {
+        getValue.get(force, callback)
     }
 
 }
