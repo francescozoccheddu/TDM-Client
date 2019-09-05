@@ -10,6 +10,7 @@ import com.francescozoccheddu.tdmclient.R
 import com.francescozoccheddu.tdmclient.data.PlaceQuerier
 import com.francescozoccheddu.tdmclient.utils.commons.FuncEvent
 import com.francescozoccheddu.tdmclient.utils.commons.ProcEvent
+import com.francescozoccheddu.tdmclient.utils.commons.hmIntervalString
 import com.francescozoccheddu.tdmclient.utils.commons.snap
 import com.francescozoccheddu.tdmclient.utils.data.travelDuration
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -63,10 +64,7 @@ class LocationSearchProvider {
                     tvDistance.text = run {
                         val tm = (travelDuration(a.distanceTo(b).toFloat()) / 60f)
                         val m = tm.snap(if (tm < 3) 1f else if (tm < 30f) 5f else 15f).toInt()
-                        val h = m / 60
-                        if (h > 0) "${h}h ${m % 60}m"
-                        else if (m > 0) "${m}m"
-                        else "<1m"
+                        hmIntervalString(m)
                     }
                     tvDistance.visibility = View.VISIBLE
                 }
