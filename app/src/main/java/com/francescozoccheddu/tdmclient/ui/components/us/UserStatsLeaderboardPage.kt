@@ -3,7 +3,6 @@ package com.francescozoccheddu.tdmclient.ui.components.us
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +14,7 @@ import com.francescozoccheddu.tdmclient.ui.MainService
 import com.francescozoccheddu.tdmclient.utils.android.getStyledString
 import com.francescozoccheddu.tdmclient.utils.android.visible
 import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator
 import me.everything.android.ui.overscroll.adapters.RecyclerViewOverScrollDecorAdapter
 
@@ -29,7 +29,7 @@ class UserStatsLeaderboardPage(parent: View) {
             private val tvName =
                 viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_name)
             private val ivAvatar =
-                viewGroup.findViewById<ImageView>(R.id.uss_leaderboard_item_avatar)
+                viewGroup.findViewById<CircleImageView>(R.id.uss_leaderboard_item_avatar)
             private val tvTitle =
                 viewGroup.findViewById<TextView>(R.id.uss_leaderboard_item_title)
             private val tvLevel =

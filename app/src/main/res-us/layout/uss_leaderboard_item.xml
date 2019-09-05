@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
+            android:alpha="0.75"
             android:ellipsize="none"
             android:singleLine="true"
             android:textSize="@dimen/uss_leaderboard_position_size" />
@@ -54,7 +55,9 @@
         <TextView
                 android:id="@+id/uss_leaderboard_item_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:alpha="0.7"
+                android:textStyle="italic" />
     
     </LinearLayout>
     
@@ -75,7 +78,8 @@
         <TextView
                 android:id="@+id/uss_leaderboard_item_level"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:alpha="0.8" />
     
     </LinearLayout>
 

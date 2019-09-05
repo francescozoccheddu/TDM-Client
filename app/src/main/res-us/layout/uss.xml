@@ -52,8 +52,8 @@
             
             <com.francescozoccheddu.tdmclient.ui.utils.InOutImageButton
                     android:id="@+id/uss_close"
-                    android:layout_width="@dimen/uss_button_size"
-                    android:layout_height="@dimen/uss_button_size"
+                    android:layout_width="@dimen/uss_close_size"
+                    android:layout_height="@dimen/uss_close_size"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:background="?selectableItemBackgroundBorderless"
