@@ -8,9 +8,8 @@
     <string name="uss_next_level">score to level up</string>
     <string name="uss_next_level_help"><b>Required score to get to the next level</b>\nGet %1$d more points to get to level %2$d!</string>
     <string name="uss_link_rules"><a href="https://www.example.com">Terms of service</a></string>
-    <string name="uss_link_privacy">"<a href="https://www.example.com">Privacy policy</a>\n    "</string>
+    <string name="uss_link_privacy">"<a href="https://www.example.com">Privacy policy</a>"</string>
     <string name="uss_url_site" translatable="false">https://www.example.com</string>
-    
     <string name="uss_profile_page">Profile</string>
     <string name="uss_leaderboard_page">Leaderboard</string>
     <string name="uss_leaderboard_score">%1$d&lt;small>pt&lt;/small></string>
