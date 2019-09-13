@@ -1,33 +1,25 @@
 <resources>
-    <string name="uss_score">punteggio</string>
-    <string name="uss_score_help"><b>Il tuo punteggio attuale</b>\nPasseggia nelle zone evidenziate nella mappa per
-        guadagnare punti!
-    </string>
-    <string name="uss_level">livello</string>
-    <string name="uss_level_help"><b>Il tuo livello attuale</b>\nDetermina il moltiplicatore del punteggio. \nOttieni
-        più punti per aumentare il livello.
-    </string>
-    <string name="uss_multiplier">moltiplicatore</string>
-    <string name="uss_multiplier_help"><b>Il moltiplicatore del punteggio</b>\nUn moltiplicatore più alto ti consentirà
-        di guadagnare punti più velocemente. \nOttieni più punti per aumentare il moltiplicatore!
-    </string>
-    <string name="uss_next_level">punti per il prossimo livello</string>
-    <string name="uss_next_level_help">&lt;b>Il punteggio necessario per passare al prossimo livello&lt;/b>\nOttieni altri %1$d
-        punti per passare al livello %2$d!
-    </string>
-    <string name="uss_link_rules">
+    <string name="uss_score">score</string>
+    <string name="uss_score_help">"<b>Your current score</b>\nWalk near the highlighted areas in the map to get more points!\n    "</string>
+    <string name="uss_level">level</string>
+    <string name="uss_level_help">"<b>Your current level</b>\nIt affects the score multiplier. \nGet more points to level up.\n    "</string>
+    <string name="uss_multiplier">multiplier</string>
+    <string name="uss_multiplier_help">"<b>The score multiplier</b>\nHigher multipliers will allow you to get points faster. \nGet more points to increase your multiplier!\n    "</string>
+    <string name="uss_next_level">score to level up</string>
+    <string name="uss_next_level_help"><b>Required score to get to the next level</b>\nGet %1$d more points to get to level %2$d!</string>
+    <string name="uss_link_rules" translatable="false">
         <a href="https://www.example.com">Regolamento</a>
     </string>
-    <string name="uss_link_privacy">
+    <string name="uss_link_privacy" translatable="false">
         <a href="https://www.example.com">Informativa sulla privacy</a>
     </string>
-    <string name="uss_url_site">https://www.example.com</string>
+    <string name="uss_url_site" translatable="false">https://www.example.com</string>
     
-    <string name="uss_profile_page">Profilo</string>
-    <string name="uss_leaderboard_page">Classifica</string>
+    <string name="uss_profile_page">Profile</string>
+    <string name="uss_leaderboard_page">Leaderboard</string>
     <string name="uss_leaderboard_score">%1$d&lt;small>pt&lt;/small></string>
     <string name="uss_leaderboard_level">&lt;small>lv&lt;/small>%1$d</string>
-    <string name="uss_leaderboard_loading">Caricamento in corso</string>
-    <string name="uss_profile_name_profanity">Il nome non può contenere parole offensive o volgari.</string>
-    <string name="uss_profile_name_failure">Errore di rete.</string>
+    <string name="uss_leaderboard_loading">Loading</string>
+    <string name="uss_profile_name_profanity">Your name cannot contain offensive or rude words.</string>
+    <string name="uss_profile_name_failure">Network error.</string>
 </resources>

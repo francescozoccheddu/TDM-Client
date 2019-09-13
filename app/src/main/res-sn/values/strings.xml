@@ -1,12 +1,12 @@
 <resources>
-    <string name="sn_channel">Notifiche</string>
+    <string name="sn_channel">Notifications</string>
     <string name="sn_title">TDM Client</string>
-    <string name="sn_content_ok">In esecuzione</string>
-    <string name="sn_content_unknown_location">Localizzazione in corso</string>
-    <string name="sn_content_unreachable">Servizio non disponibile</string>
-    <string name="sn_content_offline">Nessuna connessiona ad Internet</string>
-    <string name="sn_content_unlocatable">Servizi di localizzazione disattivati</string>
-    <string name="sn_action_unlocatable">Abilita</string>
-    <string name="sn_content_device_lost">Connessione col sensore persa</string>
-    <string name="sn_action_kill">Interrompi</string>
+    <string name="sn_content_ok">Running</string>
+    <string name="sn_content_unknown_location">Locating your position</string>
+    <string name="sn_content_unreachable">Service unavailable</string>
+    <string name="sn_content_offline">No Internet connection</string>
+    <string name="sn_content_unlocatable">Location services are not enabled</string>
+    <string name="sn_action_unlocatable">Enable</string>
+    <string name="sn_content_device_lost">Lost connection with the sensor</string>
+    <string name="sn_action_kill">Quit</string>
 </resources>

@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">TDM-Client</string>
-    <string name="mapbox_access_token" translatable="false">
-        pk.eyJ1IjoiZnJhbmNlc2NvenoiLCJhIjoiY2pzYndrOTg5MGVrdzN5cGR2ZjdkY3ZnMiJ9.MCiDPh-MIjlWxN1IdzrYSg
-    </string>
-    <string name="date_minutes_zero">less than a minute</string>
+    <string name="date_minutes_zero">meno di un minuto</string>
     <plurals name="date_minutes">
         <item quantity="one">1 minuto</item>
         <item quantity="other">%1$d minuti</item>
@@ -12,5 +9,5 @@
         <item quantity="one">1 ora</item>
         <item quantity="other">%1$d ore</item>
     </plurals>
-    <string name="date_format_hours_minutes">%1$s and %2$s</string>
+    <string name="date_format_hours_minutes">%1$s e %2$s</string>
 </resources>
