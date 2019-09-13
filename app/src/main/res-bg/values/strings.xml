@@ -13,7 +13,7 @@
     <string name="bg_picking">Choose your destination</string>
     <string name="bg_action_picking">Cancel</string>
     <string name="bg_action_destinated">Accept</string>
-    <string name="bg_action_routed">Abort</string>
+    <string name="bg_action_routed">Cancel</string>
     <string name="bg_unknown_place">Unknown place</string>
     <string name="bg_routed">Route calculated</string>
     <string name="bg_route_completed">Destination reached!</string>
